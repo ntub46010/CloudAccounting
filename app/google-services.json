@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "231691327468",
+    "firebase_url": "https://accountingbook-60e34.firebaseio.com",
+    "project_id": "accountingbook-60e34",
+    "storage_bucket": "accountingbook-60e34.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:231691327468:android:9ca31d0b79b31d01",
+        "android_client_info": {
+          "package_name": "com.vincent.acnt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "231691327468-e7l8nc0ftklsgve1f4ffng2riktlu05d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vincent.acnt",
+            "certificate_hash": "98226e65c4cbe703dd1801caa7511b5bab1a0bad"
+          }
+        },
+        {
+          "client_id": "231691327468-7rja52iop4i2mpojekpgk4inlligqntb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD74YuLZBu1ThxW1TrTgkQOolOwqsv7C5w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "231691327468-7rja52iop4i2mpojekpgk4inlligqntb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
