@@ -1,3 +1,36 @@
 <resources>
     <string name="app_name">AccountingBook</string>
+
+    <array name="ary_subject_type">
+        <item>資產</item>
+        <item>負債</item>
+        <item>權益</item>
+        <item>收益</item>
+        <item>費損</item>
+    </array>
+
+    <array name="ary_direction">
+        <item>借</item>
+        <item>貸</item>
+    </array>
+
+    <array name="ary_month">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+    </array>
+
+    <string name="chk_format_wrong">%1s格式不正確\n</string>
+    <string name="chk_subject_name_wrong">第%1s個科目名稱不存在\n</string>
+    <string name="chk_max_words">%1s最多%2s字\n</string>
+
 </resources>

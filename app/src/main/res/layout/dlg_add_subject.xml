@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp">
+
+    <TableRow>
+        <TextView
+            style="@style/text"
+            android:text="類別："/>
+        <Spinner
+            android:id="@+id/spnSubjectType"
+            android:entries="@array/ary_subject_type"/>
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            style="@style/text"
+            android:text="科目編號："/>
+        <EditText
+            android:id="@+id/edtSubjectId"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:hint="兩位數字"
+            android:singleLine="true"
+            android:inputType="number"/>
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            style="@style/text"
+            android:text="科目名稱："/>
+        <EditText
+            android:id="@+id/edtSubjectName"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:hint="中文30字以內"
+            android:singleLine="true"/>
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            style="@style/text"
+            android:text="初始借方金額："/>
+        <EditText
+            android:id="@+id/edtCredit"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:inputType="number"/>
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            style="@style/text"
+            android:text="初始貸方金額："/>
+        <EditText
+            android:id="@+id/edtDebit"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:inputType="number"/>
+    </TableRow>
+
+
+</TableLayout>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        style="@style/text"
+        android:text="指定期間："/>
+
+    <Spinner
+        android:id="@+id/spnYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        style="@style/text"
+        android:text="年"/>
+
+    <Spinner
+        android:id="@+id/spnMonth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        style="@style/text"
+        android:text="月"/>
+
+</LinearLayout>

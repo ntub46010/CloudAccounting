@@ -16,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".SubjectActivity" />
+        <activity android:name=".JournalActivity" />
+        <activity android:name=".EntryCreateActivity" />
+        <activity android:name=".EntryUpdateActivity"></activity>
     </application>
 
 </manifest>
