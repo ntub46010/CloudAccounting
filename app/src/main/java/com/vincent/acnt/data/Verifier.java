@@ -55,4 +55,11 @@ public class Verifier {
             return c.getString(R.string.chk_max_words, "摘要", "100");
     }
 
+    public String chkPs(String s) {
+        if (Pattern.matches(ptnMemo, s))
+            return "";
+        else
+            return c.getString(R.string.chk_max_words, "備註", "100");
+    }
+
 }

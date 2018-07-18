@@ -2,21 +2,15 @@ package com.vincent.acnt.data;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.widget.TextView;
+
+import com.vincent.acnt.R;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
 public class DataHelper {
-    public static int CODE_CREDIT = 1;
-    public static int CODE_DEBIT = 2;
-
-    public static String PRO_STAMP = "stamp";
-    public static String PRO_SUBJECT_ID = "subjectId";
-    public static String KEY_SUBJECTS = "Subjects";
-    public static String PRO_SUBJECTS = "subjects";
-    public static String KEY_ENTRIES = "Entries";
-    public static String PRO_DATE = "date";
-    public static String PRO_MEMO = "memo";
-    public static String PRO_DOCUMENT_ID = "documentId";
 
     public static AlertDialog.Builder getPlainDialog(Context context, String title, String message) {
         return new AlertDialog.Builder(context)
@@ -50,10 +44,13 @@ public class DataHelper {
 
     public static int binarySearchNumber(ArrayList<Integer> ary, Integer target) {
         int left = 0, right = ary.size() - 1;
+        if (ary.get(right).compareTo(target) == 0)
+            return right;
+
         while (left <= right) {
             int middle = (right + left) / 2;
 
-            if (ary.get(middle) == target)
+            if (ary.get(middle).compareTo(target) == 0)
                 return middle;
 
             if (ary.get(middle) > target)
@@ -62,6 +59,7 @@ public class DataHelper {
                 left = middle + 1;
         }
         return -1;
+
         //int first = 0, last = ary.size();
 		/*
 		 	假設first、mid, last為最後三個索引(5、6、7)，但未找到
@@ -87,7 +85,7 @@ public class DataHelper {
         */
     }
 
-    public static String getEngMonth(String  month) {
+    public static String getEngMonth(String month) {
         switch (month){
             case "01":
                 return "Jun";
@@ -115,6 +113,24 @@ public class DataHelper {
                 return "Dec";
             default:
                 return "";
+        }
+    }
+
+    public static int getSubjectColor(Context context, Subject subject) {
+        MyApp app = (MyApp) context.getApplicationContext();
+        switch (subject.getSubjectId().substring(0, 1)) {
+            case "1":
+                return app.getResource().getColor(R.color.type_asset);
+            case "2":
+                return app.getResource().getColor(R.color.type_liability);
+            case "3":
+                return app.getResource().getColor(R.color.type_capital);
+            case "4":
+                return app.getResource().getColor(R.color.type_revenue);
+            case "5":
+                return app.getResource().getColor(R.color.type_expense);
+            default:
+                return app.getResource().getColor(R.color.type_asset);
         }
     }
 }

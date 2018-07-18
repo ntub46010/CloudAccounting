@@ -3,6 +3,7 @@
     package="com.vincent.acnt">
 
     <application
+        android:name=".data.MyApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,7 +20,8 @@
         <activity android:name=".SubjectActivity" />
         <activity android:name=".JournalActivity" />
         <activity android:name=".EntryCreateActivity" />
-        <activity android:name=".EntryUpdateActivity"></activity>
+        <activity android:name=".EntryUpdateActivity" />
+        <activity android:name=".EntryDetailActivity"></activity>
     </application>
 
 </manifest>

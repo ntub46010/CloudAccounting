@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.data.Entry;
 import com.vincent.acnt.data.EntryElementView;
+import com.vincent.acnt.data.MyApp;
 import com.vincent.acnt.data.Subject;
 import com.vincent.acnt.data.Verifier;
 
@@ -34,10 +35,10 @@ import java.util.Calendar;
 
 import javax.annotation.Nullable;
 
-import static com.vincent.acnt.data.DataHelper.CODE_CREDIT;
-import static com.vincent.acnt.data.DataHelper.KEY_SUBJECTS;
-import static com.vincent.acnt.data.DataHelper.PRO_SUBJECT_ID;
 import static com.vincent.acnt.data.DataHelper.getPlainDialog;
+import static com.vincent.acnt.data.MyApp.CODE_CREDIT;
+import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
 
 public class EntryEditActivity  extends AppCompatActivity {
     protected Context context;
@@ -47,7 +48,7 @@ public class EntryEditActivity  extends AppCompatActivity {
     protected FirebaseFirestore db;
 
     protected ImageView btnSubmit;
-    protected EditText edtDate, edtMemo;
+    protected EditText edtDate, edtMemo, edtPs;
     protected LinearLayout layEntry;
     protected Button btnElementView;
 
@@ -63,7 +64,7 @@ public class EntryEditActivity  extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(layout);
-        db = FirebaseFirestore.getInstance();
+        db = ((MyApp) getApplication()).getFirestore();
         setResult(0);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -81,6 +82,7 @@ public class EntryEditActivity  extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btnSubmit);
         edtDate = findViewById(R.id.edtDate);
         edtMemo = findViewById(R.id.edtMemo);
+        edtPs = findViewById(R.id.edtPs);
         layEntry = findViewById(R.id.layEntry);
         btnElementView = findViewById(R.id.btnAddField);
 
@@ -152,7 +154,7 @@ public class EntryEditActivity  extends AppCompatActivity {
         });
     }
 
-    private void addElementView() {
+    protected void addElementView() {
         LinearLayout layElement = (LinearLayout) inflater.inflate(R.layout.content_entry_element, null);
         EntryElementView view = new EntryElementView(
                 (AutoCompleteTextView) layElement.findViewById(R.id.actSubject),
@@ -174,7 +176,8 @@ public class EntryEditActivity  extends AppCompatActivity {
 
         entry = new Entry(
                 Integer.parseInt(date),
-                edtMemo.getText().toString()
+                edtMemo.getText().toString(),
+                edtPs.getText().toString()
         );
 
         Subject subject;
@@ -192,10 +195,12 @@ public class EntryEditActivity  extends AppCompatActivity {
             else
                 subject.setDebit(view.getAmount());
 
-            //設置戳記，當科目名稱更改時，能憑此戳記找到對應科目
+            //設置戳記與編號，當科目名稱更改時，能憑此戳記找到對應科目
             for (int i = 0; i < subjectNames.size(); i++) {
-                if (subject.getName().equals(subjectNames.get(i)))
+                if (subject.getName().equals(subjectNames.get(i))) {
                     subject.setStamp(subjectStamps.get(i));
+                    subject.setSubjectId(subjectIds.get(i));
+                }
             }
 
             entry.addSubject(subject);
@@ -216,6 +221,7 @@ public class EntryEditActivity  extends AppCompatActivity {
             errMsg.append("日期未輸入\n");
 
         errMsg.append(v.chkMemo(entry.getMemo()));
+        errMsg.append(v.chkPs(entry.getPs()));
 
         Subject subject;
         for (int i = 0; i < entry.getSubjects().size(); i++) {
@@ -245,6 +251,7 @@ public class EntryEditActivity  extends AppCompatActivity {
         elementViews.clear();
         edtDate.setText(null);
         edtMemo.setText(null);
+        edtPs.setText(null);
         layEntry.removeAllViews();
     }
 

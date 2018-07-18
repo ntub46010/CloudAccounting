@@ -32,6 +32,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.vincent.acnt.adapter.SubjectAdapter;
 import com.vincent.acnt.data.Entry;
+import com.vincent.acnt.data.MyApp;
 import com.vincent.acnt.data.Subject;
 import com.vincent.acnt.data.Verifier;
 
@@ -39,11 +40,11 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import static com.vincent.acnt.data.DataHelper.KEY_ENTRIES;
-import static com.vincent.acnt.data.DataHelper.KEY_SUBJECTS;
-import static com.vincent.acnt.data.DataHelper.PRO_SUBJECT_ID;
 import static com.vincent.acnt.data.DataHelper.binarySearchNumber;
 import static com.vincent.acnt.data.DataHelper.getPlainDialog;
+import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
 
 public class SubjectActivity extends AppCompatActivity {
     private Context context;
@@ -59,7 +60,7 @@ public class SubjectActivity extends AppCompatActivity {
     private int longClickPosition;
 
     private Subject subject;
-    private int subjectId;
+    private int subjectId, mode;
     private ArrayList<Integer> subjectIds;
 
     @Override
@@ -67,7 +68,7 @@ public class SubjectActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subject);
         context = this;
-        db = FirebaseFirestore.getInstance();
+        db = ((MyApp) getApplication()).getFirestore();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -87,7 +88,8 @@ public class SubjectActivity extends AppCompatActivity {
         fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                prepareDialog(1);
+                mode = 1;
+                prepareDialog();
             }
         });
 
@@ -125,7 +127,7 @@ public class SubjectActivity extends AppCompatActivity {
         });
     }
 
-    private void prepareDialog(int mode) {
+    private void prepareDialog() {
         LayoutInflater inflater = LayoutInflater.from(context);
         LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.dlg_add_subject, null);
 
@@ -293,8 +295,10 @@ public class SubjectActivity extends AppCompatActivity {
 
         errMsg.append(v.chkId(String.valueOf(subject.getSubjectId())));
         //檢查編號重複
-        if (binarySearchNumber(subjectIds, Integer.parseInt(subject.getSubjectId())) != -1)
-            errMsg.append("科目編號").append(subject.getSubjectId()).append("已被使用\n");
+        if (mode == 1) {
+            if (binarySearchNumber(subjectIds, Integer.parseInt(subject.getSubjectId())) != -1)
+                errMsg.append("科目編號").append(subject.getSubjectId()).append("已被使用\n");
+        }
 
         errMsg.append(v.chkSubjectName(subject.getName()));
 
@@ -329,7 +333,8 @@ public class SubjectActivity extends AppCompatActivity {
         subject = (Subject) adapter.getItem(longClickPosition);
         switch (item.getItemId()) {
             case mnuEditSubject:
-                prepareDialog(2);
+                mode = 2;
+                prepareDialog();
                 break;
 
             case mnuDelSubject:

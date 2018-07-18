@@ -16,11 +16,11 @@ import com.vincent.acnt.data.Subject;
 
 import java.util.ArrayList;
 
-import static com.vincent.acnt.data.DataHelper.PRO_DATE;
-import static com.vincent.acnt.data.DataHelper.PRO_DOCUMENT_ID;
-import static com.vincent.acnt.data.DataHelper.KEY_ENTRIES;
-import static com.vincent.acnt.data.DataHelper.PRO_MEMO;
-import static com.vincent.acnt.data.DataHelper.KEY_SUBJECTS;
+import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.data.MyApp.PRO_DATE;
+import static com.vincent.acnt.data.MyApp.PRO_DOCUMENT_ID;
+import static com.vincent.acnt.data.MyApp.PRO_MEMO;
 
 public class EntryUpdateActivity extends EntryEditActivity {
     private String documentId;

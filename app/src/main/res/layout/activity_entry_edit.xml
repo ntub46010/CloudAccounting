@@ -30,7 +30,8 @@
 
                 <TextView
                     style="@style/text"
-                    android:text="日期："/>
+                    android:text="日期："
+                    android:textSize="19sp"/>
 
                 <EditText
                     android:id="@+id/edtDate"
@@ -42,10 +43,23 @@
 
                 <TextView
                     style="@style/text"
-                    android:text="摘要："/>
+                    android:text="摘要："
+                    android:textSize="19sp"/>
 
                 <EditText
                     android:id="@+id/edtMemo"
+                    android:layout_width="280dp"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:maxLines="3"/>
+
+                <TextView
+                    style="@style/text"
+                    android:text="備註："
+                    android:textSize="19sp"/>
+
+                <EditText
+                    android:id="@+id/edtPs"
                     android:layout_width="280dp"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
@@ -56,7 +70,8 @@
             <TextView
                 style="@style/text"
                 android:layout_marginTop="3dp"
-                android:text="分錄："/>
+                android:text="分錄："
+                android:textSize="19sp"/>
 
             <Button
                 android:id="@+id/btnAddField"

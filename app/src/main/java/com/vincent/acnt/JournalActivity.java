@@ -29,18 +29,19 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.EntryCardAdapter;
 import com.vincent.acnt.data.Entry;
+import com.vincent.acnt.data.MyApp;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import javax.annotation.Nullable;
 
-import static com.vincent.acnt.data.DataHelper.PRO_DATE;
-import static com.vincent.acnt.data.DataHelper.PRO_DOCUMENT_ID;
-import static com.vincent.acnt.data.DataHelper.KEY_ENTRIES;
-import static com.vincent.acnt.data.DataHelper.PRO_MEMO;
-import static com.vincent.acnt.data.DataHelper.KEY_SUBJECTS;
 import static com.vincent.acnt.data.DataHelper.getPlainDialog;
+import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.data.MyApp.PRO_DATE;
+import static com.vincent.acnt.data.MyApp.PRO_DOCUMENT_ID;
+import static com.vincent.acnt.data.MyApp.PRO_MEMO;
 
 public class JournalActivity extends AppCompatActivity {
     private Context context;
@@ -66,7 +67,7 @@ public class JournalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_journal);
         context = this;
-        db = FirebaseFirestore.getInstance();
+        db = ((MyApp) getApplication()).getFirestore();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);

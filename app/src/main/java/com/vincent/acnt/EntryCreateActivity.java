@@ -12,7 +12,7 @@ import com.google.firebase.firestore.DocumentReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static com.vincent.acnt.data.DataHelper.KEY_ENTRIES;
+import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 
 public class EntryCreateActivity extends EntryEditActivity {
 
@@ -22,6 +22,8 @@ public class EntryCreateActivity extends EntryEditActivity {
         layout = R.layout.activity_entry_edit;
         activityTitle = "新建會計分錄";
         super.onCreate(savedInstanceState);
+        addElementView();
+        addElementView();
 
         edtDate.setText(new SimpleDateFormat("yyyy/MM/dd").format(new Date()));
 

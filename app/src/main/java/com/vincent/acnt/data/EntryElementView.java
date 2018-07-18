@@ -6,8 +6,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import static com.vincent.acnt.data.DataHelper.CODE_CREDIT;
-import static com.vincent.acnt.data.DataHelper.CODE_DEBIT;
+import static com.vincent.acnt.data.MyApp.CODE_CREDIT;
+import static com.vincent.acnt.data.MyApp.CODE_DEBIT;
 
 public class EntryElementView {
     private AutoCompleteTextView actSubject;

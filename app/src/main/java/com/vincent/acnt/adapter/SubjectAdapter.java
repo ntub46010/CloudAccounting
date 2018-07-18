@@ -1,7 +1,6 @@
 package com.vincent.acnt.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,18 +8,22 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.vincent.acnt.R;
+import com.vincent.acnt.data.MyApp;
 import com.vincent.acnt.data.Subject;
 
 import java.util.ArrayList;
 
 import static com.vincent.acnt.data.DataHelper.Comma;
+import static com.vincent.acnt.data.DataHelper.getSubjectColor;
 
 public class SubjectAdapter extends BaseAdapter {
+    private Context context;
     private LayoutInflater layoutInflater;
     private ArrayList<Subject> subjects;
 
     public SubjectAdapter (Context context, ArrayList<Subject> subjects) {
-        layoutInflater = LayoutInflater.from(context);
+        this.context = context;
+        this.layoutInflater = LayoutInflater.from(context);
         this.subjects = subjects;
     }
 
@@ -55,23 +58,7 @@ public class SubjectAdapter extends BaseAdapter {
         txtCredit.setText("借：" + Comma(subject.getCredit()));
         txtDebit.setText("貸：" + Comma(subject.getDebit()));
 
-        switch (subject.getSubjectId().substring(0, 1)) {
-            case "1":
-                txtId.setTextColor(Color.parseColor("#F56800"));
-                break;
-            case "2":
-                txtId.setTextColor(Color.parseColor("#0D8F06"));
-                break;
-            case "3":
-                txtId.setTextColor(Color.parseColor("#F02A2A"));//D53756
-                break;
-            case "4":
-                txtId.setTextColor(Color.parseColor("#5462C7"));
-                break;
-            case "5":
-                txtId.setTextColor(Color.parseColor("#883DAE"));
-                break;
-        }
+        txtId.setTextColor(getSubjectColor(context, subject));
 
         return view;
     }

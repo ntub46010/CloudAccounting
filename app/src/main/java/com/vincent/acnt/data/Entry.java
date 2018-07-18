@@ -1,21 +1,23 @@
 package com.vincent.acnt.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static com.vincent.acnt.data.DataHelper.Comma;
 
-public class Entry {
+public class Entry implements Serializable {
     private long date;
     private ArrayList<Subject> subjects;
-    private String memo;
+    private String memo, ps;
     private String documentId;
 
     public Entry() {}
 
-    public Entry(int date, String memo) {
+    public Entry(int date, String memo, String ps) {
         this.subjects = new ArrayList<>();
         this.date = date;
         this.memo = memo;
+        this.ps = ps;
     }
 
     public long getDate() {
@@ -24,6 +26,10 @@ public class Entry {
 
     public String getMemo() {
         return memo;
+    }
+
+    public String getPs() {
+        return ps;
     }
 
     public ArrayList<Subject> getSubjects() {
@@ -40,6 +46,10 @@ public class Entry {
 
     public void setMemo(String memo) {
         this.memo = memo;
+    }
+
+    public void setPs(String ps) {
+        this.ps = ps;
     }
 
     public void setSubjects(ArrayList<Subject> subjects) {
@@ -72,11 +82,4 @@ public class Entry {
         return debit;
     }
 
-    /*public String gainDetailText() {
-        StringBuffer sb = new StringBuffer();
-        for (Subject subject : subjects)
-            sb.append(String.format("%s：%s／%s", subject.getName(), Comma(subject.getCredit()), Comma(subject.getDebit()))).append("\n");
-
-        return sb.toString();
-    }*/
 }
