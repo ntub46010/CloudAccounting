@@ -5,12 +5,11 @@ public class LedgerRecord {
     private String memo;
     private int credit, debit, balance;
 
-    public LedgerRecord(long date, String memo, int credit, int debit, int balance) {
+    public LedgerRecord(long date, String memo, int credit, int debit) {
         this.date = date;
         this.memo = memo;
         this.credit = credit;
         this.debit = debit;
-        this.balance = balance;
     }
 
     public long getDate() {
@@ -37,11 +36,4 @@ public class LedgerRecord {
         this.balance = balance;
     }
 
-    public void setCredit(int credit) {
-        this.credit = credit;
-    }
-
-    public void setDebit(int debit) {
-        this.debit = debit;
-    }
 }

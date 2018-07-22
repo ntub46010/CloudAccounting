@@ -28,6 +28,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.vincent.acnt.adapter.SubjectAdapter;
@@ -103,28 +104,30 @@ public class SubjectActivity extends AppCompatActivity {
         //顯示科目清單
         prgBar.setVisibility(View.VISIBLE);
         lstSubject.setVisibility(View.GONE);
-        db.collection(KEY_SUBJECTS).orderBy(PRO_SUBJECT_ID).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                ArrayList<Subject> subjects = new ArrayList<>();
-                subjectIds = new ArrayList<>();
-                Subject subject;
-                for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
-                    subject = documentSnapshot.toObject(Subject.class);
-                    subject.giveDocumentId(documentSnapshot.getId());
-                    subjects.add(subject);
+        db.collection(KEY_SUBJECTS)
+                .orderBy(PRO_SUBJECT_ID, Query.Direction.ASCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        ArrayList<Subject> subjects = new ArrayList<>();
+                        subjectIds = new ArrayList<>();
+                        Subject subject;
+                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
+                            subject = documentSnapshot.toObject(Subject.class);
+                            subject.giveDocumentId(documentSnapshot.getId());
+                            subjects.add(subject);
 
-                    //取得各科目編號，供新增與編輯科目時確認
-                    subjectIds.add(Integer.parseInt(subject.getSubjectId()));
-                }
+                            //取得各科目編號，供新增與編輯科目時確認
+                            subjectIds.add(Integer.parseInt(subject.getSubjectId()));
+                        }
 
-                adapter = new SubjectAdapter(context, subjects);
-                lstSubject.setAdapter(adapter);
+                        adapter = new SubjectAdapter(context, subjects);
+                        lstSubject.setAdapter(adapter);
 
-                prgBar.setVisibility(View.GONE);
-                lstSubject.setVisibility(View.VISIBLE);
-            }
-        });
+                        prgBar.setVisibility(View.GONE);
+                        lstSubject.setVisibility(View.VISIBLE);
+                    }
+                });
     }
 
     private void prepareDialog() {

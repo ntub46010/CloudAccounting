@@ -11,6 +11,11 @@ public class MyApp extends Application {
 
     public static int CODE_CREDIT = 1;
     public static int CODE_DEBIT = 2;
+    public static final String CODE_ASSET = "1";
+    public static final String CODE_LIABILITY = "2";
+    public static final String CODE_CAPITAL = "3";
+    public static final String CODE_REVENUE = "4";
+    public static final String CODE_EXPANSE = "5";
     public static String PRO_STAMP = "stamp";
     public static String PRO_NAME = "name";
     public static String PRO_SUBJECT_ID = "subjectId";
@@ -21,6 +26,7 @@ public class MyApp extends Application {
     public static String PRO_DATE = "date";
     public static String PRO_MEMO = "memo";
     public static String PRO_DOCUMENT_ID = "documentId";
+    public static String KEY_REPORT_ITEMS = "ReportItems";
 
     @Override
     public void onCreate() {

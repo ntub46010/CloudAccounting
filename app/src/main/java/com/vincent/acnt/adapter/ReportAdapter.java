@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.vincent.acnt.R;
+import com.vincent.acnt.data.ReportItem;
 import com.vincent.acnt.data.Subject;
 
 import java.text.NumberFormat;
@@ -16,25 +17,25 @@ import java.util.Locale;
 
 import static com.vincent.acnt.data.DataHelper.getSubjectColor;
 
-public class SubjectAdapter extends BaseAdapter {
+public class ReportAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
-    private ArrayList<Subject> subjects;
+    private ArrayList<ReportItem> items;
 
-    public SubjectAdapter (Context context, ArrayList<Subject> subjects) {
+    public ReportAdapter (Context context, ArrayList<ReportItem> items) {
         this.context = context;
         this.layoutInflater = LayoutInflater.from(context);
-        this.subjects = subjects;
+        this.items = items;
     }
 
     @Override
     public int getCount() {
-        return subjects.size();
+        return items.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return subjects.get(position);
+        return items.get(position);
     }
 
     @Override
@@ -45,20 +46,23 @@ public class SubjectAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         if (view == null)
-            view = layoutInflater.inflate(R.layout.lst_subject, parent,false);
+            view = layoutInflater.inflate(R.layout.lst_report_item, parent,false);
 
         TextView txtId = view.findViewById(R.id.txtSubjectId);
         TextView txtName = view.findViewById(R.id.txtSubjectName);
         TextView txtCredit = view.findViewById(R.id.txtCredit);
         TextView txtDebit = view.findViewById(R.id.txtDebit);
+        TextView txtBalance = view.findViewById(R.id.txtBalance);
 
-        Subject subject = subjects.get(position);
-        txtId.setText(String.valueOf(subject.getSubjectId()));
-        txtName.setText(subject.getName());
-        txtCredit.setText("借：" + NumberFormat.getNumberInstance(Locale.US).format(subject.getCredit()));
-        txtDebit.setText("貸：" + NumberFormat.getNumberInstance(Locale.US).format(subject.getDebit()));
+        ReportItem item = items.get(position);
+        txtId.setText(String.valueOf(item.getId()));
+        txtName.setText(item.getName());
+        txtCredit.setText("借：" + NumberFormat.getNumberInstance(Locale.US).format(item.getTotalCredit()));
+        txtDebit.setText("貸：" + NumberFormat.getNumberInstance(Locale.US).format(item.getTotalDebit()));
+        txtBalance.setText("餘：" + NumberFormat.getNumberInstance(Locale.US).format(item.getBalance()));
 
-        txtId.setTextColor(getSubjectColor(context, subject));
+        //txtId.setTextColor(getSubjectColor(context, subject));
+
 
         return view;
     }

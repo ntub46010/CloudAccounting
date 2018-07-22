@@ -60,7 +60,6 @@ public class LedgerActivity extends AppCompatActivity {
     private ArrayList<String> subjectNames;
     private ArrayList<Entry> entries;
     private ArrayList<LedgerRecord> records;
-    private LedgerRecord originRecord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -230,10 +229,99 @@ public class LedgerActivity extends AppCompatActivity {
 
         entries = new ArrayList<>();
         records = new ArrayList<>();
-        queryOriginBalance(subjectName, selectedYear * 10000 + selectedMonth * 100 + 1, endYear * 10000 + endMonth * 100 + 1);
+        queryMonthlyRecord(subjectName, selectedYear * 10000 + selectedMonth * 100 + 1, endYear * 10000 + endMonth * 100 + 1);
     }
 
-    private void queryOriginBalance(final String subjectName, final int selectDate, final int endDate) {
+    private void queryMonthlyRecord(final String subjectName, final int selectedDate, int endDate) {
+        db.collection(KEY_ENTRIES)
+                .orderBy(PRO_DATE, Query.Direction.DESCENDING)
+                .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
+                .whereGreaterThanOrEqualTo(PRO_DATE, selectedDate)
+                .whereLessThan(PRO_DATE, endDate)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(context, "查詢本月明細失敗", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        QuerySnapshot querySnapshot = task.getResult();
+                        Entry entry;
+                        for (DocumentSnapshot documentSnapshot : querySnapshot) {
+                            //儲存分錄，供點擊清單後能顯示詳情，越前面越新
+                            entry = documentSnapshot.toObject(Entry.class);
+                            entries.add(entry);
+
+                            //儲存明細，越前面是越新的紀錄
+                            for (Subject subject : entry.getSubjects()) {
+                                if (subject.getName().equals(subjectName)) {
+                                    records.add(new LedgerRecord(
+                                            entry.getDate(),
+                                            entry.getMemo(),
+                                            subject.getCredit(),
+                                            subject.getDebit()
+                                    ));
+                                }
+                           }
+                        }
+
+                        if (records.isEmpty())
+                            Toast.makeText(context, "本月沒有紀錄", Toast.LENGTH_SHORT).show();
+
+                        //若選擇1月，則略過查詢歷史總額，否則繼續查詢
+                        if (String.valueOf(selectedDate).substring(4).equals("0101"))
+                            queryOriginBalance(subjectName, selectedDate);
+                        else
+                            queryHistoryRecord(subjectName, selectedDate);
+                    }
+                });
+    }
+
+    private void queryHistoryRecord(final String subjectName, final int selectedDate) {
+        db.collection(KEY_ENTRIES)
+                .whereLessThan(PRO_DATE, selectedDate)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(context, "查詢歷史明細失敗", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        QuerySnapshot querySnapshot = task.getResult();
+                        Entry entry;
+                        int totalCredit = 0, totalDebit = 0;
+
+                        //從歷史分錄中計算累積借貸總額
+                        for (DocumentSnapshot documentSnapshot : querySnapshot) {
+                            entry = documentSnapshot.toObject(Entry.class);
+
+                            for (Subject subject : entry.getSubjects()) {
+                                if (subject.getName().equals(subjectName)) {
+                                    totalCredit += subject.getCredit();
+                                    totalDebit += subject.getDebit();
+                                }
+                            }
+                        }
+
+                        records.add(new LedgerRecord(
+                                selectedDate,
+                                "(歷史累積紀錄)",
+                                totalCredit,
+                                totalDebit
+                        ));
+                        entries.add(null);
+
+                        //繼續查詢初始餘額
+                        queryOriginBalance(subjectName, selectedDate);
+                    }
+                });
+    }
+
+    private void queryOriginBalance(final String subjectName, final int selectedDate) {
         db.collection(KEY_SUBJECTS)
                 .whereEqualTo(PRO_NAME, subjectName)
                 .get()
@@ -244,77 +332,31 @@ public class LedgerActivity extends AppCompatActivity {
                             QuerySnapshot querySnapshots = task.getResult();
                             Subject subject = querySnapshots.getDocuments().get(0).toObject(Subject.class);
 
-                            originRecord = new LedgerRecord(
-                                    20180101,
-                                    "初始餘額",
+                            records.add(new LedgerRecord(
+                                    (selectedDate / 10000) * 10000 + 101, //修正為當年1/1，如20180101
+                                    "(初始餘額)",
                                     subject.getCredit(),
-                                    subject.getDebit(),
-                                    0
-                            );
+                                    subject.getDebit()
+                            ));
+                            entries.add(null);
 
-                            queryRecord(subjectName, selectDate, endDate);
-                        }else
-                            Toast.makeText(context, "查詢初始餘額失敗", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-    }
-
-    private void queryRecord(final String subjectName, int selectDate, int endDate) {
-        db.collection(KEY_ENTRIES)
-                .orderBy(PRO_DATE, Query.Direction.DESCENDING)
-                .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
-                .whereGreaterThanOrEqualTo(PRO_DATE, selectDate)
-                .whereLessThan(PRO_DATE, endDate)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(context, "查詢科目明細失敗", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        Entry entry;
-                        QuerySnapshot querySnapshot = task.getResult();
-                        for (DocumentSnapshot documentSnapshot : querySnapshot) {
-                            //儲存分錄，供點擊清單後能顯示詳情
-                            entry = documentSnapshot.toObject(Entry.class);
-                            entries.add(entry);
-
-                            //儲存明細
-                            for (Subject subject : entry.getSubjects()) {
-                                if (subject.getName().equals(subjectName)) {
-                                    records.add(new LedgerRecord(
-                                            entry.getDate(),
-                                            entry.getMemo(),
-                                            subject.getCredit(),
-                                            subject.getDebit(),
-                                            0
-                                    ));
-                                }
-                           }
-                        }
-
-                        entries.add(null);
-                        records.add(originRecord);
-                        if (records.size() < 2)
-                            Toast.makeText(context, "沒有紀錄", Toast.LENGTH_SHORT).show();
-                        else {
-                            //計算各明細的餘額
+                            //計算清單項目所要顯示的餘額
                             LedgerRecord r = records.get(records.size() - 1);
                             r.setBalance(r.getCredit() - r.getDebit());
                             for (int i = records.size() - 2; i >= 0; i--) {
                                 r = records.get(i);
                                 r.setBalance(records.get(i + 1).getBalance() + r.getCredit() - r.getDebit());
                             }
-                        }
 
-                        lstLedger.setAdapter(new LedgerAdapter(context, records));
-                        prgBar.setVisibility(View.GONE);
-                        lstLedger.setVisibility(View.VISIBLE);
-                        canQuery = true;
+                            //顯示清單
+                            lstLedger.setAdapter(new LedgerAdapter(context, records));
+                            prgBar.setVisibility(View.GONE);
+                            lstLedger.setVisibility(View.VISIBLE);
+                            canQuery = true;
+                        }else
+                            Toast.makeText(context, "查詢初始餘額失敗", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
+
 }
