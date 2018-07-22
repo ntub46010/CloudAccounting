@@ -13,7 +13,7 @@ public class Entry implements Serializable {
 
     public Entry() {}
 
-    public Entry(int date, String memo, String ps) {
+    public Entry(long date, String memo, String ps) {
         this.subjects = new ArrayList<>();
         this.date = date;
         this.memo = memo;

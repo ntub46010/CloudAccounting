@@ -6,7 +6,7 @@
     android:orientation="horizontal">
 
     <TextView
-        style="@style/text"
+        style="@style/txt_normal_title"
         android:text="指定期間："/>
 
     <Spinner
@@ -15,7 +15,7 @@
         android:layout_height="wrap_content" />
 
     <TextView
-        style="@style/text"
+        style="@style/txt_normal_title"
         android:text="年"/>
 
     <Spinner
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content" />
 
     <TextView
-        style="@style/text"
+        style="@style/txt_normal_title"
         android:text="月"/>
 
 </LinearLayout>

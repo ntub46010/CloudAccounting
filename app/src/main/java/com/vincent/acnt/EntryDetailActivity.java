@@ -12,6 +12,9 @@ import android.widget.TextView;
 import com.vincent.acnt.data.Entry;
 import com.vincent.acnt.data.Subject;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import static com.vincent.acnt.data.DataHelper.Comma;
 import static com.vincent.acnt.data.DataHelper.getSubjectColor;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRY;
@@ -65,9 +68,9 @@ public class EntryDetailActivity extends AppCompatActivity {
             txtSubject.setTextColor(getSubjectColor(context, subject));
 
             if (subject.getDebit() == 0)
-                txtCredit.setText(Comma(subject.getCredit()));
+                txtCredit.setText(NumberFormat.getNumberInstance(Locale.US).format(subject.getCredit()));
             else
-                txtDebit.setText(Comma(subject.getDebit()));
+                txtDebit.setText(NumberFormat.getNumberInstance(Locale.US).format(subject.getDebit()));
 
             layContainer.addView(layElement);
         }

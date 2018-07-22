@@ -41,13 +41,6 @@ public class Verifier {
             return c.getString(R.string.chk_format_wrong, "金額");
     }
 
-    public String chkAmount(String s) {
-        if (Pattern.matches(ptnAmount, s) && !s.equals("0"))
-            return "";
-        else
-            return c.getString(R.string.chk_format_wrong, "金額");
-    }
-
     public String chkMemo(String s) {
         if (Pattern.matches(ptnMemo, s))
             return "";

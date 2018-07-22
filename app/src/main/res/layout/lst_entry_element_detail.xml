@@ -20,18 +20,13 @@
 
         <TextView
             android:id="@+id/txtCredit"
-            style="@style/text"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:gravity="end"
+            style="@style/txt_amount"
             android:textColor="#555555"/>
 
         <TextView
             android:id="@+id/txtDebit"
-            style="@style/text"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:gravity="end"
+            style="@style/txt_amount"
+            android:textSize="17sp"
             android:textColor="#555555"/>
 
     </LinearLayout>

@@ -32,7 +32,7 @@
                 android:columnCount="2">
 
                 <TextView
-                    style="@style/text"
+                    style="@style/txt_normal_title"
                     android:layout_marginEnd="5dp"
                     android:layout_marginBottom="10dp"
                     android:text="日期："
@@ -45,7 +45,7 @@
                     android:textColor="#555555"/>
 
                 <TextView
-                    style="@style/text"
+                    style="@style/txt_normal_title"
                     android:layout_marginEnd="5dp"
                     android:layout_marginBottom="10dp"
                     android:text="摘要："
@@ -61,7 +61,7 @@
                     android:lineSpacingExtra="5dp"/>
 
                 <TextView
-                    style="@style/text"
+                    style="@style/txt_normal_title"
                     android:layout_marginEnd="5dp"
                     android:text="備註："
                     android:textSize="19sp"/>

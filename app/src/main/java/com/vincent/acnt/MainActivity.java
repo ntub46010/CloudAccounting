@@ -32,11 +32,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button btnShowJournal = findViewById(R.id.btnShowJournal);
-        btnShowJournal.setOnClickListener(new View.OnClickListener() {
+        Button btnJournal = findViewById(R.id.btnJournal);
+        btnJournal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(context, JournalActivity.class));
+            }
+        });
+
+        Button btnLedger = findViewById(R.id.btnLedger);
+        btnLedger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(context, LedgerActivity.class));
+            }
+        });
+
+        Button btnReport = findViewById(R.id.btnReport);
+        btnReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(context, ReportActivity.class));
             }
         });
 

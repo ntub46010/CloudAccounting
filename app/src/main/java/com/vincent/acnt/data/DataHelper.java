@@ -25,21 +25,24 @@ public class DataHelper {
         boolean negative = strNum.contains("-");
         if (negative) strNum = strNum.substring(1);
         String[] numPart = strNum.split("\\.");
-        String result;
 
-        if (numPart[0].length() < 4)
-            result = numPart[0];
-        else {
-            result = Comma(Integer.parseInt(numPart[0].substring(0, numPart[0].length() - 3)))
-                    + "," + numPart[0].substring(numPart[0].length() - 3);
+        StringBuffer res = new StringBuffer(numPart[0]);
+        int pos = 3;
+        for (int i = 0; i < res.length(); i++) {
+            if (pos + i >= res.length())
+                break;
+
+            res.insert(res.length() - pos - i, ",");
+            pos += 3;
         }
 
         if (numPart.length == 2 && !numPart[1].equals("0"))
-            result += "." + numPart[1];
-        if (negative)
-            result = "-" + result;
+            res.append(".").append(numPart[1]);
 
-        return result;
+        if (negative)
+            res.insert(0, "-");
+
+        return res.toString();
     }
 
     public static int binarySearchNumber(ArrayList<Integer> ary, Integer target) {
@@ -88,7 +91,7 @@ public class DataHelper {
     public static String getEngMonth(String month) {
         switch (month){
             case "01":
-                return "Jun";
+                return "Jan";
             case "02":
                 return "Feb";
             case "03":

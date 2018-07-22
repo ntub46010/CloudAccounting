@@ -12,6 +12,7 @@ public class MyApp extends Application {
     public static int CODE_CREDIT = 1;
     public static int CODE_DEBIT = 2;
     public static String PRO_STAMP = "stamp";
+    public static String PRO_NAME = "name";
     public static String PRO_SUBJECT_ID = "subjectId";
     public static String KEY_SUBJECTS = "Subjects";
     public static String PRO_SUBJECTS = "subjects";

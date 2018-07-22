@@ -19,7 +19,9 @@ import com.vincent.acnt.R;
 import com.vincent.acnt.data.Entry;
 import com.vincent.acnt.data.Subject;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import static com.vincent.acnt.data.DataHelper.Comma;
 import static com.vincent.acnt.data.DataHelper.getEngMonth;
@@ -105,9 +107,9 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
             txtSubject.setText(subject.getName());
 
             if (subject.getDebit() == 0)
-                txtCredit.setText(Comma(subject.getCredit()));
+                txtCredit.setText(NumberFormat.getNumberInstance(Locale.US).format(subject.getCredit()));
             else
-                txtDebit.setText(Comma(subject.getDebit()));
+                txtDebit.setText(NumberFormat.getNumberInstance(Locale.US).format(subject.getDebit()));
 
             holder.layContainer.addView(layElement);
         }

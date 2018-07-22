@@ -21,7 +21,9 @@
         <activity android:name=".JournalActivity" />
         <activity android:name=".EntryCreateActivity" />
         <activity android:name=".EntryUpdateActivity" />
-        <activity android:name=".EntryDetailActivity"></activity>
+        <activity android:name=".EntryDetailActivity" />
+        <activity android:name=".LedgerActivity" />
+        <activity android:name=".ReportActivity"></activity>
     </application>
 
 </manifest>

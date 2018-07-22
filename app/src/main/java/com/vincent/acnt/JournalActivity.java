@@ -209,7 +209,6 @@ public class JournalActivity extends AppCompatActivity {
                 queryFlag++;
                 if (queryFlag > 0)
                     showEntry();
-                showEntry();
             }
 
             @Override

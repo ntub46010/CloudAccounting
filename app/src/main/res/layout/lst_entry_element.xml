@@ -7,31 +7,21 @@
 
     <TextView
         android:id="@+id/txtSubject"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        style="@style/txt_amount"
         android:layout_weight="3"
-        android:textSize="16sp"
-        android:maxLines="1"
-        android:ellipsize="end"/>
+        android:gravity="start"
+        android:paddingEnd="0dp"/>
 
     <TextView
         android:id="@+id/txtCredit"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        style="@style/txt_amount"
         android:layout_weight="2"
-        android:gravity="end"
-        android:textSize="16sp"
-        android:maxLines="1"
-        android:ellipsize="end"/>
+        android:paddingEnd="0dp"/>
 
     <TextView
         android:id="@+id/txtDebit"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        style="@style/txt_amount"
         android:layout_weight="2"
-        android:gravity="end"
-        android:textSize="16sp"
-        android:maxLines="1"
-        android:ellipsize="end"/>
+        android:paddingEnd="0dp"/>
 
 </LinearLayout>

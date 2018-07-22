@@ -20,10 +20,8 @@
             android:text="科目編號："/>
         <EditText
             android:id="@+id/edtSubjectId"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            style="@style/edt_edit_subject"
             android:hint="兩位數字"
-            android:singleLine="true"
             android:inputType="number"/>
     </TableRow>
 
@@ -33,10 +31,8 @@
             android:text="科目名稱："/>
         <EditText
             android:id="@+id/edtSubjectName"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:hint="中文30字以內"
-            android:singleLine="true"/>
+            style="@style/edt_edit_subject"
+            android:hint="中文30字以內"/>
     </TableRow>
 
     <TableRow>
@@ -45,9 +41,7 @@
             android:text="初始借方金額："/>
         <EditText
             android:id="@+id/edtCredit"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
+            style="@style/edt_edit_subject"
             android:inputType="number"/>
     </TableRow>
 
@@ -57,11 +51,8 @@
             android:text="初始貸方金額："/>
         <EditText
             android:id="@+id/edtDebit"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
+            style="@style/edt_edit_subject"
             android:inputType="number"/>
     </TableRow>
-
 
 </TableLayout>

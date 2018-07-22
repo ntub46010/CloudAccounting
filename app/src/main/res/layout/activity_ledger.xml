@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context=".LedgerActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/toolbar"
+        android:paddingEnd="65dp"
+        app:titleTextColor="#FFFFFF"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingTop="5dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/layLedger"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include layout="@layout/content_time_filter" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/actSubject"
+                        android:layout_width="225dp"
+                        android:layout_height="wrap_content"
+                        android:hint="科目名稱"
+                        android:completionThreshold="1"
+                        android:singleLine="true" />
+
+                    <Button
+                        android:id="@+id/btnShow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="查詢"
+                        android:textSize="17sp"/>
+
+                </LinearLayout>
+
+                <ListView
+                    android:id="@+id/lstRecord"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/prgBar"
+                style="@style/prg_normal"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
