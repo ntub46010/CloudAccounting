@@ -36,6 +36,7 @@ import java.util.Calendar;
 import static com.vincent.acnt.data.DataHelper.getPlainDialog;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRY;
+import static com.vincent.acnt.data.MyApp.KEY_SUBJECT;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
 import static com.vincent.acnt.data.MyApp.PRO_DATE;
 import static com.vincent.acnt.data.MyApp.PRO_MEMO;
@@ -86,6 +87,11 @@ public class LedgerActivity extends AppCompatActivity {
         Button btnShow = findViewById(R.id.btnShow);
         lstLedger = findViewById(R.id.lstRecord);
         prgBar = findViewById(R.id.prgBar);
+
+        if (getIntent().getExtras() != null) {
+            actSubject.setText(getIntent().getExtras().getString(KEY_SUBJECT));
+            queryFlag++;
+        }
 
         setupSpinner();
 

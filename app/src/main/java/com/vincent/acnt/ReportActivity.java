@@ -95,32 +95,48 @@ public class ReportActivity extends AppCompatActivity {
 
     private void setupFragment() {
         ReportPagerAdapter adapter = new ReportPagerAdapter(getSupportFragmentManager());
-        Bundle bundle = new Bundle();
+        Bundle bundle;
 
-        AssetFragment assetFragment = new AssetFragment();
+        ReportFragment assetFragment = new ReportFragment();
+        assetFragment.setLayout(R.layout.fragment_report);
+        assetFragment.setType(CODE_ASSET);
+        bundle = new Bundle();
         bundle.putSerializable(KEY_REPORT_ITEMS, getReportItems(CODE_ASSET));
         assetFragment.setArguments(bundle);
         adapter.addFragment(assetFragment, "資產");
-/*
-        LiabilityFragment liabilityFragment = new LiabilityFragment();
+
+        ReportFragment liabilityFragment = new ReportFragment();
+        liabilityFragment.setLayout(R.layout.fragment_report);
+        liabilityFragment.setType(CODE_LIABILITY);
+        bundle = new Bundle();
         bundle.putSerializable(KEY_REPORT_ITEMS, getReportItems(CODE_LIABILITY));
         liabilityFragment.setArguments(bundle);
         adapter.addFragment(liabilityFragment, "負債");
 
-        CapitalFragment capitalFragment = new CapitalFragment();
+        ReportFragment capitalFragment = new ReportFragment();
+        capitalFragment.setLayout(R.layout.fragment_report);
+        capitalFragment.setType(CODE_CAPITAL);
+        bundle = new Bundle();
         bundle.putSerializable(KEY_REPORT_ITEMS, getReportItems(CODE_CAPITAL));
         capitalFragment.setArguments(bundle);
         adapter.addFragment(capitalFragment, "權益");
 
-        RevenueFragment revenueFragment = new RevenueFragment();
+        ReportFragment revenueFragment = new ReportFragment();
+        revenueFragment.setLayout(R.layout.fragment_report);
+        revenueFragment.setType(CODE_REVENUE);
+        bundle = new Bundle();
         bundle.putSerializable(KEY_REPORT_ITEMS, getReportItems(CODE_REVENUE));
         revenueFragment.setArguments(bundle);
         adapter.addFragment(revenueFragment, "收益");
-        ExpenseFragment expenseFragment = new ExpenseFragment();
+
+        ReportFragment expenseFragment = new ReportFragment();
+        expenseFragment.setLayout(R.layout.fragment_report);
+        expenseFragment.setType(CODE_EXPANSE);
+        bundle = new Bundle();
         bundle.putSerializable(KEY_REPORT_ITEMS, getReportItems(CODE_EXPANSE));
         expenseFragment.setArguments(bundle);
         adapter.addFragment(expenseFragment, "費損");
-*/
+
         vpgHome.setAdapter(adapter);
     }
 
@@ -153,7 +169,7 @@ public class ReportActivity extends AppCompatActivity {
                                 mapReportItem.put(subject.getSubjectId(), item);
                             }
 
-                            searchInEntry(20180722);
+                            searchInEntry(20180822);
                         }else
                             Toast.makeText(context, "取得科目資料失敗", Toast.LENGTH_SHORT).show();
                     }
@@ -210,14 +226,12 @@ public class ReportActivity extends AppCompatActivity {
     public ArrayList<ReportItem> getReportItems(String type) {
         ArrayList<ReportItem> reportItems = new ArrayList<>();
         ReportItem item;
-
         for (Subject subject : subjects) {
             if (subject.getSubjectId().substring(0, 1).equals(type)) {
                 item = mapReportItem.get(subject.getSubjectId());
                 item.calBalance();
                 reportItems.add(item);
-            }else
-                break;
+            }
         }
         return reportItems;
     }

@@ -19,6 +19,7 @@ public class MyApp extends Application {
     public static String PRO_STAMP = "stamp";
     public static String PRO_NAME = "name";
     public static String PRO_SUBJECT_ID = "subjectId";
+    public static String KEY_SUBJECT = "Subject";
     public static String KEY_SUBJECTS = "Subjects";
     public static String PRO_SUBJECTS = "subjects";
     public static String KEY_ENTRY = "Entry";
