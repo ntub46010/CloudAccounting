@@ -33,6 +33,7 @@ import com.vincent.acnt.data.Subject;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static com.vincent.acnt.data.DataHelper.getDateNumber;
 import static com.vincent.acnt.data.DataHelper.getPlainDialog;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRY;
@@ -235,7 +236,7 @@ public class LedgerActivity extends AppCompatActivity {
 
         entries = new ArrayList<>();
         records = new ArrayList<>();
-        queryMonthlyRecord(subjectName, selectedYear * 10000 + selectedMonth * 100 + 1, endYear * 10000 + endMonth * 100 + 1);
+        queryMonthlyRecord(subjectName, getDateNumber(selectedYear, selectedMonth, 1), getDateNumber(endYear, endMonth, 1));
     }
 
     private void queryMonthlyRecord(final String subjectName, final int selectedDate, int endDate) {

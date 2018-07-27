@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vincent.acnt.EntryDetailActivity;
 import com.vincent.acnt.R;
@@ -20,11 +21,16 @@ import com.vincent.acnt.data.Entry;
 import com.vincent.acnt.data.Subject;
 
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import static com.vincent.acnt.data.DataHelper.Comma;
 import static com.vincent.acnt.data.DataHelper.getEngMonth;
+import static com.vincent.acnt.data.DataHelper.getWeekColor;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRY;
 
 public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.DataViewHolder> {
@@ -47,7 +53,7 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
         int position;
         CardView cardEntry;
         TextView txtDate, txtMemo;
-        LinearLayout layContainer;
+        LinearLayout layEntry, layContainer;
 
         DataViewHolder(View itemView) {
             super(itemView);
@@ -56,6 +62,7 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
             cardEntry = itemView.findViewById(R.id.cardEntry);
             txtDate = itemView.findViewById(R.id.txtDate);
             txtMemo = itemView.findViewById(R.id.txtMemo);
+            layEntry = itemView.findViewById(R.id.layEntry);
             layContainer = itemView.findViewById(R.id.layContainer);
 
             cardEntry.setOnClickListener(new View.OnClickListener() {
@@ -90,6 +97,14 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
         Entry entry = entries.get(position);
         String date = String.valueOf(entry.getDate());
 
+        Calendar c = Calendar.getInstance();
+        try {
+            c.setTime(new SimpleDateFormat("yyyyMMdd").parse(date));
+            holder.layEntry.setBackgroundColor(getWeekColor(context, c));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         holder.txtDate.setText(String.format("%s\n%s. %s",
                         date.substring(0, 4),
                         getEngMonth(date.substring(4, 6)),
@@ -97,6 +112,7 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
         ));
         holder.txtMemo.setText(entry.getMemo());
 
+        holder.layContainer.removeAllViews();
         TextView txtSubject, txtCredit, txtDebit;
         for (Subject subject : entry.getSubjects()) {
             LinearLayout layElement = (LinearLayout) inflater.inflate(R.layout.lst_entry_element, null);

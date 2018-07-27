@@ -34,6 +34,8 @@ public class EntryCreateActivity extends EntryEditActivity {
                 addEntry();
             }
         });
+
+        now.setTime(new Date());
     }
 
     @Override

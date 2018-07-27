@@ -3,6 +3,7 @@ package com.vincent.acnt.data;
 import android.app.Application;
 import android.content.res.Resources;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MyApp extends Application {
@@ -11,11 +12,7 @@ public class MyApp extends Application {
 
     public static int CODE_CREDIT = 1;
     public static int CODE_DEBIT = 2;
-    public static final String CODE_ASSET = "1";
-    public static final String CODE_LIABILITY = "2";
-    public static final String CODE_CAPITAL = "3";
-    public static final String CODE_REVENUE = "4";
-    public static final String CODE_EXPANSE = "5";
+    public static String[] CODE_TYPE = new String[5];
     public static String PRO_STAMP = "stamp";
     public static String PRO_NAME = "name";
     public static String PRO_SUBJECT_ID = "subjectId";
@@ -35,6 +32,10 @@ public class MyApp extends Application {
 
         res = getResources();
         db = FirebaseFirestore.getInstance();
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
+        for (int i = 0; i < 5; i++)
+            CODE_TYPE[i] = String.valueOf(i + 1);
     }
 
     public FirebaseFirestore getFirestore() {

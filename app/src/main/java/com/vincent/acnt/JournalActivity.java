@@ -36,6 +36,7 @@ import java.util.Calendar;
 
 import javax.annotation.Nullable;
 
+import static com.vincent.acnt.data.DataHelper.getDateNumber;
 import static com.vincent.acnt.data.DataHelper.getPlainDialog;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
@@ -118,8 +119,8 @@ public class JournalActivity extends AppCompatActivity {
         db.collection(KEY_ENTRIES)
                 .orderBy(PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
-                .whereGreaterThanOrEqualTo(PRO_DATE, selectedYear * 10000 + selectedMonth * 100 + 1)
-                .whereLessThan(PRO_DATE, endYear * 10000 + endMonth * 100 + 1)
+                .whereGreaterThanOrEqualTo(PRO_DATE, getDateNumber(selectedYear, selectedMonth, 1))
+                .whereLessThan(PRO_DATE, getDateNumber(endYear, endMonth, 1))
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {

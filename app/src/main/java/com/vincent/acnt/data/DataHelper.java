@@ -9,6 +9,7 @@ import com.vincent.acnt.R;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DataHelper {
 
@@ -135,5 +136,31 @@ public class DataHelper {
             default:
                 return app.getResource().getColor(R.color.type_asset);
         }
+    }
+
+    public static int getWeekColor(Context context, Calendar calendar) {
+        MyApp app = (MyApp) context.getApplicationContext();
+        switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+            case 1:
+                return app.getResource().getColor(R.color.week_sun);
+            case 2:
+                return app.getResource().getColor(R.color.week_mon);
+            case 3:
+                return app.getResource().getColor(R.color.week_tue);
+            case 4:
+                return app.getResource().getColor(R.color.week_wen);
+            case 5:
+                return app.getResource().getColor(R.color.week_thr);
+            case 6:
+                return app.getResource().getColor(R.color.week_fri);
+            case 7:
+                return app.getResource().getColor(R.color.week_sat);
+            default:
+                return app.getResource().getColor(R.color.week_sun);
+        }
+    }
+
+    public static int getDateNumber(int year, int month, int day) {
+        return year * 10000 + month * 100 + day;
     }
 }

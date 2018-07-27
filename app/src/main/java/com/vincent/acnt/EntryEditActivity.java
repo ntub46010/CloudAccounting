@@ -58,6 +58,7 @@ public class EntryEditActivity  extends AppCompatActivity {
     private ArrayList<String> subjectIds, subjectNames;
     protected ArrayAdapter<String> adpSubjectName;
 
+    protected Calendar now;
     protected Dialog dlgUpload;
 
     @Override
@@ -89,7 +90,6 @@ public class EntryEditActivity  extends AppCompatActivity {
         edtDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar now = Calendar.getInstance();
                 DatePickerDialog dlgDate = new DatePickerDialog(
                         context,
                         new DatePickerDialog.OnDateSetListener() {
@@ -119,6 +119,8 @@ public class EntryEditActivity  extends AppCompatActivity {
 
         inflater = LayoutInflater.from(context);
         elementViews = new ArrayList<>();
+
+        now = Calendar.getInstance();
 
         dlgUpload = new Dialog(context);
         dlgUpload.requestWindowFeature(Window.FEATURE_NO_TITLE);

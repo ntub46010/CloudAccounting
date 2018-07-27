@@ -14,6 +14,8 @@ import com.google.android.gms.tasks.Task;
 import com.vincent.acnt.data.EntryElementView;
 import com.vincent.acnt.data.Subject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
@@ -47,6 +49,12 @@ public class EntryUpdateActivity extends EntryEditActivity {
         ArrayList<Subject> subjects = (ArrayList<Subject>) getIntent().getSerializableExtra(KEY_SUBJECTS);
         for (Subject subject :  subjects)
             addElementView(subject);
+
+        try {
+            now.setTime(new SimpleDateFormat("yyyy/MM/dd").parse(bundle.getString(PRO_DATE)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         documentId = bundle.getString(PRO_DOCUMENT_ID);
     }

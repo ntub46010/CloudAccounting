@@ -9,4 +9,12 @@
     <color name="type_capital">#F02A2A</color>
     <color name="type_revenue">#5462C7</color>
     <color name="type_expense">#883DAE</color>
+
+    <color name="week_mon">#D8B1E5</color>
+    <color name="week_tue">#FEA7AA</color>
+    <color name="week_wen">#B3C5E1</color>
+    <color name="week_thr">#8BD490</color>
+    <color name="week_fri">#F6F2A6</color>
+    <color name="week_sat">#DCB797</color>
+    <color name="week_sun">#D0D0D0</color>
 </resources>
