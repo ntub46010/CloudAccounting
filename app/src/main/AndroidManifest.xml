@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.vincent.acnt">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".data.MyApp"
         android:allowBackup="true"
@@ -10,12 +12,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
+
+        <activity android:name=".MainActivity">
+
         </activity>
         <activity android:name=".SubjectActivity" />
         <activity android:name=".JournalActivity" />
@@ -23,7 +26,14 @@
         <activity android:name=".EntryUpdateActivity" />
         <activity android:name=".EntryDetailActivity" />
         <activity android:name=".LedgerActivity" />
-        <activity android:name=".ReportActivity"></activity>
+        <activity android:name=".ReportActivity" />
+        <activity android:name=".LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

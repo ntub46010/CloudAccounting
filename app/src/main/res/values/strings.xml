@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">AccountingBook</string>
 
+    <string name="facebook_app_id">513446362411836</string>
+    <string name="fb_login_protocol_scheme">fb513446362411836</string>
+
     <array name="ary_subject_type">
         <item>資產</item>
         <item>負債</item>
@@ -32,5 +35,6 @@
     <string name="chk_format_wrong">%1s格式不正確\n</string>
     <string name="chk_subject_name_wrong">第%1s個科目名稱不存在\n</string>
     <string name="chk_max_words">%1s最多%2s字\n</string>
+    <string name="title_activity_login">Sign in</string>
 
 </resources>

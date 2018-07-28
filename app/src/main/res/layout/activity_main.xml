@@ -4,31 +4,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btnSubject"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="會計科目"/>
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnSubject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="會計科目"/>
+
+        <Button
+            android:id="@+id/btnJournal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="日記簿"/>
+
+        <Button
+            android:id="@+id/btnLedger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="分類帳"/>
+
+        <Button
+            android:id="@+id/btnReport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="報表"/>
+
+    </LinearLayout>
 
     <Button
-        android:id="@+id/btnJournal"
+        android:id="@+id/btnLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="日記簿"/>
-
-    <Button
-        android:id="@+id/btnLedger"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="分類帳"/>
-
-    <Button
-        android:id="@+id/btnReport"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="報表"/>
+        android:text="登出"/>
 
 </LinearLayout>
