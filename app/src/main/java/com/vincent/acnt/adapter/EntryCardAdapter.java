@@ -100,7 +100,7 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
         Calendar c = Calendar.getInstance();
         try {
             c.setTime(new SimpleDateFormat("yyyyMMdd").parse(date));
-            holder.layEntry.setBackgroundColor(getWeekColor(context, c));
+            holder.layEntry.setBackgroundColor(getWeekColor(c));
         } catch (ParseException e) {
             e.printStackTrace();
         }

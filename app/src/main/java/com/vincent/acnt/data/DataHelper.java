@@ -1,7 +1,9 @@
 package com.vincent.acnt.data;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.view.Window;
 import android.widget.TextView;
 
 import com.vincent.acnt.R;
@@ -19,6 +21,14 @@ public class DataHelper {
                 .setMessage(message)
                 .setCancelable(true)
                 .setPositiveButton("確定", null);
+    }
+
+    public static Dialog getWaitingDialog(Context context) {
+        Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dlg_waiting);
+        dialog.setCancelable(false);
+        return dialog;
     }
 
     public static String Comma(float num) {
@@ -48,6 +58,10 @@ public class DataHelper {
 
     public static int binarySearchNumber(ArrayList<Integer> ary, Integer target) {
         int left = 0, right = ary.size() - 1;
+
+        if (ary.isEmpty())
+            return -1;
+
         if (ary.get(right).compareTo(target) == 0)
             return right;
 
@@ -62,31 +76,8 @@ public class DataHelper {
             else
                 left = middle + 1;
         }
+
         return -1;
-
-        //int first = 0, last = ary.size();
-		/*
-		 	假設first、mid, last為最後三個索引(5、6、7)，但未找到
-			則first = mid = 6，得mid = (6 + 7) / 2，捨去小數點仍為6，造成無限尋找
-			因此last應預設為元素個數，屆時mid = (6 + 8) / 2 = 7，可找到最後一個元素
-		*/
-    /*
-        int mid = (last + first) / 2;
-        Integer integer;
-
-        while (first < last) {
-            integer = ary.get(mid);
-            if (integer.compareTo(target) == 0)
-                return mid;
-            else if (integer.compareTo(target) > 0)
-                last = mid;
-            else
-                first = mid;
-
-            mid = (last + first) / 2;
-        }
-        return -1;
-        */
     }
 
     public static String getEngMonth(String month) {
@@ -120,8 +111,8 @@ public class DataHelper {
         }
     }
 
-    public static int getSubjectColor(Context context, Subject subject) {
-        MyApp app = (MyApp) context.getApplicationContext();
+    public static int getSubjectColor(Subject subject) {
+        MyApp app = MyApp.getInstance();
         switch (subject.getSubjectId().substring(0, 1)) {
             case "1":
                 return app.getResource().getColor(R.color.type_asset);
@@ -138,8 +129,8 @@ public class DataHelper {
         }
     }
 
-    public static int getWeekColor(Context context, Calendar calendar) {
-        MyApp app = (MyApp) context.getApplicationContext();
+    public static int getWeekColor(Calendar calendar) {
+        MyApp app =  MyApp.getInstance();
         switch (calendar.get(Calendar.DAY_OF_WEEK)) {
             case 1:
                 return app.getResource().getColor(R.color.week_sun);

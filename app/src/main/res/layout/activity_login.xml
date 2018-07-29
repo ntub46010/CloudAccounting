@@ -51,7 +51,17 @@
         android:text="註冊"/>
 
     <com.facebook.login.widget.LoginButton
-        android:id="@+id/login_button"
+        android:id="@+id/login_button_facebook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:layout_marginStart="2.5dp"
+        android:layout_marginTop="16dp"/>
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/login_button_google"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

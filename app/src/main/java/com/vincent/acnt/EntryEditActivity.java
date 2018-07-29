@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -36,8 +35,10 @@ import java.util.Calendar;
 import javax.annotation.Nullable;
 
 import static com.vincent.acnt.data.DataHelper.getPlainDialog;
+import static com.vincent.acnt.data.DataHelper.getWaitingDialog;
 import static com.vincent.acnt.data.MyApp.CODE_CREDIT;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
 
 public class EntryEditActivity  extends AppCompatActivity {
@@ -59,13 +60,13 @@ public class EntryEditActivity  extends AppCompatActivity {
     protected ArrayAdapter<String> adpSubjectName;
 
     protected Calendar now;
-    protected Dialog dlgUpload;
+    protected Dialog dlgWaiting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(layout);
-        db = ((MyApp) getApplication()).getFirestore();
+        db = MyApp.getInstance().getFirestore();
         setResult(0);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -122,10 +123,7 @@ public class EntryEditActivity  extends AppCompatActivity {
 
         now = Calendar.getInstance();
 
-        dlgUpload = new Dialog(context);
-        dlgUpload.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dlgUpload.setContentView(R.layout.dlg_waiting);
-        dlgUpload.setCancelable(false);
+        dlgWaiting = getWaitingDialog(context);
     }
 
     @Override
@@ -133,27 +131,29 @@ public class EntryEditActivity  extends AppCompatActivity {
         super.onResume();
 
         //取得科目編號、名稱、戳記
-        db.collection(KEY_SUBJECTS).orderBy(PRO_SUBJECT_ID).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                subjectIds = new ArrayList<>();
-                subjectNames = new ArrayList<>();
-                subjectStamps = new ArrayList<>();
-                Subject subject;
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS)
+                .orderBy(PRO_SUBJECT_ID)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        subjectIds = new ArrayList<>();
+                        subjectNames = new ArrayList<>();
+                        subjectStamps = new ArrayList<>();
+                        Subject subject;
 
-                for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
-                    subject = documentSnapshot.toObject(Subject.class);
-                    subjectIds.add(subject.getSubjectId());
-                    subjectNames.add(subject.getName());
-                    subjectStamps.add(subject.getStamp());
-                }
+                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
+                            subject = documentSnapshot.toObject(Subject.class);
+                            subjectIds.add(subject.getSubjectId());
+                            subjectNames.add(subject.getName());
+                            subjectStamps.add(subject.getStamp());
+                        }
 
-                //設定自動完成科目名稱
-                adpSubjectName = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, subjectNames);
-                for (EntryElementView view : elementViews)
-                    view.getActSubject().setAdapter(adpSubjectName);
-            }
-        });
+                        //設定自動完成科目名稱
+                        adpSubjectName = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, subjectNames);
+                        for (EntryElementView view : elementViews)
+                            view.getActSubject().setAdapter(adpSubjectName);
+                    }
+                });
     }
 
     protected void addElementView() {
@@ -229,7 +229,7 @@ public class EntryEditActivity  extends AppCompatActivity {
         for (int i = 0; i < entry.getSubjects().size(); i++) {
             subject = entry.getSubjects().get(i);
 
-            //檢查科目名稱，若無subjectId代表該科目不存在
+            //檢查科目戳記，若無戳記代表該科目不存在
             if (subject.getStamp() == 0)
                 subjectExist.append(String.valueOf(i + 1)).append("、");
         }

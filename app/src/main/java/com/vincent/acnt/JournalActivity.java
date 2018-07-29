@@ -40,6 +40,7 @@ import static com.vincent.acnt.data.DataHelper.getDateNumber;
 import static com.vincent.acnt.data.DataHelper.getPlainDialog;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_DATE;
 import static com.vincent.acnt.data.MyApp.PRO_DOCUMENT_ID;
 import static com.vincent.acnt.data.MyApp.PRO_MEMO;
@@ -68,7 +69,7 @@ public class JournalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_journal);
         context = this;
-        db = ((MyApp) getApplication()).getFirestore();
+        db = MyApp.getInstance().getFirestore();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -116,7 +117,7 @@ public class JournalActivity extends AppCompatActivity {
         }
 
         entries = new ArrayList<>();
-        db.collection(KEY_ENTRIES)
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES)
                 .orderBy(PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
                 .whereGreaterThanOrEqualTo(PRO_DATE, getDateNumber(selectedYear, selectedMonth, 1))
@@ -152,7 +153,7 @@ public class JournalActivity extends AppCompatActivity {
                         prgBar.setVisibility(View.VISIBLE);
                         recyEntry.setVisibility(View.GONE);
 
-                        db.collection(KEY_ENTRIES).document(entry.gainDocumentId())
+                        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES).document(entry.gainDocumentId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override

@@ -65,7 +65,7 @@ public class EntryDetailActivity extends AppCompatActivity {
             txtDebit = layElement.findViewById(R.id.txtDebit);
 
             txtSubject.setText(subject.getName());
-            txtSubject.setTextColor(getSubjectColor(context, subject));
+            txtSubject.setTextColor(getSubjectColor(subject));
 
             if (subject.getDebit() == 0)
                 txtCredit.setText(NumberFormat.getNumberInstance(Locale.US).format(subject.getCredit()));

@@ -58,7 +58,7 @@ public class SubjectAdapter extends BaseAdapter {
         txtCredit.setText("借：" + NumberFormat.getNumberInstance(Locale.US).format(subject.getCredit()));
         txtDebit.setText("貸：" + NumberFormat.getNumberInstance(Locale.US).format(subject.getDebit()));
 
-        txtId.setTextColor(getSubjectColor(context, subject));
+        txtId.setTextColor(getSubjectColor(subject));
 
         return view;
     }

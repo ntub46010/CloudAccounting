@@ -35,9 +35,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.vincent.acnt.data.DataHelper.getDateNumber;
+import static com.vincent.acnt.data.DataHelper.getWaitingDialog;
 import static com.vincent.acnt.data.MyApp.CODE_TYPE;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_DATE;
 import static com.vincent.acnt.data.MyApp.PRO_MEMO;
 import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
@@ -56,7 +58,7 @@ public class ReportActivity extends AppCompatActivity {
     private Map<String, ReportItem> mapReportItem;
     private ReportFragment[] reportFragments = new ReportFragment[5];
 
-    private Dialog dlgUpload;
+    private Dialog dlgWaiting;
 
     private interface TaskListener { void onFinish();}
 
@@ -65,7 +67,7 @@ public class ReportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
         context = this;
-        db = ((MyApp) getApplication()).getFirestore();
+        db = MyApp.getInstance().getFirestore();
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
         toolbar = findViewById(R.id.toolbar);
@@ -114,11 +116,7 @@ public class ReportActivity extends AppCompatActivity {
             }
         });
 
-        dlgUpload = new Dialog(context);
-        dlgUpload.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dlgUpload.setContentView(R.layout.dlg_waiting);
-        dlgUpload.setCancelable(false);
-
+        dlgWaiting = getWaitingDialog(context);
 
         collectReportItems(Integer.parseInt(date), null);
     }
@@ -141,11 +139,11 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void collectReportItems(final int endDate, final TaskListener listener) {
-        dlgUpload.show();
+        dlgWaiting.show();
         fabDate.setVisibility(View.GONE);
 
         subjects = new ArrayList<>();
-        db.collection(KEY_SUBJECTS)
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS)
                 .orderBy(PRO_SUBJECT_ID, Query.Direction.ASCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -179,7 +177,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private void searchInEntry(final int endDate, final TaskListener listener) {
         entries = new ArrayList<>();
-        db.collection(KEY_ENTRIES)
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES)
                 .orderBy(PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
                 .whereLessThanOrEqualTo(PRO_DATE, endDate)
@@ -228,7 +226,7 @@ public class ReportActivity extends AppCompatActivity {
                                     date.substring(6, 8)
                             ));
                             fabDate.setVisibility(View.VISIBLE);
-                            dlgUpload.dismiss();
+                            dlgWaiting.dismiss();
                         }else
                             Toast.makeText(context, "取得分錄失敗", Toast.LENGTH_SHORT).show();
                     }

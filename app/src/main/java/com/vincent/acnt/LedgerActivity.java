@@ -39,6 +39,7 @@ import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRY;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECT;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_DATE;
 import static com.vincent.acnt.data.MyApp.PRO_MEMO;
 import static com.vincent.acnt.data.MyApp.PRO_NAME;
@@ -130,7 +131,7 @@ public class LedgerActivity extends AppCompatActivity {
     private void querySubject() {
         layLedger.setVisibility(View.INVISIBLE);
         prgBar.setVisibility(View.VISIBLE);
-        db.collection(KEY_SUBJECTS)
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS)
                 .orderBy(PRO_SUBJECT_ID)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -240,7 +241,7 @@ public class LedgerActivity extends AppCompatActivity {
     }
 
     private void queryMonthlyRecord(final String subjectName, final int selectedDate, int endDate) {
-        db.collection(KEY_ENTRIES)
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES)
                 .orderBy(PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
                 .whereGreaterThanOrEqualTo(PRO_DATE, selectedDate)
@@ -287,7 +288,7 @@ public class LedgerActivity extends AppCompatActivity {
     }
 
     private void queryHistoryRecord(final String subjectName, final int selectedDate) {
-        db.collection(KEY_ENTRIES)
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES)
                 .whereLessThan(PRO_DATE, selectedDate)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -329,7 +330,7 @@ public class LedgerActivity extends AppCompatActivity {
     }
 
     private void queryOriginBalance(final String subjectName, final int selectedDate) {
-        db.collection(KEY_SUBJECTS)
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS)
                 .whereEqualTo(PRO_NAME, subjectName)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

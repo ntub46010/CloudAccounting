@@ -8,11 +8,13 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.vincent.acnt.data.MyApp;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.data.MyApp.KEY_USERS;
 
 public class EntryCreateActivity extends EntryEditActivity {
 
@@ -47,8 +49,8 @@ public class EntryCreateActivity extends EntryEditActivity {
         if (!isValid(entry))
             return;
 
-        dlgUpload.show();
-        db.collection(KEY_ENTRIES)
+        dlgWaiting.show();
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES)
                 .add(entry)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -56,11 +58,13 @@ public class EntryCreateActivity extends EntryEditActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(context, "新增分錄成功", Toast.LENGTH_SHORT).show();
                             clearContent();
+                            addElementView();
+                            addElementView();
                             setResult(1);
                         }else
                             Toast.makeText(context, "新增分錄失敗", Toast.LENGTH_SHORT).show();
 
-                        dlgUpload.dismiss();
+                        dlgWaiting.dismiss();
                     }
                 });
     }

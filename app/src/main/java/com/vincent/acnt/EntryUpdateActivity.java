@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.vincent.acnt.data.EntryElementView;
+import com.vincent.acnt.data.MyApp;
 import com.vincent.acnt.data.Subject;
 
 import java.text.ParseException;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_DATE;
 import static com.vincent.acnt.data.MyApp.PRO_DOCUMENT_ID;
 import static com.vincent.acnt.data.MyApp.PRO_MEMO;
@@ -79,8 +81,8 @@ public class EntryUpdateActivity extends EntryEditActivity {
         if (!isValid(entry))
             return;
 
-        dlgUpload.show();
-        db.collection(KEY_ENTRIES).document(documentId)
+        dlgWaiting.show();
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES).document(documentId)
                 .set(entry)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -92,7 +94,7 @@ public class EntryUpdateActivity extends EntryEditActivity {
                         }else
                             Toast.makeText(context, "修改分錄失敗", Toast.LENGTH_SHORT).show();
 
-                        dlgUpload.dismiss();
+                        dlgWaiting.dismiss();
                     }
                 });
     }

@@ -45,6 +45,7 @@ import static com.vincent.acnt.data.DataHelper.binarySearchNumber;
 import static com.vincent.acnt.data.DataHelper.getPlainDialog;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
 
 public class SubjectActivity extends AppCompatActivity {
@@ -69,7 +70,7 @@ public class SubjectActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subject);
         context = this;
-        db = ((MyApp) getApplication()).getFirestore();
+        db = MyApp.getInstance().getFirestore();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -104,7 +105,7 @@ public class SubjectActivity extends AppCompatActivity {
         //顯示科目清單
         prgBar.setVisibility(View.VISIBLE);
         lstSubject.setVisibility(View.GONE);
-        db.collection(KEY_SUBJECTS)
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS)
                 .orderBy(PRO_SUBJECT_ID, Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -207,7 +208,7 @@ public class SubjectActivity extends AppCompatActivity {
 
         //指定儲存的位置(集合)，呼叫add加入至資料庫，並定義callback方法
         //藉由物件的get方法，轉化為資料庫可儲存的形式
-        db.collection(KEY_SUBJECTS)
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS)
                 .add(subject)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -224,7 +225,7 @@ public class SubjectActivity extends AppCompatActivity {
         if (!isValid(subject))
             return;
 
-        db.collection(KEY_SUBJECTS).document(subject.gainDocumentId())
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
                 .set(subject)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -243,7 +244,7 @@ public class SubjectActivity extends AppCompatActivity {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        db.collection(KEY_SUBJECTS).document(subject.gainDocumentId())
+                        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -261,7 +262,7 @@ public class SubjectActivity extends AppCompatActivity {
     }
 
     private void updateSubjectInEntry(final Subject newSubject) {
-        db.collection(KEY_ENTRIES)
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -281,7 +282,7 @@ public class SubjectActivity extends AppCompatActivity {
                                 if (subject.getStamp() == newSubject.getStamp()) {
 
                                     subject.setName(newSubject.getName());
-                                    db.collection(KEY_ENTRIES)
+                                    db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES)
                                             .document(subEntry.gainDocumentId())
                                             .set(subEntry, SetOptions.merge());
                                     break;
