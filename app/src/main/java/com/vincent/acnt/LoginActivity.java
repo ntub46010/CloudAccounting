@@ -11,10 +11,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -38,6 +41,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.data.MyApp;
 import com.vincent.acnt.data.User;
+
+import org.json.JSONObject;
+
+import java.util.Random;
 
 import static com.vincent.acnt.data.DataHelper.getWaitingDialog;
 import static com.vincent.acnt.data.MyApp.KEY_USERS;
@@ -92,10 +99,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        prepareLogin();
+        prepareLogin(null);
     }
 
-    private void prepareLogin() {
+    private void prepareLogin(User user) {
         currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             Toast.makeText(context, "未登入", Toast.LENGTH_SHORT).show();
@@ -104,25 +111,32 @@ public class LoginActivity extends AppCompatActivity {
             LoginManager.getInstance().logOut();
             FacebookSdk.sdkInitialize(context);
         }else {
+            //沒登出或剛註冊
             if (!dlgWaiting.isShowing())
                 dlgWaiting.show();
-            checkIsUserExist(currentUser.getUid());
+
+            if (user == null) //onStart、email login、email register
+                user = new User(currentUser.getUid(), null, currentUser.getEmail());
+            else //fbLogin、googleLogin
+                user = new User(currentUser.getUid(), currentUser.getDisplayName(), currentUser.getEmail());
+
+            checkIsUserExist(user);
         }
     }
 
-    private void checkIsUserExist(final String uid) {
+    private void checkIsUserExist(final User user) {
         //查詢該會員是否存在，若不存在則新增一個
         db.collection(KEY_USERS)
-                .whereEqualTo(PRO_UID, uid)
+                .whereEqualTo(PRO_UID, user.getUid())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot.isEmpty())
-                                createUser(uid, currentUser.getEmail());
-                            else {
+                            if (querySnapshot.isEmpty()) //剛註冊，會員不存在於資料庫
+                                createUser(user);
+                            else { //會員存在，抓取資料庫的資料
                                 DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
                                 User user = documentSnapshot.toObject(User.class);
                                 user.giveDocumentId(documentSnapshot.getId());
@@ -140,15 +154,18 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void createUser(final String uid, final String email) {
+    private void createUser(final User user) {
+        //email註冊隨機產生使用者名字
+        if (user.getName() == null)
+            user.setName("user" + String.valueOf(new Random().nextInt(8999) + 1000));
+
         db.collection(KEY_USERS)
-                .add(new User(uid, email))
+                .add(user)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
                             DocumentReference documentReference = task.getResult();
-                            User user = new User(uid, email);
                             user.giveDocumentId(documentReference.getId());
                             MyApp.getInstance().setUser(user);
 
@@ -171,7 +188,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(context, "註冊成功", Toast.LENGTH_SHORT).show();
-                            prepareLogin();
+                            prepareLogin(null);
                         }else {
                             Toast.makeText(context, "註冊失敗", Toast.LENGTH_SHORT).show();
                             Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_LONG).show();
@@ -189,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(context, "登入成功", Toast.LENGTH_SHORT).show();
-                            prepareLogin();
+                            prepareLogin(null);
                         }else {
                             Toast.makeText(context, "登入失敗", Toast.LENGTH_SHORT).show();
                             Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_LONG).show();
@@ -212,7 +229,19 @@ public class LoginActivity extends AppCompatActivity {
         facebookLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                loginWithCredential(FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken()));
+                final AccessToken accessToken = loginResult.getAccessToken();
+
+                GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        loginWithCredential(FacebookAuthProvider.getCredential(accessToken.getToken()), object.optString("name"));
+                    }
+                });
+
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "name");
+                request.setParameters(parameters);
+                request.executeAsync();
             }
 
             @Override
@@ -248,7 +277,7 @@ public class LoginActivity extends AppCompatActivity {
         try {
             // Google Sign In was successful, authenticate with Firebase
             GoogleSignInAccount account = task.getResult(ApiException.class);
-            loginWithCredential(GoogleAuthProvider.getCredential(account.getIdToken(), null));
+            loginWithCredential(GoogleAuthProvider.getCredential(account.getIdToken(), null), account.getDisplayName());
         }catch (ApiException e) {
             // Google Sign In failed
             dlgWaiting.dismiss();
@@ -256,7 +285,8 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void loginWithCredential(AuthCredential credential) {
+    private void loginWithCredential(AuthCredential credential, final String name) {
+        //在Auth中登錄會員
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -264,7 +294,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             currentUser = mAuth.getCurrentUser();
-                            prepareLogin();
+                            prepareLogin(new User(currentUser.getUid(), name, currentUser.getEmail()));
                         }else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();

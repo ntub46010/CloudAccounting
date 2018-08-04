@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.res.Resources;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MyApp extends Application {
@@ -34,7 +35,7 @@ public class MyApp extends Application {
 
         res = getResources();
         db = FirebaseFirestore.getInstance();
-        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mAuth = FirebaseAuth.getInstance();
 
         for (int i = 0; i < 5; i++)

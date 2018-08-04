@@ -5,43 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/normal_background"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <GridView
+        android:id="@+id/grdFeature"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnSubject"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="會計科目"/>
-
-        <Button
-            android:id="@+id/btnJournal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="日記簿"/>
-
-        <Button
-            android:id="@+id/btnLedger"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="分類帳"/>
-
-        <Button
-            android:id="@+id/btnReport"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="報表"/>
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/btnLogout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="登出"/>
+        android:layout_gravity="center_vertical"
+        android:numColumns="2"/>
 
 </LinearLayout>
