@@ -6,11 +6,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.vincent.acnt.adapter.FeatureAdapter;
+import com.vincent.acnt.adapter.FeatureGridAdapter;
 
 public class MainActivity extends AppCompatActivity {
     private Context context;
@@ -24,11 +24,19 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         GridView grdFeature = findViewById(R.id.grdFeature);
-        grdFeature.setAdapter(new FeatureAdapter(context));
+        grdFeature.setAdapter(new FeatureGridAdapter(context));
         grdFeature.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 executeFeature(position);
+            }
+        });
+
+        ImageView btnBook = findViewById(R.id.btnBook);
+        btnBook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(context, BookListActivity.class));
             }
         });
     }

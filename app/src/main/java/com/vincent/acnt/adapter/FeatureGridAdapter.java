@@ -10,12 +10,12 @@ import android.widget.TextView;
 
 import com.vincent.acnt.R;
 
-public class FeatureAdapter extends BaseAdapter {
+public class FeatureGridAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
     private int[] icons;
     private String[] titles;
 
-    public FeatureAdapter(Context context) {
+    public FeatureGridAdapter(Context context) {
         layoutInflater = LayoutInflater.from(context);
 
         icons = new int[] {

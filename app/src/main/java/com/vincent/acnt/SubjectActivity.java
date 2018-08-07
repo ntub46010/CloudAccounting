@@ -31,7 +31,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
-import com.vincent.acnt.adapter.SubjectAdapter;
+import com.vincent.acnt.adapter.SubjectListAdapter;
 import com.vincent.acnt.data.Entry;
 import com.vincent.acnt.data.MyApp;
 import com.vincent.acnt.data.Subject;
@@ -57,7 +57,7 @@ public class SubjectActivity extends AppCompatActivity {
     private EditText edtId, edtName, edtCredit, edtDebit;
     private ProgressBar prgBar;
 
-    private SubjectAdapter adapter;
+    private SubjectListAdapter adapter;
     private final int mnuEditSubject = Menu.FIRST, mnuDelSubject = Menu.FIRST + 1;
     private int longClickPosition;
 
@@ -122,7 +122,7 @@ public class SubjectActivity extends AppCompatActivity {
                             subjectIds.add(Integer.parseInt(subject.getSubjectId()));
                         }
 
-                        adapter = new SubjectAdapter(context, subjects);
+                        adapter = new SubjectListAdapter(context, subjects);
                         lstSubject.setAdapter(adapter);
 
                         prgBar.setVisibility(View.GONE);

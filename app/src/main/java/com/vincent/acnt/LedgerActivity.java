@@ -24,7 +24,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.vincent.acnt.adapter.LedgerAdapter;
+import com.vincent.acnt.adapter.LedgerListAdapter;
 import com.vincent.acnt.data.Entry;
 import com.vincent.acnt.data.LedgerRecord;
 import com.vincent.acnt.data.MyApp;
@@ -357,7 +357,7 @@ public class LedgerActivity extends AppCompatActivity {
                             }
 
                             //顯示清單
-                            lstLedger.setAdapter(new LedgerAdapter(context, records));
+                            lstLedger.setAdapter(new LedgerListAdapter(context, records));
                             prgBar.setVisibility(View.GONE);
                             lstLedger.setVisibility(View.VISIBLE);
                             canQuery = true;

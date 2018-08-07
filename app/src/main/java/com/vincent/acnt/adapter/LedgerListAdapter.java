@@ -18,12 +18,12 @@ import java.util.Locale;
 import static com.vincent.acnt.data.DataHelper.Comma;
 import static com.vincent.acnt.data.DataHelper.getEngMonth;
 
-public class LedgerAdapter extends BaseAdapter {
+public class LedgerListAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
     private ArrayList<LedgerRecord> records;
 
-    public LedgerAdapter (Context context, ArrayList<LedgerRecord> records) {
+    public LedgerListAdapter(Context context, ArrayList<LedgerRecord> records) {
         this.context = context;
         this.layoutInflater = LayoutInflater.from(context);
         this.records = records;

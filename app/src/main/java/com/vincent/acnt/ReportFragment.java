@@ -11,7 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.vincent.acnt.adapter.ReportAdapter;
+import com.vincent.acnt.adapter.ReportListAdapter;
 import com.vincent.acnt.data.ReportItem;
 
 import java.text.NumberFormat;
@@ -28,7 +28,7 @@ public class ReportFragment extends Fragment {
 
     private String type;
     private ArrayList<ReportItem> reportItems;
-    private ReportAdapter adapter;
+    private ReportListAdapter adapter;
 
     public ReportFragment() {
 
@@ -62,7 +62,7 @@ public class ReportFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        adapter = new ReportAdapter(context, reportItems);
+        adapter = new ReportListAdapter(context, reportItems);
         lstReport.setAdapter(adapter);
         showBalance();
     }

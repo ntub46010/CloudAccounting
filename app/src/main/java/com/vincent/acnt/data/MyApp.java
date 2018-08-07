@@ -15,7 +15,10 @@ public class MyApp extends Application {
     private User user;
 
     public static String KEY_USERS = "Users";
+    public static String KEY_BOOKS = "Books";
     public static String PRO_UID = "uid";
+    public static String PRO_BOOKS = "books";
+    public static String PRO_ID = "id";
     public static int CODE_CREDIT = 1;
     public static int CODE_DEBIT = 2;
     public static String[] CODE_TYPE = new String[5];

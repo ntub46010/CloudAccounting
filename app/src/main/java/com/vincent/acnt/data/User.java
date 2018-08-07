@@ -1,7 +1,10 @@
 package com.vincent.acnt.data;
 
+import java.util.ArrayList;
+
 public class User {
     private String uid, name, email;
+    private ArrayList<Long> books;
     private String documentId;
 
     public User() {
@@ -43,11 +46,25 @@ public class User {
         this.email = email;
     }
 
+    public ArrayList<Long> getBooks() {
+        return books;
+    }
+
+    public void setBooks(ArrayList<Long> books) {
+        this.books = books;
+    }
+
     public String gainDocumentId() {
         return documentId;
     }
 
     public void giveDocumentId(String documentId) {
         this.documentId = documentId;
+    }
+
+    public void addBooks(long bookId) {
+        if (books == null)
+            books = new ArrayList<>();
+        books.add(0, bookId);
     }
 }
