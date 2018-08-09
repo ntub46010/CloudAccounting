@@ -1,7 +1,7 @@
 package com.vincent.acnt.data;
 
 public class Book {
-    private long id;
+    private String id;
     private String name, creator;
     private String documentId;
 
@@ -9,17 +9,17 @@ public class Book {
 
     }
 
-    public Book(long id, String name, String creator) {
+    public Book(String id, String name, String creator) {
         this.id = id;
         this.name = name;
         this.creator = creator;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

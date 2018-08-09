@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/action_journal"
+            android:icon="@drawable/icon_tag"
+            android:title="日記簿" />
+
+        <item
+            android:id="@+id/action_ledger"
+            android:icon="@drawable/icon_tag"
+            android:title="分類帳" />
+
+        <item
+            android:id="@+id/action_report"
+            android:icon="@drawable/icon_tag"
+            android:title="財務報告" />
+
+        <item
+            android:id="@+id/action_subject"
+            android:icon="@drawable/icon_tag"
+            android:title="記帳科目" />
+
+    </group>
+
+</menu>

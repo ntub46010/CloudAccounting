@@ -18,6 +18,9 @@ public class MyApp extends Application {
     public static String KEY_BOOKS = "Books";
     public static String PRO_UID = "uid";
     public static String PRO_BOOKS = "books";
+    public static String KEY_BOOK_NAME = "BookName";
+    public static String KEY_CREATOR = "Creator";
+    public static String KEY_ID = "Id";
     public static String PRO_ID = "id";
     public static int CODE_CREDIT = 1;
     public static int CODE_DEBIT = 2;

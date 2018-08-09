@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/normal_background">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            style="@style/toolbar"
+            android:paddingEnd="65dp"
+            app:titleTextColor="#FFFFFF"/>
+
+    </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabAdd"
+        style="@style/fab"
+        android:layout_marginEnd="@dimen/fab_margin"
+        app:srcCompat="@drawable/icon_add"
+        app:fabSize="normal"/>
+
+</android.support.design.widget.CoordinatorLayout>

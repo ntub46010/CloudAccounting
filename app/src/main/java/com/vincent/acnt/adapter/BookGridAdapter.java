@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vincent.acnt.R;
 import com.vincent.acnt.data.Book;
@@ -40,7 +41,7 @@ public class BookGridAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View view, ViewGroup parent) {
+    public View getView(final int position, View view, ViewGroup parent) {
         if (view == null)
             view = layoutInflater.inflate(R.layout.grd_book, parent,false);
 

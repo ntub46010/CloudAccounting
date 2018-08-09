@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class User {
     private String uid, name, email;
-    private ArrayList<Long> books;
+    private ArrayList<String> books;
     private String documentId;
 
     public User() {
@@ -46,11 +46,11 @@ public class User {
         this.email = email;
     }
 
-    public ArrayList<Long> getBooks() {
+    public ArrayList<String> getBooks() {
         return books;
     }
 
-    public void setBooks(ArrayList<Long> books) {
+    public void setBooks(ArrayList<String> books) {
         this.books = books;
     }
 
@@ -62,7 +62,7 @@ public class User {
         this.documentId = documentId;
     }
 
-    public void addBooks(long bookId) {
+    public void addBooks(String bookId) {
         if (books == null)
             books = new ArrayList<>();
         books.add(0, bookId);

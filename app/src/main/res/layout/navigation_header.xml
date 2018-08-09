@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="8dp"
+    android:gravity="bottom"
+    android:background="@color/colorPrimary">
+
+    <TextView
+        android:id="@+id/txtBookName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:lineSpacingExtra="5dp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textColor="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/txtCreator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="end"
+        android:textSize="14sp"
+        android:ellipsize="end"
+        android:textColor="#FFFFFF" />
+
+</LinearLayout>

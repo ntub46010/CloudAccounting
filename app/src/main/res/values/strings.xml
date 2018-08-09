@@ -4,6 +4,9 @@
     <string name="facebook_app_id">513446362411836</string>
     <string name="fb_login_protocol_scheme">fb513446362411836</string>
 
+    <string name="drawer_open">Drawer opened</string>
+    <string name="drawer_close">Drawer closed</string>
+
     <array name="ary_subject_type">
         <item>資產</item>
         <item>負債</item>
@@ -36,5 +39,12 @@
     <string name="chk_subject_name_wrong">第%1s個科目名稱不存在\n</string>
     <string name="chk_max_words">%1s最多%2s字\n</string>
     <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_book_home">BookHomeActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
 
 </resources>
