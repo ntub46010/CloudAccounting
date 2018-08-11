@@ -12,19 +12,19 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.vincent.acnt.data.EntryElementView;
-import com.vincent.acnt.data.MyApp;
 import com.vincent.acnt.data.Subject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_DATE;
 import static com.vincent.acnt.data.MyApp.PRO_DOCUMENT_ID;
 import static com.vincent.acnt.data.MyApp.PRO_MEMO;
+import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
 
 public class EntryUpdateActivity extends EntryEditActivity {
     private String documentId;
@@ -82,7 +82,7 @@ public class EntryUpdateActivity extends EntryEditActivity {
             return;
 
         dlgWaiting.show();
-        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES).document(documentId)
+        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES).document(documentId)
                 .set(entry)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

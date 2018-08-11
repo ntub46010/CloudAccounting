@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vincent.acnt.R;
 import com.vincent.acnt.data.LedgerRecord;
@@ -15,8 +14,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import static com.vincent.acnt.data.DataHelper.Comma;
-import static com.vincent.acnt.data.DataHelper.getEngMonth;
+import static com.vincent.acnt.data.Utility.getEngMonth;
 
 public class LedgerListAdapter extends BaseAdapter {
     private Context context;

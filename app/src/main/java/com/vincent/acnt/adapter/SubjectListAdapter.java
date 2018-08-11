@@ -14,7 +14,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import static com.vincent.acnt.data.DataHelper.getSubjectColor;
+import static com.vincent.acnt.data.Utility.getSubjectColor;
 
 public class SubjectListAdapter extends BaseAdapter {
     private Context context;

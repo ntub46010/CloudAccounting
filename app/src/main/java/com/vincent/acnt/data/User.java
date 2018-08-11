@@ -51,6 +51,8 @@ public class User {
     }
 
     public void setBooks(ArrayList<String> books) {
+        if (books == null)
+            books = new ArrayList<>();
         this.books = books;
     }
 
@@ -63,8 +65,6 @@ public class User {
     }
 
     public void addBooks(String bookId) {
-        if (books == null)
-            books = new ArrayList<>();
         books.add(0, bookId);
     }
 }

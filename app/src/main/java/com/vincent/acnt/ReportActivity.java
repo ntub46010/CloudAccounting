@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Window;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
@@ -34,15 +33,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.vincent.acnt.data.DataHelper.getDateNumber;
-import static com.vincent.acnt.data.DataHelper.getWaitingDialog;
+import static com.vincent.acnt.data.Utility.getDateNumber;
+import static com.vincent.acnt.data.Utility.getWaitingDialog;
 import static com.vincent.acnt.data.MyApp.CODE_TYPE;
+import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_DATE;
 import static com.vincent.acnt.data.MyApp.PRO_MEMO;
 import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
+import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
 
 public class ReportActivity extends AppCompatActivity {
     private Context context;
@@ -143,7 +143,7 @@ public class ReportActivity extends AppCompatActivity {
         fabDate.setVisibility(View.GONE);
 
         subjects = new ArrayList<>();
-        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS)
+        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_SUBJECTS)
                 .orderBy(PRO_SUBJECT_ID, Query.Direction.ASCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -177,7 +177,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private void searchInEntry(final int endDate, final TaskListener listener) {
         entries = new ArrayList<>();
-        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES)
                 .orderBy(PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
                 .whereLessThanOrEqualTo(PRO_DATE, endDate)

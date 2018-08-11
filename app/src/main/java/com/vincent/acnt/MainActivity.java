@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void executeFeature(int position) {
         switch (position) {
+            /*
             case 0:
                 startActivity(new Intent(context, SubjectActivity.class));
                 break;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             case 3:
                 startActivity(new Intent(context, ReportActivity.class));
                 break;
+                */
             case 5:
                 mAuth.signOut();
                 startActivity(new Intent(context, LoginActivity.class));

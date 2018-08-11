@@ -9,13 +9,10 @@ import android.widget.TextView;
 
 import com.vincent.acnt.R;
 import com.vincent.acnt.data.ReportItem;
-import com.vincent.acnt.data.Subject;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
-
-import static com.vincent.acnt.data.DataHelper.getSubjectColor;
 
 public class ReportListAdapter extends BaseAdapter {
     private Context context;

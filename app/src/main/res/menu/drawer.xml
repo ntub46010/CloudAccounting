@@ -1,27 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/action_journal"
-            android:icon="@drawable/icon_tag"
-            android:title="日記簿" />
+            android:id="@+id/nav_journal"
+            android:icon="@android:drawable/ic_menu_my_calendar"
+            android:title="日記簿"
+            android:foreground="?android:attr/selectableItemBackground" />
 
         <item
-            android:id="@+id/action_ledger"
-            android:icon="@drawable/icon_tag"
-            android:title="分類帳" />
+            android:id="@+id/nav_ledger"
+            android:icon="@android:drawable/ic_menu_upload"
+            android:title="分類帳"
+            android:foreground="?android:attr/selectableItemBackground" />
 
         <item
-            android:id="@+id/action_report"
-            android:icon="@drawable/icon_tag"
-            android:title="財務報告" />
+            android:id="@+id/nav_report"
+            android:icon="@android:drawable/ic_search_category_default"
+            android:title="財務報告"
+            android:foreground="?android:attr/selectableItemBackground" />
 
         <item
-            android:id="@+id/action_subject"
-            android:icon="@drawable/icon_tag"
-            android:title="記帳科目" />
+            android:id="@+id/nav_subject"
+            android:icon="@android:drawable/ic_dialog_map"
+            android:title="記帳科目"
+            android:foreground="?android:attr/selectableItemBackground" />
+    </group>
 
+    <group android:id="@+id/subAction">
+        <!-- Divider will appear above this item -->
+        <item
+            android:id="@+id/nav_member"
+            android:icon="@android:drawable/ic_popup_reminder"
+            android:title="成員"
+            android:foreground="?android:attr/selectableItemBackground" />
+        <item
+            android:id="@+id/nav_options"
+            android:icon="@android:drawable/ic_lock_idle_alarm"
+            android:title="選項"
+            android:foreground="?android:attr/selectableItemBackground" />
     </group>
 
 </menu>

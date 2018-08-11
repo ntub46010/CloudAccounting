@@ -3,8 +3,6 @@ package com.vincent.acnt.data;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import static com.vincent.acnt.data.DataHelper.Comma;
-
 public class Entry implements Serializable {
     private long date;
     private ArrayList<Subject> subjects;

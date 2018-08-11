@@ -34,12 +34,13 @@ import java.util.Calendar;
 
 import javax.annotation.Nullable;
 
-import static com.vincent.acnt.data.DataHelper.getPlainDialog;
-import static com.vincent.acnt.data.DataHelper.getWaitingDialog;
+import static com.vincent.acnt.data.Utility.getPlainDialog;
+import static com.vincent.acnt.data.Utility.getWaitingDialog;
 import static com.vincent.acnt.data.MyApp.CODE_CREDIT;
+import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
+import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
 
 public class EntryEditActivity  extends AppCompatActivity {
     protected Context context;
@@ -131,7 +132,7 @@ public class EntryEditActivity  extends AppCompatActivity {
         super.onResume();
 
         //取得科目編號、名稱、戳記
-        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS)
+        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_SUBJECTS)
                 .orderBy(PRO_SUBJECT_ID)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override

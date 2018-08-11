@@ -15,8 +15,7 @@ import com.vincent.acnt.data.Subject;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import static com.vincent.acnt.data.DataHelper.Comma;
-import static com.vincent.acnt.data.DataHelper.getSubjectColor;
+import static com.vincent.acnt.data.Utility.getSubjectColor;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRY;
 
 public class EntryDetailActivity extends AppCompatActivity {

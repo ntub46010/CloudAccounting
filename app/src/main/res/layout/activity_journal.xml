@@ -49,7 +49,7 @@
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabAdd"
+        android:id="@+id/fabCreateEntry"
         style="@style/fab"
         android:layout_marginEnd="@dimen/fab_margin"
         app:srcCompat="@drawable/icon_add"

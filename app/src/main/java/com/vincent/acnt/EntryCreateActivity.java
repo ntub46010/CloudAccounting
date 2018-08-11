@@ -8,15 +8,16 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
-import com.vincent.acnt.data.MyApp;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.data.MyApp.KEY_USERS;
+import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
 
 public class EntryCreateActivity extends EntryEditActivity {
+    private String today;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,8 @@ public class EntryCreateActivity extends EntryEditActivity {
         addElementView();
         addElementView();
 
-        edtDate.setText(new SimpleDateFormat("yyyy/MM/dd").format(new Date()));
+        today = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+        edtDate.setText(today);
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,13 +52,14 @@ public class EntryCreateActivity extends EntryEditActivity {
             return;
 
         dlgWaiting.show();
-        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES)
                 .add(entry)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(context, "新增分錄成功", Toast.LENGTH_SHORT).show();
+                            edtDate.setText(today);
                             clearContent();
                             addElementView();
                             addElementView();

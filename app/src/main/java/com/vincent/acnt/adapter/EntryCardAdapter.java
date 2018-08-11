@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vincent.acnt.EntryDetailActivity;
 import com.vincent.acnt.R;
@@ -25,12 +24,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
-import static com.vincent.acnt.data.DataHelper.Comma;
-import static com.vincent.acnt.data.DataHelper.getEngMonth;
-import static com.vincent.acnt.data.DataHelper.getWeekColor;
+import static com.vincent.acnt.data.Utility.getEngMonth;
+import static com.vincent.acnt.data.Utility.getWeekColor;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRY;
 
 public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.DataViewHolder> {

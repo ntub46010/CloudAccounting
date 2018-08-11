@@ -4,7 +4,6 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorControlNormal">#FFFFFF</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -16,6 +15,7 @@
         <item name="android:layout_alignParentTop">true</item>
         <item name="android:background">@color/colorPrimary</item>
         <item name="android:elevation">4dp</item>
+        <item name="android:theme">@style/AppTheme.AppBarOverlay</item>
     </style>
 
     <style name="prg_normal">

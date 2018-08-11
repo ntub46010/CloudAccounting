@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -35,14 +34,15 @@ import com.vincent.acnt.data.User;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.vincent.acnt.data.DataHelper.getPlainDialog;
+import static com.vincent.acnt.data.Utility.getPlainDialog;
 import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.data.MyApp.KEY_BOOK_NAME;
 import static com.vincent.acnt.data.MyApp.KEY_CREATOR;
-import static com.vincent.acnt.data.MyApp.KEY_ID;
+import static com.vincent.acnt.data.MyApp.KEY_BOOK_DOCUMENT_ID;
 import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_BOOKS;
 import static com.vincent.acnt.data.MyApp.PRO_ID;
+import static com.vincent.acnt.data.Utility.convertTo62Notation;
 
 public class BookListActivity extends AppCompatActivity {
     private Context context;
@@ -55,14 +55,13 @@ public class BookListActivity extends AppCompatActivity {
 
     private Dialog dialog;
 
-    private ArrayList<String> bookIds;
     private ArrayList<Book> books;
     private int cnt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book);
+        setContentView(R.layout.activity_book_list);
         context = this;
         db = MyApp.getInstance().getFirestore();
         user = MyApp.getInstance().getUser();
@@ -78,11 +77,11 @@ public class BookListActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton fabAdd = findViewById(R.id.fabAdd);
+        FloatingActionButton fabAddBook = findViewById(R.id.fabAddBook);
         grdBook = findViewById(R.id.grdBook);
         prgBar = findViewById(R.id.prgBar);
 
-        fabAdd.setOnClickListener(new View.OnClickListener() {
+        fabAddBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.show();
@@ -94,7 +93,7 @@ public class BookListActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent it = new Intent(context, BookHomeActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString(KEY_ID, books.get(position).getId());
+                bundle.putString(KEY_BOOK_DOCUMENT_ID, books.get(position).gainDocumentId());
                 bundle.putString(KEY_BOOK_NAME, books.get(position).getName());
                 bundle.putString(KEY_CREATOR, books.get(position).getCreator());
                 it.putExtras(bundle);
@@ -103,11 +102,7 @@ public class BookListActivity extends AppCompatActivity {
         });
 
         prepareDialog();
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
         loadBooksData();
     }
 
@@ -127,7 +122,7 @@ public class BookListActivity extends AppCompatActivity {
             }
         });
 
-        dialog = getPlainDialog(context, activityTitle, "請選擇帳本新增方式")
+        dialog = getPlainDialog(context, activityTitle, "請選擇帳本加入方式")
                 .setView(layAddBook)
                 .setPositiveButton("確定", new DialogInterface.OnClickListener() {
                     @Override
@@ -148,23 +143,21 @@ public class BookListActivity extends AppCompatActivity {
     private void loadBooksData() {
         prgBar.setVisibility(View.VISIBLE);
 
-        bookIds = user.getBooks();
-        if (bookIds == null) {
+        if (user.getBooks().isEmpty()) {
             prgBar.setVisibility(View.GONE);
             Toast.makeText(context, "您目前沒有帳本", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        cnt = bookIds.size();
+        cnt = user.getBooks().size();
         books = new ArrayList<>();
         downloadBook();
     }
 
     private void downloadBook() {
-
         if (cnt > 0) {
             db.collection(KEY_BOOKS)
-                    .whereEqualTo(PRO_ID, bookIds.get(bookIds.size() - cnt))
+                    .whereEqualTo(PRO_ID, user.getBooks().get(user.getBooks().size() - cnt))
                     .get()
                     .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
@@ -178,14 +171,14 @@ public class BookListActivity extends AppCompatActivity {
                             downloadBook();
                         }
                     });
-        }else
+        }else {
             grdBook.setAdapter(new BookGridAdapter(context, books));
-
-        prgBar.setVisibility(View.GONE);
+            prgBar.setVisibility(View.GONE);
+        }
     }
 
     private void createBook(String bookName) {
-        final Book book = new Book(String.valueOf(System.currentTimeMillis()), bookName, user.getName());
+        final Book book = new Book(convertTo62Notation(String.valueOf(System.currentTimeMillis())), bookName, user.getName());
         db.collection(KEY_BOOKS)
                 .add(book)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {

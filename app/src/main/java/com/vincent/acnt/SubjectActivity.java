@@ -41,12 +41,13 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import static com.vincent.acnt.data.DataHelper.binarySearchNumber;
-import static com.vincent.acnt.data.DataHelper.getPlainDialog;
+import static com.vincent.acnt.data.Utility.binarySearchNumber;
+import static com.vincent.acnt.data.Utility.getPlainDialog;
+import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
+import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
 
 public class SubjectActivity extends AppCompatActivity {
     private Context context;
@@ -83,11 +84,11 @@ public class SubjectActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton fabAdd = findViewById(R.id.fabAdd);
+        FloatingActionButton fabCreateSubject = findViewById(R.id.fabCreateSubject);
         lstSubject = findViewById(R.id.lstSubject);
         prgBar = findViewById(R.id.prgBar);
 
-        fabAdd.setOnClickListener(new View.OnClickListener() {
+        fabCreateSubject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mode = 1;
@@ -105,7 +106,7 @@ public class SubjectActivity extends AppCompatActivity {
         //顯示科目清單
         prgBar.setVisibility(View.VISIBLE);
         lstSubject.setVisibility(View.GONE);
-        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS)
+        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_SUBJECTS)
                 .orderBy(PRO_SUBJECT_ID, Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -208,7 +209,7 @@ public class SubjectActivity extends AppCompatActivity {
 
         //指定儲存的位置(集合)，呼叫add加入至資料庫，並定義callback方法
         //藉由物件的get方法，轉化為資料庫可儲存的形式
-        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS)
+        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_SUBJECTS)
                 .add(subject)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -225,7 +226,7 @@ public class SubjectActivity extends AppCompatActivity {
         if (!isValid(subject))
             return;
 
-        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
+        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
                 .set(subject)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -244,7 +245,7 @@ public class SubjectActivity extends AppCompatActivity {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
+                        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -262,7 +263,7 @@ public class SubjectActivity extends AppCompatActivity {
     }
 
     private void updateSubjectInEntry(final Subject newSubject) {
-        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -282,7 +283,7 @@ public class SubjectActivity extends AppCompatActivity {
                                 if (subject.getStamp() == newSubject.getStamp()) {
 
                                     subject.setName(newSubject.getName());
-                                    db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId()).collection(KEY_ENTRIES)
+                                    db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES)
                                             .document(subEntry.gainDocumentId())
                                             .set(subEntry, SetOptions.merge());
                                     break;
