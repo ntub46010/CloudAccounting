@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:columnCount="2">
+
+        <TextView
+            style="@style/txt_normal_title"
+            android:text="上月支出："/>
+
+        <TextView
+            android:id="@+id/txtLastMonthExpanse"
+            style="@style/txt_normal_title" />
+
+        <TextView
+            style="@style/txt_normal_title"
+            android:text="本月支出："/>
+
+        <TextView
+            android:id="@+id/txtThisMonthExpanse"
+            style="@style/txt_normal_title" />
+
+    </GridLayout>
+
+</LinearLayout>

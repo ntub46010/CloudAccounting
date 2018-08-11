@@ -17,7 +17,6 @@ import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
 
 public class EntryCreateActivity extends EntryEditActivity {
-    private String today;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +27,7 @@ public class EntryCreateActivity extends EntryEditActivity {
         addElementView();
         addElementView();
 
-        today = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
-        edtDate.setText(today);
+        edtDate.setText(new SimpleDateFormat("yyyy/MM/dd").format(new Date()));
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,7 +57,6 @@ public class EntryCreateActivity extends EntryEditActivity {
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(context, "新增分錄成功", Toast.LENGTH_SHORT).show();
-                            edtDate.setText(today);
                             clearContent();
                             addElementView();
                             addElementView();

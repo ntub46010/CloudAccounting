@@ -252,7 +252,6 @@ public class EntryEditActivity  extends AppCompatActivity {
 
     protected void clearContent() {
         elementViews.clear();
-        edtDate.setText(null);
         edtMemo.setText(null);
         edtPs.setText(null);
         layEntry.removeAllViews();

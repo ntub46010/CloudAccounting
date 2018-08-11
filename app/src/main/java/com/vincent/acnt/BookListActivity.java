@@ -97,13 +97,13 @@ public class BookListActivity extends AppCompatActivity {
                 bundle.putString(KEY_BOOK_NAME, books.get(position).getName());
                 bundle.putString(KEY_CREATOR, books.get(position).getCreator());
                 it.putExtras(bundle);
-                startActivity(it);
+                startActivityForResult(it, 0);
             }
         });
 
         prepareDialog();
 
-        loadBooksData();
+        loadBooksData(true);
     }
 
     private void prepareDialog() {
@@ -140,8 +140,9 @@ public class BookListActivity extends AppCompatActivity {
                 .create();
     }
 
-    private void loadBooksData() {
-        prgBar.setVisibility(View.VISIBLE);
+    private void loadBooksData(boolean showPrgBar) {
+        if (showPrgBar)
+            prgBar.setVisibility(View.VISIBLE);
 
         if (user.getBooks().isEmpty()) {
             prgBar.setVisibility(View.GONE);
@@ -229,13 +230,19 @@ public class BookListActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(context, "新增帳本成功", Toast.LENGTH_SHORT).show();
-                            loadBooksData();
+                            Toast.makeText(context, "加入帳本成功", Toast.LENGTH_SHORT).show();
+                            loadBooksData(true);
                         }else {
-                            Toast.makeText(context, "新增帳本失敗", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "加入帳本失敗", Toast.LENGTH_SHORT).show();
                             prgBar.setVisibility(View.GONE);
                         }
                     }
                 });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        loadBooksData(false);
     }
 }
