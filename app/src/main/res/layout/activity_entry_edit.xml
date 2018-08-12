@@ -37,7 +37,7 @@
                     android:id="@+id/edtDate"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:hint="點我選擇日期"
+                    android:hint="點此選擇日期"
                     android:editable="false"
                     android:singleLine="true"/>
 
@@ -80,11 +80,11 @@
                 android:layout_marginTop="3dp"
                 android:text="新增填寫欄位"/>
 
-        <LinearLayout
-            android:id="@+id/layEntry"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            <LinearLayout
+                android:id="@+id/layEntry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
 
         </LinearLayout>
 

@@ -15,24 +15,17 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             style="@style/toolbar"
-            android:paddingEnd="65dp"
             app:titleTextColor="#FFFFFF"/>
-        
-        <FrameLayout
+            
+        <ListView
+            android:id="@+id/lstSubject"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/toolbar">
-            
-            <ListView
-                android:id="@+id/lstSubject"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-            
-            <ProgressBar
-                android:id="@+id/prgBar"
-                style="@style/prg_normal" />
+            android:layout_below="@+id/toolbar"/>
 
-        </FrameLayout>        
+        <ProgressBar
+            android:id="@+id/prgBar"
+            style="@style/prg_normal"/>
 
     </RelativeLayout>
 

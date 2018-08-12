@@ -259,13 +259,14 @@ public class LedgerActivity extends AppCompatActivity {
                         QuerySnapshot querySnapshot = task.getResult();
                         Entry entry;
                         for (DocumentSnapshot documentSnapshot : querySnapshot) {
-                            //儲存分錄，供點擊清單後能顯示詳情，越前面越新
                             entry = documentSnapshot.toObject(Entry.class);
-                            entries.add(entry);
 
-                            //儲存明細，越前面是越新的紀錄
                             for (Subject subject : entry.getSubjects()) {
                                 if (subject.getName().equals(subjectName)) {
+                                    //儲存分錄，供點擊清單後能顯示詳情，越前面越新
+                                    entries.add(entry);
+
+                                    //儲存明細，越前面是越新的紀錄
                                     records.add(new LedgerRecord(
                                             entry.getDate(),
                                             entry.getMemo(),

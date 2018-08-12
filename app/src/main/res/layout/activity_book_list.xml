@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,40 +8,29 @@
     android:background="@color/normal_background"
     tools:context=".BookListActivity">
 
-    <RelativeLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/toolbar"
+        app:titleTextColor="#FFFFFF"/>
+
+    <GridView
+        android:id="@+id/grdBook"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:numColumns="2"
+        android:layout_below="@id/toolbar"/>
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            style="@style/toolbar"
-            android:paddingEnd="65dp"
-            app:titleTextColor="#FFFFFF"/>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/toolbar">
-
-            <GridView
-                android:id="@+id/grdBook"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:numColumns="2"/>
-
-            <ProgressBar
-                android:id="@+id/prgBar"
-                style="@style/prg_normal" />
-
-        </FrameLayout>
-
-    </RelativeLayout>
+    <ProgressBar
+        android:id="@+id/prgBar"
+        style="@style/prg_normal" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabAddBook"
         style="@style/fab"
         android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         app:srcCompat="@drawable/icon_add"
         app:fabSize="normal"/>
 
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>

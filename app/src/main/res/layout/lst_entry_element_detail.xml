@@ -26,7 +26,6 @@
         <TextView
             android:id="@+id/txtDebit"
             style="@style/txt_amount"
-            android:textSize="17sp"
             android:textColor="#555555"/>
 
     </LinearLayout>

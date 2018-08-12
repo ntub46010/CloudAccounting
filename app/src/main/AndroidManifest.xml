@@ -32,7 +32,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".BookListActivity" />
-        <activity android:name=".BookHomeActivity"></activity>
+        <activity android:name=".BookHomeActivity" />
+        <activity android:name=".BookOptionActivity"></activity>
     </application>
 
 </manifest>

@@ -1,57 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/normal_background">
 
-    <RelativeLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/toolbar"
+        app:titleTextColor="#FFFFFF"/>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:layout_below="@id/toolbar">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            style="@style/toolbar"
-            android:paddingEnd="65dp"
-            app:titleTextColor="#FFFFFF"/>
-
-        <LinearLayout
+        <include
+            android:id="@+id/dashboard"
+            layout="@layout/content_book_home_dashboard"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="10dp"
-            android:layout_below="@id/toolbar">
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
-            <include
-                android:id="@+id/dashboard"
-                layout="@layout/content_book_home_dashboard"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyEntry"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recyEntry"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:background="#DDDDDD"/>
+    </LinearLayout>
 
-        </LinearLayout>
-
-        <ProgressBar
-            android:id="@+id/prgBar"
-            style="@style/prg_normal"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"/>
-
-    </RelativeLayout>
+    <ProgressBar
+        android:id="@+id/prgBar"
+        style="@style/prg_normal"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabCreateEntry"
         style="@style/fab"
         android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         app:srcCompat="@drawable/icon_add"
         app:fabSize="normal"/>
 
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>

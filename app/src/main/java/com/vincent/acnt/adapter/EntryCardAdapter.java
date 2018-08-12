@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vincent.acnt.EntryDetailActivity;
@@ -50,7 +51,8 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
         int position;
         CardView cardEntry;
         TextView txtDate, txtMemo;
-        LinearLayout layEntry, layContainer;
+        RelativeLayout layEntry;
+        LinearLayout layContainer;
 
         DataViewHolder(View itemView) {
             super(itemView);
@@ -102,8 +104,7 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
             e.printStackTrace();
         }
 
-        holder.txtDate.setText(String.format("%s\n%s. %s",
-                        date.substring(0, 4),
+        holder.txtDate.setText(String.format("%s. %s",
                         getEngMonth(date.substring(4, 6)),
                         date.substring(6, 8)
         ));

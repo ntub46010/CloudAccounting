@@ -127,13 +127,22 @@ public class BookListActivity extends AppCompatActivity {
                 .setPositiveButton("確定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (rgpAddMode.getCheckedRadioButtonId() == R.id.rdoCreateBook)
-                            createBook(edtBookIdentity.getText().toString());
-                        else
-                            importBook(edtBookIdentity.getText().toString());
+                        String bookIdentity = edtBookIdentity.getText().toString();
 
+                        if (rgpAddMode.getCheckedRadioButtonId() == R.id.rdoCreateBook) {
+                            if (bookIdentity.equals(""))
+                                getPlainDialog(context, activityTitle, "帳本名稱未輸入").show();
+                            else
+                                createBook(bookIdentity);
+                        }else {
+                            if (bookIdentity.equals(""))
+                                getPlainDialog(context, activityTitle, "帳本ID未輸入").show();
+                            else
+                                importBook(edtBookIdentity.getText().toString());
+                        }
+
+                        rgpAddMode.check(R.id.rdoCreateBook);
                         edtBookIdentity.setText(null);
-                        prgBar.setVisibility(View.VISIBLE);
                     }
                 })
                 .setNegativeButton("取消", null)
@@ -179,6 +188,8 @@ public class BookListActivity extends AppCompatActivity {
     }
 
     private void createBook(String bookName) {
+        prgBar.setVisibility(View.VISIBLE);
+
         final Book book = new Book(convertTo62Notation(String.valueOf(System.currentTimeMillis())), bookName, user.getName());
         db.collection(KEY_BOOKS)
                 .add(book)
@@ -196,9 +207,12 @@ public class BookListActivity extends AppCompatActivity {
     }
 
     private void importBook(final String bookId) {
+        prgBar.setVisibility(View.VISIBLE);
+
         for (String id : user.getBooks()) {
             if (id.equals(bookId)) {
                 Toast.makeText(context, "您先前已經匯入該帳本", Toast.LENGTH_SHORT).show();
+                prgBar.setVisibility(View.GONE);
                 return;
             }
         }
@@ -211,12 +225,15 @@ public class BookListActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             List<DocumentSnapshot> documentSnapshot = task.getResult().getDocuments();
-                            if (documentSnapshot.isEmpty())
+                            if (documentSnapshot.isEmpty()) {
                                 Toast.makeText(context, "該帳本不存在，請確認帳本ID", Toast.LENGTH_SHORT).show();
-                            else
+                                prgBar.setVisibility(View.GONE);
+                            }else
                                 addToBookList(bookId);
-                        }else
+                        }else {
                             Toast.makeText(context, "帳本確認失敗", Toast.LENGTH_SHORT).show();
+                            prgBar.setVisibility(View.GONE);
+                        }
                     }
                 });
     }

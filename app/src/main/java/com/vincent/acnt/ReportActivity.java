@@ -85,8 +85,8 @@ public class ReportActivity extends AppCompatActivity {
             }
         });
 
-        vpgHome = findViewById(R.id.vpgHome);
-        fabDate = findViewById(R.id.fabDate);
+        vpgHome = findViewById(R.id.vpgReport);
+        fabDate = findViewById(R.id.fabSelectDate);
         TabLayout tabHome = findViewById(R.id.tabs);
 
         vpgHome.setOffscreenPageLimit(15);

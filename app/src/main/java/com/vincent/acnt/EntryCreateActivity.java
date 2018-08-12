@@ -60,7 +60,6 @@ public class EntryCreateActivity extends EntryEditActivity {
                             clearContent();
                             addElementView();
                             addElementView();
-                            setResult(1);
                         }else
                             Toast.makeText(context, "新增分錄失敗", Toast.LENGTH_SHORT).show();
 

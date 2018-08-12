@@ -89,7 +89,6 @@ public class EntryUpdateActivity extends EntryEditActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(context, "修改分錄成功", Toast.LENGTH_SHORT).show();
-                            setResult(1);
                             finish();
                         }else
                             Toast.makeText(context, "修改分錄失敗", Toast.LENGTH_SHORT).show();

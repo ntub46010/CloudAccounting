@@ -42,7 +42,7 @@ public class MyApp extends Application {
 
         res = getResources();
         db = FirebaseFirestore.getInstance();
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mAuth = FirebaseAuth.getInstance();
 
         for (int i = 0; i < 5; i++)
