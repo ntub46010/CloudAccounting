@@ -53,7 +53,7 @@ public class FeatureGridAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int position, View view, ViewGroup parent) {
+    public View getView(int position, View view, ViewGroup parent) {
         if (view == null)
             view = layoutInflater.inflate(R.layout.grd_feature, parent, false);
 

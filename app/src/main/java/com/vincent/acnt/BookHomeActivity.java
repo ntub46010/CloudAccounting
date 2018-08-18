@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.EntryCardAdapter;
+import com.vincent.acnt.data.Book;
 import com.vincent.acnt.data.Entry;
 import com.vincent.acnt.data.EntryContextMenuHandler;
 import com.vincent.acnt.data.MyApp;
@@ -42,22 +44,23 @@ import javax.annotation.Nullable;
 
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_DELETE;
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_UPDATE;
+import static com.vincent.acnt.data.MyApp.CODE_QUIT_ACTIVITY;
 import static com.vincent.acnt.data.MyApp.CODE_TYPE;
 import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_BOOK_DOCUMENT_ID;
 import static com.vincent.acnt.data.MyApp.KEY_BOOK_NAME;
 import static com.vincent.acnt.data.MyApp.KEY_CREATOR;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.PRO_DATE;
-import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
+import static com.vincent.acnt.data.MyApp.browsingBook;
 
 public class BookHomeActivity extends AppCompatActivity {
     private Context context;
     private FirebaseFirestore db;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    private NavigationView navigation_view;
-    private TextView txtLastMonthExpanse, txtThisMonthExpanse;
+    private NavigationView navigationView;
+    private LinearLayout layBookHome;
+    private TextView txtLastMonthExpanse, txtThisMonthExpanse, txtBookName, txtBookCreator;
     private RecyclerView recyEntry;
     private ProgressBar prgBar;
 
@@ -73,15 +76,15 @@ public class BookHomeActivity extends AppCompatActivity {
         context = this;
         db = MyApp.getInstance().getFirestore();
         Bundle bundle = getIntent().getExtras();
-        browsingBookDocumentId = bundle.getString(KEY_BOOK_DOCUMENT_ID);
 
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(bundle.getString(KEY_BOOK_NAME));
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawerLayout);
-        navigation_view = findViewById(R.id.navigation_view);
+        navigationView = findViewById(R.id.navigation_view);
         FloatingActionButton fabCreateEntry = findViewById(R.id.fabCreateEntry);
+        layBookHome = findViewById(R.id.layBookHome);
         txtLastMonthExpanse = findViewById(R.id.txtLastMonthExpanse);
         txtThisMonthExpanse = findViewById(R.id.txtThisMonthExpanse);
         recyEntry = findViewById(R.id.recyEntry);
@@ -99,10 +102,11 @@ public class BookHomeActivity extends AppCompatActivity {
         recyEntry.setHasFixedSize(true);
         recyEntry.setLayoutManager(new LinearLayoutManager(context));
 
-        //startQueryExpanse(true);
+        Date date = new Date();
+        thisMonthStartDate = Integer.parseInt(new SimpleDateFormat("yyyyMM01").format(date));
+        thisMonthEndDate = Integer.parseInt(new SimpleDateFormat("yyyyMM31").format(date));
 
-        thisMonthStartDate = Integer.parseInt(new SimpleDateFormat("yyyyMM01").format(new Date()));
-        thisMonthEndDate = Integer.parseInt(new SimpleDateFormat("yyyyMM31").format(new Date()));
+        layBookHome.setVisibility(View.INVISIBLE);
         startQueryExpanse();
     }
 
@@ -115,7 +119,7 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void startQueryExpanse() {
-        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
                 .whereGreaterThanOrEqualTo(PRO_DATE, thisMonthStartDate)
                 .whereLessThanOrEqualTo(PRO_DATE, thisMonthEndDate)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -168,7 +172,8 @@ public class BookHomeActivity extends AppCompatActivity {
         toggle.syncState();
         drawerLayout.addDrawerListener(toggle);
 
-        navigation_view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        navigationView.getMenu().findItem(R.id.nav_member).setTitle(String.format("成員（ %d ）", browsingBook.getMemberIds().size()));
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
@@ -187,7 +192,7 @@ public class BookHomeActivity extends AppCompatActivity {
                     case R.id.nav_member:
                         break;
                     case R.id.nav_options:
-                        startActivity(new Intent(context, BookOptionActivity.class));
+                        startActivityForResult(new Intent(context, BookOptionActivity.class), 0);
                         break;
                 }
 
@@ -195,15 +200,29 @@ public class BookHomeActivity extends AppCompatActivity {
             }
         });
 
-        View header = navigation_view.getHeaderView(0);
-        TextView txtBookName = header.findViewById(R.id.txtBookName);
-        TextView txtCreator = header.findViewById(R.id.txtCreator);
+        View header = navigationView.getHeaderView(0);
+        txtBookName = header.findViewById(R.id.txtBookName);
+        txtBookCreator = header.findViewById(R.id.txtCreator);
         txtBookName.setText(bundle.getString(KEY_BOOK_NAME));
-        txtCreator.setText("由" + bundle.getString(KEY_CREATOR) + "建立");
+        txtBookCreator.setText("由" + bundle.getString(KEY_CREATOR) + "建立");
+
+        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId())
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        if (documentSnapshot.exists()) {
+                            Book book = documentSnapshot.toObject(Book.class);
+                            toolbar.setTitle(book.getName());
+                            txtBookName.setText(book.getName());
+                            txtBookCreator.setText("由" + book.getCreator() + "建立");
+                        }else
+                            Toast.makeText(context, "該帳本不存在！", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void queryLastMonthExpanse(int startDate, int endDate) {
-        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
                 .whereGreaterThanOrEqualTo(PRO_DATE, startDate)
                 .whereLessThan(PRO_DATE, endDate)
                 .get()
@@ -246,7 +265,7 @@ public class BookHomeActivity extends AppCompatActivity {
             Toast.makeText(context, "今日尚未記帳", Toast.LENGTH_SHORT).show();
 
         prgBar.setVisibility(View.GONE);
-        recyEntry.setVisibility(View.VISIBLE);
+        layBookHome.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -259,7 +278,7 @@ public class BookHomeActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        browsingBookDocumentId = null;
+        browsingBook = null;
         super.onDestroy();
     }
 
@@ -278,6 +297,15 @@ public class BookHomeActivity extends AppCompatActivity {
         }
 
         return super.onContextItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == CODE_QUIT_ACTIVITY) {
+            setResult(CODE_QUIT_ACTIVITY);
+            finish();
+        }
     }
 
 }

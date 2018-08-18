@@ -5,15 +5,23 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.vincent.acnt.adapter.FeatureGridAdapter;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.vincent.acnt.data.MyApp;
+import com.vincent.acnt.data.User;
+
+import javax.annotation.Nullable;
+
+import static com.vincent.acnt.data.MyApp.KEY_USERS;
 
 public class MainActivity extends AppCompatActivity {
     private Context context;
+    private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
     @Override
@@ -21,47 +29,36 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
+        db = MyApp.getInstance().getFirestore();
         mAuth = FirebaseAuth.getInstance();
 
-        GridView grdFeature = findViewById(R.id.grdFeature);
-        grdFeature.setAdapter(new FeatureGridAdapter(context));
-        grdFeature.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                executeFeature(position);
-            }
-        });
-
-        ImageView btnBook = findViewById(R.id.btnBook);
+        ImageButton btnBook = findViewById(R.id.btnBook);
         btnBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(context, BookListActivity.class));
             }
         });
-    }
 
-    private void executeFeature(int position) {
-        switch (position) {
-            /*
-            case 0:
-                startActivity(new Intent(context, SubjectActivity.class));
-                break;
-            case 1:
-                startActivity(new Intent(context, JournalActivity.class));
-                break;
-            case 2:
-                startActivity(new Intent(context, LedgerActivity.class));
-                break;
-            case 3:
-                startActivity(new Intent(context, ReportActivity.class));
-                break;
-                */
-            case 5:
+        ImageButton btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 mAuth.signOut();
                 startActivity(new Intent(context, LoginActivity.class));
                 finish();
-                break;
-        }
+            }
+        });
+
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId())
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        User user = documentSnapshot.toObject(User.class);
+                        user.giveDocumentId(documentSnapshot.getId());
+                        MyApp.getInstance().setUser(user);
+                    }
+                });
     }
+
 }

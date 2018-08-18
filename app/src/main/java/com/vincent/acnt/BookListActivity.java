@@ -20,11 +20,12 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.BookGridAdapter;
 import com.vincent.acnt.data.Book;
@@ -34,11 +35,16 @@ import com.vincent.acnt.data.User;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import static com.vincent.acnt.data.MyApp.CODE_QUIT_ACTIVITY;
+import static com.vincent.acnt.data.MyApp.PRO_MEMBER_AMOUNT;
+import static com.vincent.acnt.data.MyApp.PRO_MEMBER_IDS;
+import static com.vincent.acnt.data.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getPlainDialog;
 import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.data.MyApp.KEY_BOOK_NAME;
 import static com.vincent.acnt.data.MyApp.KEY_CREATOR;
-import static com.vincent.acnt.data.MyApp.KEY_BOOK_DOCUMENT_ID;
 import static com.vincent.acnt.data.MyApp.KEY_USERS;
 import static com.vincent.acnt.data.MyApp.PRO_BOOKS;
 import static com.vincent.acnt.data.MyApp.PRO_ID;
@@ -93,10 +99,10 @@ public class BookListActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent it = new Intent(context, BookHomeActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString(KEY_BOOK_DOCUMENT_ID, books.get(position).gainDocumentId());
                 bundle.putString(KEY_BOOK_NAME, books.get(position).getName());
                 bundle.putString(KEY_CREATOR, books.get(position).getCreator());
                 it.putExtras(bundle);
+                browsingBook = books.get(position);
                 startActivityForResult(it, 0);
             }
         });
@@ -143,6 +149,8 @@ public class BookListActivity extends AppCompatActivity {
 
                         rgpAddMode.check(R.id.rdoCreateBook);
                         edtBookIdentity.setText(null);
+                        prgBar.setVisibility(View.VISIBLE);
+                        grdBook.setVisibility(View.INVISIBLE);
                     }
                 })
                 .setNegativeButton("取消", null)
@@ -150,11 +158,14 @@ public class BookListActivity extends AppCompatActivity {
     }
 
     private void loadBooksData(boolean showPrgBar) {
-        if (showPrgBar)
+        if (showPrgBar) {
             prgBar.setVisibility(View.VISIBLE);
+            grdBook.setVisibility(View.INVISIBLE);
+        }
 
         if (user.getBooks().isEmpty()) {
             prgBar.setVisibility(View.GONE);
+            grdBook.setVisibility(View.VISIBLE);
             Toast.makeText(context, "您目前沒有帳本", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -166,16 +177,28 @@ public class BookListActivity extends AppCompatActivity {
 
     private void downloadBook() {
         if (cnt > 0) {
+            final String bookId = user.getBooks().get(user.getBooks().size() - cnt);
             db.collection(KEY_BOOKS)
-                    .whereEqualTo(PRO_ID, user.getBooks().get(user.getBooks().size() - cnt))
+                    .whereEqualTo(PRO_ID, bookId)
                     .get()
-                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
-                            Book book = documentSnapshot.toObject(Book.class);
-                            book.giveDocumentId(documentSnapshot.getId());
-                            books.add(book);
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+
+                                if (documentSnapshots.isEmpty()) {
+                                    //若發現帳本已不存在，則把帳本ID由使用者資料中移除
+                                    User user = MyApp.getInstance().getUser();
+                                    user.getBooks().remove(bookId);
+                                    db.collection(KEY_USERS).document(user.gainDocumentId()).update(PRO_BOOKS, user.getBooks());
+                                }else {
+                                    DocumentSnapshot documentSnapshot = documentSnapshots.get(0);
+                                    Book book = documentSnapshot.toObject(Book.class);
+                                    book.giveDocumentId(documentSnapshot.getId());
+                                    books.add(book);
+                                }
+                            }
 
                             cnt--;
                             downloadBook();
@@ -184,6 +207,7 @@ public class BookListActivity extends AppCompatActivity {
         }else {
             grdBook.setAdapter(new BookGridAdapter(context, books));
             prgBar.setVisibility(View.GONE);
+            grdBook.setVisibility(View.VISIBLE);
         }
     }
 
@@ -197,7 +221,9 @@ public class BookListActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
-                            addToBookList(book.getId());
+                            Book fakeBook = new Book();
+                            fakeBook.giveDocumentId(task.getResult().getId());
+                            addToBookList(book.getId(), fakeBook);
                         }else {
                             Toast.makeText(context, "新增帳本失敗", Toast.LENGTH_SHORT).show();
                             prgBar.setVisibility(View.GONE);
@@ -228,8 +254,11 @@ public class BookListActivity extends AppCompatActivity {
                             if (documentSnapshot.isEmpty()) {
                                 Toast.makeText(context, "該帳本不存在，請確認帳本ID", Toast.LENGTH_SHORT).show();
                                 prgBar.setVisibility(View.GONE);
-                            }else
-                                addToBookList(bookId);
+                            }else {
+                                Book fakeBook = new Book();
+                                fakeBook.giveDocumentId(task.getResult().getDocuments().get(0).getId());
+                                addToBookList(bookId, fakeBook);
+                            }
                         }else {
                             Toast.makeText(context, "帳本確認失敗", Toast.LENGTH_SHORT).show();
                             prgBar.setVisibility(View.GONE);
@@ -238,7 +267,7 @@ public class BookListActivity extends AppCompatActivity {
                 });
     }
 
-    private void addToBookList(String bookId) {
+    private void addToBookList(final String bookId, final Book book) {
         user.addBooks(bookId);
 
         db.collection(KEY_USERS).document(user.gainDocumentId())
@@ -249,6 +278,7 @@ public class BookListActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(context, "加入帳本成功", Toast.LENGTH_SHORT).show();
                             loadBooksData(true);
+                            addMember(book);
                         }else {
                             Toast.makeText(context, "加入帳本失敗", Toast.LENGTH_SHORT).show();
                             prgBar.setVisibility(View.GONE);
@@ -257,9 +287,23 @@ public class BookListActivity extends AppCompatActivity {
                 });
     }
 
+    private void addMember(Book book) {
+        book.addMember(user.getUid());
+
+        db.collection(KEY_BOOKS)
+                .document(book.gainDocumentId())
+                .update(PRO_MEMBER_IDS, book.getMemberIds())
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                    }
+                });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        loadBooksData(resultCode == CODE_QUIT_ACTIVITY);
         super.onActivityResult(requestCode, resultCode, data);
-        loadBooksData(false);
     }
 }

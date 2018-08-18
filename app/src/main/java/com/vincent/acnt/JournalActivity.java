@@ -1,9 +1,7 @@
 package com.vincent.acnt;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,8 +16,6 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -38,13 +34,12 @@ import javax.annotation.Nullable;
 
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_DELETE;
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_UPDATE;
+import static com.vincent.acnt.data.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getDateNumber;
-import static com.vincent.acnt.data.Utility.getPlainDialog;
 import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.PRO_DATE;
 import static com.vincent.acnt.data.MyApp.PRO_MEMO;
-import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
 
 public class JournalActivity extends AppCompatActivity {
     private Context context;
@@ -175,7 +170,7 @@ public class JournalActivity extends AppCompatActivity {
             endMonth = 1;
         }
 
-        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
                 .orderBy(PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
                 .whereGreaterThanOrEqualTo(PRO_DATE, getDateNumber(selectedYear, selectedMonth, 1))

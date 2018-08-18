@@ -58,12 +58,17 @@
         <item name="android:ellipsize">end</item>
     </style>
 
+    <style name="txt_small_amount" parent="txt_amount">
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:gravity">start</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">#555555</item>
+    </style>
+
     <style name="edt_edit_subject">
         <item name="android:layout_width">150dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:singleLine">true</item>
     </style>
-
-    <!--<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />-->
 
 </resources>

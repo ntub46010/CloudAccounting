@@ -14,7 +14,7 @@ import java.util.Date;
 
 import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
+import static com.vincent.acnt.data.MyApp.browsingBook;
 
 public class EntryCreateActivity extends EntryEditActivity {
 
@@ -46,11 +46,11 @@ public class EntryCreateActivity extends EntryEditActivity {
     }
 
     private void addEntry() {
-        if (!isValid(entry))
+        if (isNotValid(entry))
             return;
 
         dlgWaiting.show();
-        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
                 .add(entry)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override

@@ -41,13 +41,13 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
+import static com.vincent.acnt.data.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.binarySearchNumber;
 import static com.vincent.acnt.data.Utility.getPlainDialog;
 import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
 import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
-import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
 
 public class SubjectActivity extends AppCompatActivity {
     private Context context;
@@ -97,16 +97,12 @@ public class SubjectActivity extends AppCompatActivity {
         });
 
         registerForContextMenu(lstSubject);
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        //顯示科目清單
         prgBar.setVisibility(View.VISIBLE);
         lstSubject.setVisibility(View.GONE);
-        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_SUBJECTS)
+
+        //顯示科目清單
+        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_SUBJECTS)
                 .orderBy(PRO_SUBJECT_ID, Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -204,12 +200,12 @@ public class SubjectActivity extends AppCompatActivity {
     }
 
     private void addSubject(Subject subject) {
-        if (!isValid(subject))
+        if (isNotValid(subject))
             return;
 
         //指定儲存的位置(集合)，呼叫add加入至資料庫，並定義callback方法
         //藉由物件的get方法，轉化為資料庫可儲存的形式
-        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_SUBJECTS)
+        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_SUBJECTS)
                 .add(subject)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -223,10 +219,10 @@ public class SubjectActivity extends AppCompatActivity {
     }
 
     private void editSubject(final Subject subject) {
-        if (!isValid(subject))
+        if (isNotValid(subject))
             return;
 
-        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
+        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
                 .set(subject)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -245,7 +241,7 @@ public class SubjectActivity extends AppCompatActivity {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
+                        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -263,7 +259,7 @@ public class SubjectActivity extends AppCompatActivity {
     }
 
     private void updateSubjectInEntry(final Subject newSubject) {
-        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -283,7 +279,7 @@ public class SubjectActivity extends AppCompatActivity {
                                 if (subject.getStamp() == newSubject.getStamp()) {
 
                                     subject.setName(newSubject.getName());
-                                    db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES)
+                                    db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
                                             .document(subEntry.gainDocumentId())
                                             .set(subEntry, SetOptions.merge());
                                     break;
@@ -294,14 +290,14 @@ public class SubjectActivity extends AppCompatActivity {
                 });
     }
 
-    private boolean isValid(Subject subject) {
-        StringBuffer errMsg = new StringBuffer();
+    private boolean isNotValid(Subject subject) {
+        StringBuilder errMsg = new StringBuilder(64);
         Verifier v = new Verifier(context);
 
         errMsg.append(v.chkId(String.valueOf(subject.getSubjectId())));
         //檢查編號重複
         if (mode == 1) {
-            if (binarySearchNumber(subjectIds, Integer.parseInt(subject.getSubjectId())) != -1)
+            if (binarySearchNumber(subjectIds, Integer.parseInt(subject.getSubjectId())) >= 0)
                 errMsg.append("科目編號").append(subject.getSubjectId()).append("已被使用\n");
         }
 
@@ -315,10 +311,10 @@ public class SubjectActivity extends AppCompatActivity {
             errMsg.append(v.chkSubjectAmount(String.valueOf(subject.getDebit())));
 
         if (errMsg.toString().equals(""))
-            return true;
+            return false;
         else {
             getPlainDialog(context, activityTitle, errMsg.toString()).show();
-            return false;
+            return true;
         }
     }
 

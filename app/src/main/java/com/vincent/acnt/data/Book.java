@@ -1,8 +1,11 @@
 package com.vincent.acnt.data;
 
+import java.util.ArrayList;
+
 public class Book {
     private String id;
     private String name, creator;
+    private ArrayList<String> memberIds;
     private String documentId;
 
     public Book() {
@@ -13,6 +16,7 @@ public class Book {
         this.id = id;
         this.name = name;
         this.creator = creator;
+        this.memberIds = new ArrayList<>();
     }
 
     public String getId() {
@@ -37,6 +41,22 @@ public class Book {
 
     public void setCreator(String creator) {
         this.creator = creator;
+    }
+
+    public ArrayList<String> getMemberIds() {
+        return memberIds;
+    }
+
+    public void setMemberIds(ArrayList<String> memberIds) {
+        if (memberIds == null)
+            memberIds = new ArrayList<>();
+        this.memberIds = memberIds;
+    }
+
+    public void addMember(String userId) {
+        if (memberIds == null)
+            memberIds = new ArrayList<>();
+        memberIds.add(userId);
     }
 
     public String gainDocumentId() {

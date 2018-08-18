@@ -13,4 +13,9 @@
         style="@style/toolbar"
         app:titleTextColor="#FFFFFF"/>
 
+    <ListView
+        android:id="@+id/lstBookOption"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>

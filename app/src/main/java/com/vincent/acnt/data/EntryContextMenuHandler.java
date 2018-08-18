@@ -22,7 +22,7 @@ import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
 import static com.vincent.acnt.data.MyApp.PRO_DATE;
 import static com.vincent.acnt.data.MyApp.PRO_DOCUMENT_ID;
 import static com.vincent.acnt.data.MyApp.PRO_MEMO;
-import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
+import static com.vincent.acnt.data.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getPlainDialog;
 
 public class EntryContextMenuHandler {
@@ -65,7 +65,7 @@ public class EntryContextMenuHandler {
                         prgBar.setVisibility(View.VISIBLE);
                         recyEntry.setVisibility(View.GONE);
 
-                        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES).document(entry.gainDocumentId())
+                        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES).document(entry.gainDocumentId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override

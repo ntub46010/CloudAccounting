@@ -24,7 +24,7 @@ import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
 import static com.vincent.acnt.data.MyApp.PRO_DATE;
 import static com.vincent.acnt.data.MyApp.PRO_DOCUMENT_ID;
 import static com.vincent.acnt.data.MyApp.PRO_MEMO;
-import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
+import static com.vincent.acnt.data.MyApp.browsingBook;
 
 public class EntryUpdateActivity extends EntryEditActivity {
     private String documentId;
@@ -78,11 +78,11 @@ public class EntryUpdateActivity extends EntryEditActivity {
     }
 
     private void updateEntry() {
-        if (!isValid(entry))
+        if (isNotValid(entry))
             return;
 
         dlgWaiting.show();
-        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_ENTRIES).document(documentId)
+        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES).document(documentId)
                 .set(entry)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

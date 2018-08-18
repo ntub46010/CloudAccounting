@@ -34,13 +34,13 @@ import java.util.Calendar;
 
 import javax.annotation.Nullable;
 
+import static com.vincent.acnt.data.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getPlainDialog;
 import static com.vincent.acnt.data.Utility.getWaitingDialog;
 import static com.vincent.acnt.data.MyApp.CODE_CREDIT;
 import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
 import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
-import static com.vincent.acnt.data.MyApp.browsingBookDocumentId;
 
 public class EntryEditActivity  extends AppCompatActivity {
     protected Context context;
@@ -132,7 +132,7 @@ public class EntryEditActivity  extends AppCompatActivity {
         super.onResume();
 
         //取得科目編號、名稱、戳記
-        db.collection(KEY_BOOKS).document(browsingBookDocumentId).collection(KEY_SUBJECTS)
+        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_SUBJECTS)
                 .orderBy(PRO_SUBJECT_ID)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -210,15 +210,15 @@ public class EntryEditActivity  extends AppCompatActivity {
         }
     }
 
-    protected boolean isValid(Entry entry) {
+    protected boolean isNotValid(Entry entry) {
         if (entry.getSubjects().size() < 2 || (entry.calTotalCredit() == 0 && entry.calTotalDebit() == 0)) {
             getPlainDialog(context, activityTitle, "會計科目填寫不全").show();
             return false;
         }
 
         Verifier v = new Verifier(context);
-        StringBuffer errMsg = new StringBuffer();
-        StringBuffer subjectExist = new StringBuffer();
+        StringBuilder errMsg = new StringBuilder(256);
+        StringBuilder subjectExist = new StringBuilder(128);
 
         if (entry.getDate() == 0)
             errMsg.append("日期未輸入\n");
@@ -243,10 +243,10 @@ public class EntryEditActivity  extends AppCompatActivity {
             errMsg.append("借貸金額不平衡\n");
 
         if (errMsg.length() == 0)
-            return true;
+            return false;
         else {
             getPlainDialog(context, activityTitle, errMsg.toString()).show();
-            return false;
+            return true;
         }
     }
 

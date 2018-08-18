@@ -20,25 +20,29 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
-        <ImageView
+        <ImageButton
             android:id="@+id/btnBook"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="10dp"
-            android:src="@drawable/fun_journal"/>
-        <ImageView
+            android:src="@drawable/fun_journal"
+            android:scaleType="centerInside"/>
+        <ImageButton
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="10dp"
-            android:src="@drawable/fun_profile"/>
-        <ImageView
+            android:src="@drawable/fun_profile"
+            android:scaleType="centerInside"/>
+        <ImageButton
+            android:id="@+id/btnLogout"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="10dp"
-            android:src="@drawable/fun_logout"/>
+            android:src="@drawable/fun_logout" android:background="#DDDD00"
+            android:scaleType="centerInside"/>
     </LinearLayout>
 
 </LinearLayout>
