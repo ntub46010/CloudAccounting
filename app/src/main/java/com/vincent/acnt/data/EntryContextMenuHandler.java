@@ -15,14 +15,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.vincent.acnt.EntryUpdateActivity;
+import com.vincent.acnt.entity.Entry;
 
-import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.data.MyApp.PRO_DATE;
-import static com.vincent.acnt.data.MyApp.PRO_DOCUMENT_ID;
-import static com.vincent.acnt.data.MyApp.PRO_MEMO;
-import static com.vincent.acnt.data.MyApp.browsingBook;
+import static com.vincent.acnt.MyApp.KEY_BOOKS;
+import static com.vincent.acnt.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.MyApp.PRO_DATE;
+import static com.vincent.acnt.MyApp.PRO_DOCUMENT_ID;
+import static com.vincent.acnt.MyApp.PRO_MEMO;
+import static com.vincent.acnt.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getPlainDialog;
 
 public class EntryContextMenuHandler {
@@ -32,7 +33,6 @@ public class EntryContextMenuHandler {
 
     public static final int MENU_UPDATE = Menu.FIRST, MENU_DELETE = Menu.FIRST + 1;
 
-
     public EntryContextMenuHandler(Context context, Entry entry, FirebaseFirestore db) {
         this.context = context;
         this.entry = entry;
@@ -41,7 +41,7 @@ public class EntryContextMenuHandler {
 
     public void updateEntry() {
         //調整日期格式
-        StringBuffer date = new StringBuffer(String.valueOf(entry.getDate()));
+        StringBuilder date = new StringBuilder(String.valueOf(entry.getDate()));
         date.insert(4, "/");
         date.insert(7, "/");
 
@@ -63,17 +63,20 @@ public class EntryContextMenuHandler {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         prgBar.setVisibility(View.VISIBLE);
-                        recyEntry.setVisibility(View.GONE);
+                        recyEntry.setVisibility(View.INVISIBLE);
 
                         db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES).document(entry.gainDocumentId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
+                                        if (task.isSuccessful())
                                             Toast.makeText(context, "分錄刪除成功", Toast.LENGTH_SHORT).show();
-                                        }else
+                                        else
                                             Toast.makeText(context, "分錄刪除失敗", Toast.LENGTH_SHORT).show();
+
+                                        prgBar.setVisibility(View.GONE);
+                                        recyEntry.setVisibility(View.VISIBLE);
                                     }
                                 });
                     }

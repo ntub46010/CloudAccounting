@@ -1,5 +1,6 @@
 package com.vincent.acnt;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -39,20 +40,21 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.vincent.acnt.data.MyApp;
-import com.vincent.acnt.data.User;
+import com.vincent.acnt.entity.User;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import static com.vincent.acnt.data.Utility.getWaitingDialog;
-import static com.vincent.acnt.data.MyApp.KEY_USERS;
-import static com.vincent.acnt.data.MyApp.PRO_UID;
+import static com.vincent.acnt.MyApp.KEY_USERS;
+import static com.vincent.acnt.MyApp.PRO_UID;
 
 public class LoginActivity extends AppCompatActivity {
     private Context context;
-    FirebaseFirestore db;
+    private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
 
@@ -217,48 +219,52 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void prepareFacebookButton() {
-        mCallbackManager = CallbackManager.Factory.create();
-        LoginButton facebookLoginButton = findViewById(R.id.login_button_facebook);
-        facebookLoginButton.setReadPermissions("email", "public_profile");
-        facebookLoginButton.setOnClickListener(new View.OnClickListener() {
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
+
+        Button btnFB = findViewById(R.id.btnFBLogin);
+        btnFB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dlgWaiting.show();
+                LoginManager.getInstance().logInWithReadPermissions((Activity) context, null);
             }
         });
-        facebookLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                final AccessToken accessToken = loginResult.getAccessToken();
 
-                GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+        mCallbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(mCallbackManager,
+                new FacebookCallback<LoginResult>() {
                     @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        loginWithCredential(FacebookAuthProvider.getCredential(accessToken.getToken()), object.optString("name"));
+                    public void onSuccess(LoginResult loginResult) {
+                        final AccessToken accessToken = loginResult.getAccessToken();
+
+                        GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                loginWithCredential(FacebookAuthProvider.getCredential(accessToken.getToken()), object.optString("name"));
+                            }
+                        });
+
+                        Bundle parameters = new Bundle();
+                        parameters.putString("fields", "name");
+                        request.setParameters(parameters);
+                        request.executeAsync();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Toast.makeText(context, "取消登入", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(FacebookException error) {
+                        Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "name");
-                request.setParameters(parameters);
-                request.executeAsync();
-            }
-
-            @Override
-            public void onCancel() {
-                Toast.makeText(context, "取消登入", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void prepareGoogleButton() {
-        SignInButton googleLoginButton = findViewById(R.id.login_button_google);
-        googleLoginButton.setOnClickListener(new View.OnClickListener() {
+        Button btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
+        btnGoogleLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dlgWaiting.show();

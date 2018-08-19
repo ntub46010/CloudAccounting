@@ -23,10 +23,9 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.vincent.acnt.data.Entry;
+import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.data.EntryElementView;
-import com.vincent.acnt.data.MyApp;
-import com.vincent.acnt.data.Subject;
+import com.vincent.acnt.entity.Subject;
 import com.vincent.acnt.data.Verifier;
 
 import java.util.ArrayList;
@@ -34,13 +33,13 @@ import java.util.Calendar;
 
 import javax.annotation.Nullable;
 
-import static com.vincent.acnt.data.MyApp.browsingBook;
+import static com.vincent.acnt.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getPlainDialog;
 import static com.vincent.acnt.data.Utility.getWaitingDialog;
-import static com.vincent.acnt.data.MyApp.CODE_CREDIT;
-import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
+import static com.vincent.acnt.MyApp.CODE_CREDIT;
+import static com.vincent.acnt.MyApp.KEY_BOOKS;
+import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.MyApp.PRO_SUBJECT_ID;
 
 public class EntryEditActivity  extends AppCompatActivity {
     protected Context context;
@@ -213,7 +212,7 @@ public class EntryEditActivity  extends AppCompatActivity {
     protected boolean isNotValid(Entry entry) {
         if (entry.getSubjects().size() < 2 || (entry.calTotalCredit() == 0 && entry.calTotalDebit() == 0)) {
             getPlainDialog(context, activityTitle, "會計科目填寫不全").show();
-            return false;
+            return true;
         }
 
         Verifier v = new Verifier(context);

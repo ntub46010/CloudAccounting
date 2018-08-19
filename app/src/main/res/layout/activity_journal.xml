@@ -38,7 +38,7 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        app:srcCompat="@drawable/icon_add"
+        app:srcCompat="@drawable/icon_write"
         app:fabSize="normal"/>
 
 </RelativeLayout>

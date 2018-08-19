@@ -9,14 +9,14 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.vincent.acnt.data.Entry;
-import com.vincent.acnt.data.Subject;
+import com.vincent.acnt.entity.Entry;
+import com.vincent.acnt.entity.Subject;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
 import static com.vincent.acnt.data.Utility.getSubjectColor;
-import static com.vincent.acnt.data.MyApp.KEY_ENTRY;
+import static com.vincent.acnt.MyApp.KEY_ENTRY;
 
 public class EntryDetailActivity extends AppCompatActivity {
     private Context context;

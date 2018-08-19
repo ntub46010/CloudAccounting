@@ -1,4 +1,4 @@
-package com.vincent.acnt.data;
+package com.vincent.acnt;
 
 import android.app.Application;
 import android.content.res.Resources;
@@ -6,6 +6,8 @@ import android.content.res.Resources;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.vincent.acnt.entity.Book;
+import com.vincent.acnt.entity.User;
 
 public class MyApp extends Application {
     private static MyApp myApp;

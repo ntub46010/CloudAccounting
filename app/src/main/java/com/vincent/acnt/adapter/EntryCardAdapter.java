@@ -17,8 +17,8 @@ import android.widget.TextView;
 
 import com.vincent.acnt.EntryDetailActivity;
 import com.vincent.acnt.R;
-import com.vincent.acnt.data.Entry;
-import com.vincent.acnt.data.Subject;
+import com.vincent.acnt.entity.Entry;
+import com.vincent.acnt.entity.Subject;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -29,7 +29,7 @@ import java.util.Locale;
 
 import static com.vincent.acnt.data.Utility.getEngMonth;
 import static com.vincent.acnt.data.Utility.getWeekColor;
-import static com.vincent.acnt.data.MyApp.KEY_ENTRY;
+import static com.vincent.acnt.MyApp.KEY_ENTRY;
 
 public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.DataViewHolder> {
     private Context context;

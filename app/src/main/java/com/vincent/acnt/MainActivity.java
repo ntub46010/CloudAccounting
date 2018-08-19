@@ -12,12 +12,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.vincent.acnt.data.MyApp;
-import com.vincent.acnt.data.User;
+import com.vincent.acnt.entity.User;
 
 import javax.annotation.Nullable;
 
-import static com.vincent.acnt.data.MyApp.KEY_USERS;
+import static com.vincent.acnt.MyApp.KEY_USERS;
 
 public class MainActivity extends AppCompatActivity {
     private Context context;

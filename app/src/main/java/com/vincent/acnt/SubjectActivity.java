@@ -32,22 +32,21 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.vincent.acnt.adapter.SubjectListAdapter;
-import com.vincent.acnt.data.Entry;
-import com.vincent.acnt.data.MyApp;
-import com.vincent.acnt.data.Subject;
+import com.vincent.acnt.entity.Entry;
+import com.vincent.acnt.entity.Subject;
 import com.vincent.acnt.data.Verifier;
 
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import static com.vincent.acnt.data.MyApp.browsingBook;
+import static com.vincent.acnt.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.binarySearchNumber;
 import static com.vincent.acnt.data.Utility.getPlainDialog;
-import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
+import static com.vincent.acnt.MyApp.KEY_BOOKS;
+import static com.vincent.acnt.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.MyApp.PRO_SUBJECT_ID;
 
 public class SubjectActivity extends AppCompatActivity {
     private Context context;

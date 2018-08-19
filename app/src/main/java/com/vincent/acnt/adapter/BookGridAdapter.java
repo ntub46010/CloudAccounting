@@ -7,10 +7,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vincent.acnt.R;
-import com.vincent.acnt.data.Book;
+import com.vincent.acnt.entity.Book;
 
 import java.util.ArrayList;
 

@@ -23,9 +23,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.EntryCardAdapter;
-import com.vincent.acnt.data.Entry;
+import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.data.EntryContextMenuHandler;
-import com.vincent.acnt.data.MyApp;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,12 +33,12 @@ import javax.annotation.Nullable;
 
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_DELETE;
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_UPDATE;
-import static com.vincent.acnt.data.MyApp.browsingBook;
+import static com.vincent.acnt.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getDateNumber;
-import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.data.MyApp.PRO_DATE;
-import static com.vincent.acnt.data.MyApp.PRO_MEMO;
+import static com.vincent.acnt.MyApp.KEY_BOOKS;
+import static com.vincent.acnt.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.MyApp.PRO_DATE;
+import static com.vincent.acnt.MyApp.PRO_MEMO;
 
 public class JournalActivity extends AppCompatActivity {
     private Context context;
@@ -54,8 +53,6 @@ public class JournalActivity extends AppCompatActivity {
     private EntryCardAdapter adapter;
 
     private int selectedYear, selectedMonth;
-
-    private Entry entry;
 
     private int queryFlag = -1;
     private boolean canQuery = true;

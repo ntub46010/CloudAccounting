@@ -25,26 +25,26 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.LedgerListAdapter;
-import com.vincent.acnt.data.Entry;
-import com.vincent.acnt.data.LedgerRecord;
-import com.vincent.acnt.data.MyApp;
-import com.vincent.acnt.data.Subject;
+import com.vincent.acnt.entity.Entry;
+import com.vincent.acnt.entity.LedgerRecord;
+import com.vincent.acnt.entity.Subject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
-import static com.vincent.acnt.data.MyApp.browsingBook;
+import static com.vincent.acnt.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getDateNumber;
 import static com.vincent.acnt.data.Utility.getPlainDialog;
-import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.data.MyApp.KEY_ENTRY;
-import static com.vincent.acnt.data.MyApp.KEY_SUBJECT;
-import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.data.MyApp.PRO_DATE;
-import static com.vincent.acnt.data.MyApp.PRO_MEMO;
-import static com.vincent.acnt.data.MyApp.PRO_NAME;
-import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
+import static com.vincent.acnt.MyApp.KEY_BOOKS;
+import static com.vincent.acnt.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.MyApp.KEY_ENTRY;
+import static com.vincent.acnt.MyApp.KEY_SUBJECT;
+import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.MyApp.PRO_DATE;
+import static com.vincent.acnt.MyApp.PRO_MEMO;
+import static com.vincent.acnt.MyApp.PRO_NAME;
+import static com.vincent.acnt.MyApp.PRO_SUBJECT_ID;
 
 public class LedgerActivity extends AppCompatActivity {
     private Context context;
@@ -227,7 +227,7 @@ public class LedgerActivity extends AppCompatActivity {
 
         canQuery = false;
         prgBar.setVisibility(View.VISIBLE);
-        lstLedger.setVisibility(View.GONE);
+        lstLedger.setVisibility(View.INVISIBLE);
 
         int endYear = selectedYear;
         int endMonth = selectedMonth + 1;
@@ -256,12 +256,16 @@ public class LedgerActivity extends AppCompatActivity {
                             return;
                         }
 
-                        QuerySnapshot querySnapshot = task.getResult();
+                        List<DocumentSnapshot> docEntry = task.getResult().getDocuments();
                         Entry entry;
-                        for (DocumentSnapshot documentSnapshot : querySnapshot) {
-                            entry = documentSnapshot.toObject(Entry.class);
 
-                            for (Subject subject : entry.getSubjects()) {
+                        for (int i = 0, len = docEntry.size(); i < len; i++) {
+                            entry = docEntry.get(i).toObject(Entry.class);
+                            ArrayList<Subject> subjects = entry.getSubjects();
+
+                            for (int j = 0, len2 = subjects.size(); j < len2; j++) {
+                                Subject subject = subjects.get(j);
+
                                 if (subject.getName().equals(subjectName)) {
                                     //儲存分錄，供點擊清單後能顯示詳情，越前面越新
                                     entries.add(entry);
@@ -274,7 +278,7 @@ public class LedgerActivity extends AppCompatActivity {
                                             subject.getDebit()
                                     ));
                                 }
-                           }
+                            }
                         }
 
                         if (records.isEmpty())
@@ -301,13 +305,13 @@ public class LedgerActivity extends AppCompatActivity {
                             return;
                         }
 
-                        QuerySnapshot querySnapshot = task.getResult();
                         Entry entry;
                         int totalCredit = 0, totalDebit = 0;
 
                         //從歷史分錄中計算累積借貸總額
-                        for (DocumentSnapshot documentSnapshot : querySnapshot) {
-                            entry = documentSnapshot.toObject(Entry.class);
+                        List<DocumentSnapshot > docEntry = task.getResult().getDocuments();
+                        for (int i = 0, len = docEntry.size(); i < len; i++) {
+                            entry = docEntry.get(i).toObject(Entry.class);
 
                             for (Subject subject : entry.getSubjects()) {
                                 if (subject.getName().equals(subjectName)) {

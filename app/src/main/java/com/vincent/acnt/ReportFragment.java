@@ -12,13 +12,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.vincent.acnt.adapter.ReportListAdapter;
-import com.vincent.acnt.data.ReportItem;
+import com.vincent.acnt.entity.ReportItem;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import static com.vincent.acnt.data.MyApp.KEY_SUBJECT;
+import static com.vincent.acnt.MyApp.KEY_SUBJECT;
 
 public class ReportFragment extends Fragment {
     protected Context context;

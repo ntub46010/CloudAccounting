@@ -12,19 +12,19 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.vincent.acnt.data.EntryElementView;
-import com.vincent.acnt.data.Subject;
+import com.vincent.acnt.entity.Subject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.data.MyApp.PRO_DATE;
-import static com.vincent.acnt.data.MyApp.PRO_DOCUMENT_ID;
-import static com.vincent.acnt.data.MyApp.PRO_MEMO;
-import static com.vincent.acnt.data.MyApp.browsingBook;
+import static com.vincent.acnt.MyApp.KEY_BOOKS;
+import static com.vincent.acnt.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.MyApp.PRO_DATE;
+import static com.vincent.acnt.MyApp.PRO_DOCUMENT_ID;
+import static com.vincent.acnt.MyApp.PRO_MEMO;
+import static com.vincent.acnt.MyApp.browsingBook;
 
 public class EntryUpdateActivity extends EntryEditActivity {
     private String documentId;

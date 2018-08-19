@@ -1,31 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:background="@color/type_asset">
 
     <GridLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:columnCount="2">
+        android:columnCount="2"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true">
 
         <TextView
             style="@style/txt_normal_title"
-            android:text="上月支出："/>
+            android:layout_marginEnd="30dp"
+            android:layout_gravity="end"
+            android:text="上月支出"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"/>
 
         <TextView
             android:id="@+id/txtLastMonthExpanse"
-            style="@style/txt_normal_title" />
+            style="@style/txt_normal_title"
+            android:layout_gravity="end"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"/>
 
         <TextView
             style="@style/txt_normal_title"
-            android:text="本月支出："/>
+            android:layout_marginEnd="30dp"
+            android:layout_gravity="end"
+            android:textSize="22sp"
+            android:text="本月支出"
+            android:textColor="#FFFFFF"/>
 
         <TextView
             android:id="@+id/txtThisMonthExpanse"
-            style="@style/txt_normal_title" />
+            style="@style/txt_normal_title"
+            android:layout_gravity="end"
+            android:textSize="22sp"
+            android:textColor="#FFFFFF"/>
 
     </GridLayout>
 
-</LinearLayout>
+
+</RelativeLayout>

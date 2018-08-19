@@ -41,7 +41,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="10dp"
-            android:src="@drawable/fun_logout" android:background="#DDDD00"
+            android:src="@drawable/fun_logout"
             android:scaleType="centerInside"/>
     </LinearLayout>
 

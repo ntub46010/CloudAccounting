@@ -8,9 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -20,18 +18,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.vincent.acnt.adapter.BookOptionListAdapter;
-import com.vincent.acnt.data.MyApp;
-import com.vincent.acnt.data.User;
+import com.vincent.acnt.entity.User;
 
-import java.util.ArrayList;
-
-import static com.vincent.acnt.data.MyApp.CODE_QUIT_ACTIVITY;
-import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_USERS;
-import static com.vincent.acnt.data.MyApp.PRO_BOOKS;
-import static com.vincent.acnt.data.MyApp.PRO_MEMBER_IDS;
-import static com.vincent.acnt.data.MyApp.PRO_NAME;
-import static com.vincent.acnt.data.MyApp.browsingBook;
+import static com.vincent.acnt.MyApp.CODE_QUIT_ACTIVITY;
+import static com.vincent.acnt.MyApp.KEY_BOOKS;
+import static com.vincent.acnt.MyApp.KEY_USERS;
+import static com.vincent.acnt.MyApp.PRO_BOOKS;
+import static com.vincent.acnt.MyApp.PRO_MEMBER_IDS;
+import static com.vincent.acnt.MyApp.PRO_NAME;
+import static com.vincent.acnt.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getPlainDialog;
 
 public class BookOptionActivity extends AppCompatActivity {

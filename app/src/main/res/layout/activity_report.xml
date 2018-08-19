@@ -42,7 +42,7 @@
         android:id="@+id/fabSelectDate"
         style="@style/fab"
         android:layout_marginEnd="@dimen/fab_margin"
-        app:srcCompat="@drawable/icon_add"
+        app:srcCompat="@drawable/icon_calendar"
         app:fabSize="normal"/>
 
 </android.support.design.widget.CoordinatorLayout>

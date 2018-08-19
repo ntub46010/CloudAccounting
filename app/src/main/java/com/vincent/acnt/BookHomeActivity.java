@@ -28,11 +28,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.EntryCardAdapter;
-import com.vincent.acnt.data.Book;
-import com.vincent.acnt.data.Entry;
+import com.vincent.acnt.entity.Book;
+import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.data.EntryContextMenuHandler;
-import com.vincent.acnt.data.MyApp;
-import com.vincent.acnt.data.Subject;
+import com.vincent.acnt.entity.Subject;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -44,14 +43,14 @@ import javax.annotation.Nullable;
 
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_DELETE;
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_UPDATE;
-import static com.vincent.acnt.data.MyApp.CODE_QUIT_ACTIVITY;
-import static com.vincent.acnt.data.MyApp.CODE_TYPE;
-import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_BOOK_NAME;
-import static com.vincent.acnt.data.MyApp.KEY_CREATOR;
-import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.data.MyApp.PRO_DATE;
-import static com.vincent.acnt.data.MyApp.browsingBook;
+import static com.vincent.acnt.MyApp.CODE_QUIT_ACTIVITY;
+import static com.vincent.acnt.MyApp.CODE_TYPE;
+import static com.vincent.acnt.MyApp.KEY_BOOKS;
+import static com.vincent.acnt.MyApp.KEY_BOOK_NAME;
+import static com.vincent.acnt.MyApp.KEY_CREATOR;
+import static com.vincent.acnt.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.MyApp.PRO_DATE;
+import static com.vincent.acnt.MyApp.browsingBook;
 
 public class BookHomeActivity extends AppCompatActivity {
     private Context context;
@@ -59,7 +58,6 @@ public class BookHomeActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    private LinearLayout layBookHome;
     private TextView txtLastMonthExpanse, txtThisMonthExpanse, txtBookName, txtBookCreator;
     private RecyclerView recyEntry;
     private ProgressBar prgBar;
@@ -84,7 +82,6 @@ public class BookHomeActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigation_view);
         FloatingActionButton fabCreateEntry = findViewById(R.id.fabCreateEntry);
-        layBookHome = findViewById(R.id.layBookHome);
         txtLastMonthExpanse = findViewById(R.id.txtLastMonthExpanse);
         txtThisMonthExpanse = findViewById(R.id.txtThisMonthExpanse);
         recyEntry = findViewById(R.id.recyEntry);
@@ -106,7 +103,6 @@ public class BookHomeActivity extends AppCompatActivity {
         thisMonthStartDate = Integer.parseInt(new SimpleDateFormat("yyyyMM01").format(date));
         thisMonthEndDate = Integer.parseInt(new SimpleDateFormat("yyyyMM31").format(date));
 
-        layBookHome.setVisibility(View.INVISIBLE);
         startQueryExpanse();
     }
 
@@ -265,7 +261,6 @@ public class BookHomeActivity extends AppCompatActivity {
             Toast.makeText(context, "今日尚未記帳", Toast.LENGTH_SHORT).show();
 
         prgBar.setVisibility(View.GONE);
-        layBookHome.setVisibility(View.VISIBLE);
     }
 
     @Override

@@ -12,9 +12,9 @@ import com.google.firebase.firestore.DocumentReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.data.MyApp.browsingBook;
+import static com.vincent.acnt.MyApp.KEY_BOOKS;
+import static com.vincent.acnt.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.MyApp.browsingBook;
 
 public class EntryCreateActivity extends EntryEditActivity {
 

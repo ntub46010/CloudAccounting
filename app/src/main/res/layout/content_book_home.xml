@@ -16,7 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="10dp"
         android:layout_below="@id/toolbar">
 
         <include
@@ -30,7 +29,8 @@
             android:id="@+id/recyEntry"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3" />
+            android:layout_weight="3"
+            android:layout_margin="5dp"/>
 
     </LinearLayout>
 
@@ -44,7 +44,7 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        app:srcCompat="@drawable/icon_add"
+        app:srcCompat="@drawable/icon_write"
         app:fabSize="normal"/>
 
 </RelativeLayout>

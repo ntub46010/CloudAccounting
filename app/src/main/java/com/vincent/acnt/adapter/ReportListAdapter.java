@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.vincent.acnt.R;
-import com.vincent.acnt.data.ReportItem;
+import com.vincent.acnt.entity.ReportItem;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;

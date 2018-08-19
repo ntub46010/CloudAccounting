@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.vincent.acnt.R;
-import com.vincent.acnt.data.LedgerRecord;
+import com.vincent.acnt.entity.LedgerRecord;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;

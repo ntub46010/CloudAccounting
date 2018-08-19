@@ -5,7 +5,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.view.Window;
 
+import com.vincent.acnt.MyApp;
 import com.vincent.acnt.R;
+import com.vincent.acnt.entity.Subject;
 
 import java.math.BigDecimal;
 import java.net.URLDecoder;

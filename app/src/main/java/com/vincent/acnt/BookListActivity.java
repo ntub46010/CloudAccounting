@@ -23,31 +23,25 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.BookGridAdapter;
-import com.vincent.acnt.data.Book;
-import com.vincent.acnt.data.MyApp;
-import com.vincent.acnt.data.User;
+import com.vincent.acnt.entity.Book;
+import com.vincent.acnt.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
-import static com.vincent.acnt.data.MyApp.CODE_QUIT_ACTIVITY;
-import static com.vincent.acnt.data.MyApp.PRO_MEMBER_AMOUNT;
-import static com.vincent.acnt.data.MyApp.PRO_MEMBER_IDS;
-import static com.vincent.acnt.data.MyApp.browsingBook;
+import static com.vincent.acnt.MyApp.CODE_QUIT_ACTIVITY;
+import static com.vincent.acnt.MyApp.PRO_MEMBER_IDS;
+import static com.vincent.acnt.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getPlainDialog;
-import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_BOOK_NAME;
-import static com.vincent.acnt.data.MyApp.KEY_CREATOR;
-import static com.vincent.acnt.data.MyApp.KEY_USERS;
-import static com.vincent.acnt.data.MyApp.PRO_BOOKS;
-import static com.vincent.acnt.data.MyApp.PRO_ID;
+import static com.vincent.acnt.MyApp.KEY_BOOKS;
+import static com.vincent.acnt.MyApp.KEY_BOOK_NAME;
+import static com.vincent.acnt.MyApp.KEY_CREATOR;
+import static com.vincent.acnt.MyApp.KEY_USERS;
+import static com.vincent.acnt.MyApp.PRO_BOOKS;
+import static com.vincent.acnt.MyApp.PRO_ID;
 import static com.vincent.acnt.data.Utility.convertTo62Notation;
 
 public class BookListActivity extends AppCompatActivity {

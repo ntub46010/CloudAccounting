@@ -21,28 +21,28 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.ReportPagerAdapter;
-import com.vincent.acnt.data.Entry;
-import com.vincent.acnt.data.MyApp;
-import com.vincent.acnt.data.ReportItem;
-import com.vincent.acnt.data.Subject;
+import com.vincent.acnt.entity.Entry;
+import com.vincent.acnt.entity.ReportItem;
+import com.vincent.acnt.entity.Subject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static com.vincent.acnt.data.MyApp.browsingBook;
+import static com.vincent.acnt.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getDateNumber;
 import static com.vincent.acnt.data.Utility.getWaitingDialog;
-import static com.vincent.acnt.data.MyApp.CODE_TYPE;
-import static com.vincent.acnt.data.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.data.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.data.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.data.MyApp.PRO_DATE;
-import static com.vincent.acnt.data.MyApp.PRO_MEMO;
-import static com.vincent.acnt.data.MyApp.PRO_SUBJECT_ID;
+import static com.vincent.acnt.MyApp.CODE_TYPE;
+import static com.vincent.acnt.MyApp.KEY_BOOKS;
+import static com.vincent.acnt.MyApp.KEY_ENTRIES;
+import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.MyApp.PRO_DATE;
+import static com.vincent.acnt.MyApp.PRO_MEMO;
+import static com.vincent.acnt.MyApp.PRO_SUBJECT_ID;
 
 public class ReportActivity extends AppCompatActivity {
     private Context context;
@@ -189,13 +189,18 @@ public class ReportActivity extends AppCompatActivity {
                             QuerySnapshot querySnapshot = task.getResult();
 
                             //儲存分錄
-                            for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments())
-                                entries.add(documentSnapshot.toObject(Entry.class));
+                            List<DocumentSnapshot> docEntry = querySnapshot.getDocuments();
+                            for (int i = 0, len = docEntry.size(); i < len; i++)
+                                entries.add(docEntry.get(i).toObject(Entry.class));
 
                             //從各個分錄中將科目金額逐一儲存
                             ReportItem item;
-                            for (Entry entry : entries) {
-                                for (Subject subject : entry.getSubjects()) {
+                            for (int i = 0, len = entries.size(); i < len; i++) {
+                                ArrayList<Subject> subjects = entries.get(i).getSubjects();
+
+                                for (int j = 0, len2 = subjects.size(); j < len2; j++) {
+                                    Subject subject = subjects.get(j);
+
                                     if (mapReportItem.containsKey(subject.getSubjectId())) {
                                         //科目已存在，則取出累積金額，再放置回去
                                         item = mapReportItem.get(subject.getSubjectId());

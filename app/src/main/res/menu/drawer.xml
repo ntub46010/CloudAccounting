@@ -5,25 +5,25 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_journal"
-            android:icon="@android:drawable/ic_menu_my_calendar"
+            android:icon="@drawable/nav_journal"
             android:title="日記簿"
             android:foreground="?android:attr/selectableItemBackground" />
 
         <item
             android:id="@+id/nav_ledger"
-            android:icon="@android:drawable/ic_menu_upload"
+            android:icon="@drawable/nav_ledger"
             android:title="分類帳"
             android:foreground="?android:attr/selectableItemBackground" />
 
         <item
             android:id="@+id/nav_report"
-            android:icon="@android:drawable/ic_search_category_default"
+            android:icon="@drawable/nav_report"
             android:title="財務報告"
             android:foreground="?android:attr/selectableItemBackground" />
 
         <item
             android:id="@+id/nav_subject"
-            android:icon="@android:drawable/ic_dialog_map"
+            android:icon="@drawable/nav_subject"
             android:title="記帳科目"
             android:foreground="?android:attr/selectableItemBackground" />
     </group>
@@ -32,12 +32,12 @@
         <!-- Divider will appear above this item -->
         <item
             android:id="@+id/nav_member"
-            android:icon="@android:drawable/ic_popup_reminder"
+            android:icon="@drawable/nav_member"
             android:title="成員"
             android:foreground="?android:attr/selectableItemBackground" />
         <item
             android:id="@+id/nav_options"
-            android:icon="@android:drawable/ic_lock_idle_alarm"
+            android:icon="@drawable/nav_options"
             android:title="選項"
             android:foreground="?android:attr/selectableItemBackground" />
     </group>

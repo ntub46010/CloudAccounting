@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.vincent.acnt.R;
-import com.vincent.acnt.data.Book;
+import com.vincent.acnt.entity.Book;
 
 public class BookOptionListAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;

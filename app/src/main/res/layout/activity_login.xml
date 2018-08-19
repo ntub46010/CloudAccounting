@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <AutoCompleteTextView
+        <EditText
             android:id="@+id/edtEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,26 +48,20 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="16dp"
-        android:text="註冊"/>
+        android:text="Email註冊"/>
 
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/login_button_facebook"
+    <Button
+        android:id="@+id/btnFBLogin"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:layout_marginStart="2.5dp"
-        android:layout_marginTop="16dp"/>
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:text="Facebook登入"/>
 
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/login_button_google"
+    <Button
+        android:id="@+id/btnGoogleLogin"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:layout_marginStart="2.5dp"
-        android:layout_marginTop="16dp"/>
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:text="Google登入"/>
 
 </LinearLayout>
