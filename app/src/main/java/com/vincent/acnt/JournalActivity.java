@@ -167,7 +167,7 @@ public class JournalActivity extends AppCompatActivity {
             endMonth = 1;
         }
 
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
                 .orderBy(PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
                 .whereGreaterThanOrEqualTo(PRO_DATE, getDateNumber(selectedYear, selectedMonth, 1))
@@ -179,7 +179,7 @@ public class JournalActivity extends AppCompatActivity {
                         Entry entry;
                         for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             entry = documentSnapshot.toObject(Entry.class);
-                            entry.giveDocumentId(documentSnapshot.getId());
+                            entry.defineDocumentId(documentSnapshot.getId());
                             entries.add(entry);
                         }
 

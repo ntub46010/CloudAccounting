@@ -49,12 +49,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().gainDocumentId())
+        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().obtainDocumentId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                         User user = documentSnapshot.toObject(User.class);
-                        user.giveDocumentId(documentSnapshot.getId());
+                        user.defineDocumentId(documentSnapshot.getId());
                         MyApp.getInstance().setUser(user);
                     }
                 });

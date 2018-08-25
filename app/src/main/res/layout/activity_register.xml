@@ -1,33 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center_horizontal"
-    tools:context=".LoginActivity">
+    android:gravity="center"
+    tools:context=".RegisterActivity">
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/tilNickName"
+        style="@style/til_account"
+        app:errorEnabled="true">
+
+        <EditText
+            android:id="@+id/edtNickname"
+            style="@style/edit_text"
+            android:hint="您的暱稱"
+            android:text="仲佑"/>
+
+    </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/tilEmail"
         style="@style/til_account"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        app:errorEnabled="true">
 
         <EditText
             android:id="@+id/edtEmail"
             style="@style/edit_text"
-            android:hint="電子郵件"
-            android:text="zxcveric@yahoo.com.tw"/>
+            android:hint="電子郵件"/>
 
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/tilPwd"
         style="@style/til_account"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        app:errorEnabled="true">
 
         <EditText
             android:id="@+id/edtPwd"
@@ -39,31 +50,10 @@
     </android.support.design.widget.TextInputLayout>
 
     <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-        android:text="登入"/>
-
-    <Button
         android:id="@+id/btnRegister"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="50dp"
         android:layout_marginTop="16dp"
-        android:text="Email註冊"/>
-
-    <Button
-        android:id="@+id/btnFBLogin"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-        android:text="Facebook登入"/>
-
-    <Button
-        android:id="@+id/btnGoogleLogin"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-        android:text="Google登入"/>
+        android:text="註冊"/>
 
 </LinearLayout>

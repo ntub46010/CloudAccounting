@@ -50,7 +50,7 @@ public class EntryContextMenuHandler {
 
         bundle.putString(PRO_DATE, date.toString());
         bundle.putString(PRO_MEMO, entry.getMemo());
-        bundle.putString(PRO_DOCUMENT_ID, entry.gainDocumentId());
+        bundle.putString(PRO_DOCUMENT_ID, entry.obtainDocumentId());
         it.putExtras(bundle);
         it.putExtra(KEY_SUBJECTS, entry.getSubjects());
 
@@ -65,7 +65,7 @@ public class EntryContextMenuHandler {
                         prgBar.setVisibility(View.VISIBLE);
                         recyEntry.setVisibility(View.INVISIBLE);
 
-                        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES).document(entry.gainDocumentId())
+                        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES).document(entry.obtainDocumentId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override

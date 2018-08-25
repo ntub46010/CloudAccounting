@@ -101,7 +101,7 @@ public class SubjectActivity extends AppCompatActivity {
         lstSubject.setVisibility(View.GONE);
 
         //顯示科目清單
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_SUBJECTS)
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
                 .orderBy(PRO_SUBJECT_ID, Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -111,7 +111,7 @@ public class SubjectActivity extends AppCompatActivity {
                         Subject subject;
                         for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
                             subject = documentSnapshot.toObject(Subject.class);
-                            subject.giveDocumentId(documentSnapshot.getId());
+                            subject.defineDocumentId(documentSnapshot.getId());
                             subjects.add(subject);
 
                             //取得各科目編號，供新增與編輯科目時確認
@@ -190,7 +190,7 @@ public class SubjectActivity extends AppCompatActivity {
                                     debit.equals("") ? 0 : Integer.parseInt(debit),
                                     subject.getStamp()
                             );
-                            newSubject.giveDocumentId(subject.gainDocumentId());
+                            newSubject.defineDocumentId(subject.obtainDocumentId());
                             editSubject(newSubject);
                         }
                     })
@@ -204,7 +204,7 @@ public class SubjectActivity extends AppCompatActivity {
 
         //指定儲存的位置(集合)，呼叫add加入至資料庫，並定義callback方法
         //藉由物件的get方法，轉化為資料庫可儲存的形式
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_SUBJECTS)
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
                 .add(subject)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -221,7 +221,7 @@ public class SubjectActivity extends AppCompatActivity {
         if (isNotValid(subject))
             return;
 
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS).document(subject.obtainDocumentId())
                 .set(subject)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -240,7 +240,7 @@ public class SubjectActivity extends AppCompatActivity {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_SUBJECTS).document(subject.gainDocumentId())
+                        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS).document(subject.obtainDocumentId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -258,7 +258,7 @@ public class SubjectActivity extends AppCompatActivity {
     }
 
     private void updateSubjectInEntry(final Subject newSubject) {
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -268,7 +268,7 @@ public class SubjectActivity extends AppCompatActivity {
                         //取得各個分錄
                         for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
                             entry = documentSnapshot.toObject(Entry.class);
-                            entry.giveDocumentId(documentSnapshot.getId());
+                            entry.defineDocumentId(documentSnapshot.getId());
                             entries.add(entry);
                         }
 
@@ -278,8 +278,8 @@ public class SubjectActivity extends AppCompatActivity {
                                 if (subject.getStamp() == newSubject.getStamp()) {
 
                                     subject.setName(newSubject.getName());
-                                    db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
-                                            .document(subEntry.gainDocumentId())
+                                    db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
+                                            .document(subEntry.obtainDocumentId())
                                             .set(subEntry, SetOptions.merge());
                                     break;
                                 }

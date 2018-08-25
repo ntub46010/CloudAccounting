@@ -15,7 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -115,7 +114,7 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void startQueryExpanse() {
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
                 .whereGreaterThanOrEqualTo(PRO_DATE, thisMonthStartDate)
                 .whereLessThanOrEqualTo(PRO_DATE, thisMonthEndDate)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -136,7 +135,7 @@ public class BookHomeActivity extends AppCompatActivity {
 
                             //若為今日的分錄，則保存起來
                             if (entry.getDate() == Integer.parseInt(today)) {
-                                entry.giveDocumentId(documentSnapshot.getId());
+                                entry.defineDocumentId(documentSnapshot.getId());
                                 entries.add(entry);
                             }
 
@@ -202,7 +201,7 @@ public class BookHomeActivity extends AppCompatActivity {
         txtBookName.setText(bundle.getString(KEY_BOOK_NAME));
         txtBookCreator.setText("由" + bundle.getString(KEY_CREATOR) + "建立");
 
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId())
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -218,7 +217,7 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void queryLastMonthExpanse(int startDate, int endDate) {
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
                 .whereGreaterThanOrEqualTo(PRO_DATE, startDate)
                 .whereLessThan(PRO_DATE, endDate)
                 .get()

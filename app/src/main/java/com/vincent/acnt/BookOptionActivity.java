@@ -156,7 +156,7 @@ public class BookOptionActivity extends AppCompatActivity {
     }
 
     private void updateBookName(String bookName) {
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId())
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId())
                 .update(PRO_NAME, bookName)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -173,7 +173,7 @@ public class BookOptionActivity extends AppCompatActivity {
         final User user = MyApp.getInstance().getUser();
         user.getBooks().remove(browsingBook.getId());
 
-        db.collection(KEY_USERS).document(user.gainDocumentId())
+        db.collection(KEY_USERS).document(user.obtainDocumentId())
                 .update(PRO_BOOKS, user.getBooks())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -186,7 +186,7 @@ public class BookOptionActivity extends AppCompatActivity {
     private void removeMember(String userId) {
         browsingBook.getMemberIds().remove(userId);
 
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId())
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId())
                 .update(PRO_MEMBER_IDS, browsingBook.getMemberIds())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -202,7 +202,7 @@ public class BookOptionActivity extends AppCompatActivity {
     }
 
     private void deleteBook() {
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId())
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId())
                 .delete()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

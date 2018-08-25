@@ -26,7 +26,7 @@ import static com.vincent.acnt.MyApp.PRO_DOCUMENT_ID;
 import static com.vincent.acnt.MyApp.PRO_MEMO;
 import static com.vincent.acnt.MyApp.browsingBook;
 
-public class EntryUpdateActivity extends EntryEditActivity {
+public class EntryUpdateActivity extends EntryEditHelper {
     private String documentId;
 
     @Override
@@ -82,7 +82,7 @@ public class EntryUpdateActivity extends EntryEditActivity {
             return;
 
         dlgWaiting.show();
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES).document(documentId)
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES).document(documentId)
                 .set(entry)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

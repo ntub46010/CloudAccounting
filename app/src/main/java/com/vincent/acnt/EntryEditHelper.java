@@ -41,7 +41,7 @@ import static com.vincent.acnt.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
 import static com.vincent.acnt.MyApp.PRO_SUBJECT_ID;
 
-public class EntryEditActivity  extends AppCompatActivity {
+public class EntryEditHelper extends AppCompatActivity {
     protected Context context;
     protected int layout;
     protected String activityTitle;
@@ -131,7 +131,7 @@ public class EntryEditActivity  extends AppCompatActivity {
         super.onResume();
 
         //取得科目編號、名稱、戳記
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_SUBJECTS)
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
                 .orderBy(PRO_SUBJECT_ID)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override

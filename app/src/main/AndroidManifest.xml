@@ -33,7 +33,8 @@
         </activity>
         <activity android:name=".BookListActivity" />
         <activity android:name=".BookHomeActivity" />
-        <activity android:name=".BookOptionActivity"></activity>
+        <activity android:name=".BookOptionActivity" />
+        <activity android:name=".RegisterActivity"></activity>
     </application>
 
 </manifest>

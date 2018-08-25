@@ -143,7 +143,7 @@ public class ReportActivity extends AppCompatActivity {
         fabDate.setVisibility(View.GONE);
 
         subjects = new ArrayList<>();
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_SUBJECTS)
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
                 .orderBy(PRO_SUBJECT_ID, Query.Direction.ASCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -177,7 +177,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private void searchInEntry(final int endDate, final TaskListener listener) {
         entries = new ArrayList<>();
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
                 .orderBy(PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
                 .whereLessThanOrEqualTo(PRO_DATE, endDate)

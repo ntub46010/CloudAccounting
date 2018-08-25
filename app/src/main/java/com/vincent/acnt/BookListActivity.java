@@ -185,11 +185,11 @@ public class BookListActivity extends AppCompatActivity {
                                     //若發現帳本已不存在，則把帳本ID由使用者資料中移除
                                     User user = MyApp.getInstance().getUser();
                                     user.getBooks().remove(bookId);
-                                    db.collection(KEY_USERS).document(user.gainDocumentId()).update(PRO_BOOKS, user.getBooks());
+                                    db.collection(KEY_USERS).document(user.obtainDocumentId()).update(PRO_BOOKS, user.getBooks());
                                 }else {
                                     DocumentSnapshot documentSnapshot = documentSnapshots.get(0);
                                     Book book = documentSnapshot.toObject(Book.class);
-                                    book.giveDocumentId(documentSnapshot.getId());
+                                    book.defineDocumentId(documentSnapshot.getId());
                                     books.add(book);
                                 }
                             }
@@ -216,7 +216,7 @@ public class BookListActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
                             Book fakeBook = new Book();
-                            fakeBook.giveDocumentId(task.getResult().getId());
+                            fakeBook.defineDocumentId(task.getResult().getId());
                             addToBookList(book.getId(), fakeBook);
                         }else {
                             Toast.makeText(context, "新增帳本失敗", Toast.LENGTH_SHORT).show();
@@ -250,7 +250,7 @@ public class BookListActivity extends AppCompatActivity {
                                 prgBar.setVisibility(View.GONE);
                             }else {
                                 Book fakeBook = new Book();
-                                fakeBook.giveDocumentId(task.getResult().getDocuments().get(0).getId());
+                                fakeBook.defineDocumentId(task.getResult().getDocuments().get(0).getId());
                                 addToBookList(bookId, fakeBook);
                             }
                         }else {
@@ -264,7 +264,7 @@ public class BookListActivity extends AppCompatActivity {
     private void addToBookList(final String bookId, final Book book) {
         user.addBooks(bookId);
 
-        db.collection(KEY_USERS).document(user.gainDocumentId())
+        db.collection(KEY_USERS).document(user.obtainDocumentId())
                 .update(PRO_BOOKS, user.getBooks())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -285,7 +285,7 @@ public class BookListActivity extends AppCompatActivity {
         book.addMember(user.getUid());
 
         db.collection(KEY_BOOKS)
-                .document(book.gainDocumentId())
+                .document(book.obtainDocumentId())
                 .update(PRO_MEMBER_IDS, book.getMemberIds())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

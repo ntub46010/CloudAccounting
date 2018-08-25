@@ -16,7 +16,7 @@ import static com.vincent.acnt.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.MyApp.browsingBook;
 
-public class EntryCreateActivity extends EntryEditActivity {
+public class EntryCreateActivity extends EntryEditHelper {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +50,7 @@ public class EntryCreateActivity extends EntryEditActivity {
             return;
 
         dlgWaiting.show();
-        db.collection(KEY_BOOKS).document(browsingBook.gainDocumentId()).collection(KEY_ENTRIES)
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
                 .add(entry)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
