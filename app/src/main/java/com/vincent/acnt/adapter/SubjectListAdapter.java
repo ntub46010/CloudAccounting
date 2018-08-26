@@ -53,7 +53,7 @@ public class SubjectListAdapter extends BaseAdapter {
         TextView txtDebit = view.findViewById(R.id.txtDebit);
 
         Subject subject = subjects.get(position);
-        txtId.setText(String.valueOf(subject.getSubjectId()));
+        txtId.setText(String.valueOf(subject.getNo()));
         txtName.setText(subject.getName());
         txtCredit.setText("借：" + NumberFormat.getNumberInstance(Locale.US).format(subject.getCredit()));
         txtDebit.setText("貸：" + NumberFormat.getNumberInstance(Locale.US).format(subject.getDebit()));

@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    tools:context=".EntryCreateActivity">
+    tools:context=".EntryEditActivity">
 
-    <include layout="@layout/content_submit_toolbar" />
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/content_submit_toolbar" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp">
+        android:layout_below="@id/toolbar"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <GridLayout
+                android:id="@+id/layEntryInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -68,7 +70,9 @@
             </GridLayout>
 
             <TextView
+                android:id="@+id/textView"
                 style="@style/text"
+                android:layout_below="@id/layEntryInfo"
                 android:layout_marginTop="3dp"
                 android:text="分錄："
                 android:textSize="19sp"/>
@@ -77,17 +81,19 @@
                 android:id="@+id/btnAddField"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/textView"
                 android:layout_marginTop="3dp"
                 android:text="新增填寫欄位"/>
 
             <LinearLayout
-                android:id="@+id/layEntry"
+                android:id="@+id/layEntryContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/btnAddField"
                 android:orientation="vertical" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </ScrollView>
 
-</LinearLayout>
+</RelativeLayout>

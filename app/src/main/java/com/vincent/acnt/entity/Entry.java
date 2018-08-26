@@ -2,23 +2,26 @@ package com.vincent.acnt.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Entry implements Serializable {
-    private long date;
-    private ArrayList<Subject> subjects;
+    private int date;
+    private List<Subject> subjects = new ArrayList<>();
     private String memo, ps;
     private String documentId;
 
-    public Entry() {}
+    public Entry() {
 
-    public Entry(long date, String memo, String ps) {
+    }
+
+    public Entry(int date, String memo, String ps) {
         this.subjects = new ArrayList<>();
         this.date = date;
         this.memo = memo;
         this.ps = ps;
     }
 
-    public long getDate() {
+    public int getDate() {
         return date;
     }
 
@@ -30,7 +33,7 @@ public class Entry implements Serializable {
         return ps;
     }
 
-    public ArrayList<Subject> getSubjects() {
+    public List<Subject> getSubjects() {
         return subjects;
     }
 
@@ -38,7 +41,7 @@ public class Entry implements Serializable {
         return documentId;
     }
 
-    public void setDate(long date) {
+    public void setDate(int date) {
         this.date = date;
     }
 

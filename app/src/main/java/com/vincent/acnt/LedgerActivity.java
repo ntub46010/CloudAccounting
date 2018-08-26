@@ -40,20 +40,17 @@ import static com.vincent.acnt.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.MyApp.KEY_ENTRIES;
 import static com.vincent.acnt.MyApp.KEY_ENTRY;
 import static com.vincent.acnt.MyApp.KEY_SUBJECT;
-import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
 import static com.vincent.acnt.MyApp.PRO_DATE;
 import static com.vincent.acnt.MyApp.PRO_MEMO;
-import static com.vincent.acnt.MyApp.PRO_NAME;
-import static com.vincent.acnt.MyApp.PRO_SUBJECT_ID;
 
 public class LedgerActivity extends AppCompatActivity {
     private Context context;
     private String activityTitle = "分類帳";
     private FirebaseFirestore db;
 
-    private LinearLayout layLedger;
+    private LinearLayout layLedgerContainer;
     private Spinner spnYear, spnMonth;
-    private AutoCompleteTextView actSubject;
+    private AutoCompleteTextView actSubjectName;
     private ListView lstLedger;
     private ProgressBar prgBar;
 
@@ -61,9 +58,8 @@ public class LedgerActivity extends AppCompatActivity {
     private int queryFlag = -2;
     private boolean canQuery = true;
 
-    private ArrayList<String> subjectNames;
-    private ArrayList<Entry> entries;
-    private ArrayList<LedgerRecord> records;
+    private List<Entry> entries;
+    private List<LedgerRecord> records;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,16 +79,16 @@ public class LedgerActivity extends AppCompatActivity {
             }
         });
 
-        layLedger = findViewById(R.id.layLedger);
+        layLedgerContainer = findViewById(R.id.layLedgerContainer);
         spnYear = findViewById(R.id.spnYear);
         spnMonth = findViewById(R.id.spnMonth);
-        actSubject = findViewById(R.id.actSubject);
+        actSubjectName = findViewById(R.id.actSubjectName);
         Button btnShow = findViewById(R.id.btnShow);
         lstLedger = findViewById(R.id.lstRecord);
         prgBar = findViewById(R.id.prgBar);
 
         if (getIntent().getExtras() != null) {
-            actSubject.setText(getIntent().getExtras().getString(KEY_SUBJECT));
+            actSubjectName.setText(getIntent().getExtras().getString(KEY_SUBJECT));
             queryFlag++;
         }
 
@@ -103,10 +99,11 @@ public class LedgerActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //點擊按鈕後收起鍵盤
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(layLedger.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(layLedgerContainer.getWindowToken(), 0);
 
-                if (isSubjectExist(actSubject.getText().toString()))
+                if (isSubjectExist(actSubjectName.getText().toString())) {
                     showLedger();
+                }
             }
         });
 
@@ -124,33 +121,7 @@ public class LedgerActivity extends AppCompatActivity {
             }
         });
 
-        layLedger.setVisibility(View.INVISIBLE);
-        prgBar.setVisibility(View.VISIBLE);
-        querySubject();
-    }
-
-    private void querySubject() {
-        layLedger.setVisibility(View.INVISIBLE);
-        prgBar.setVisibility(View.VISIBLE);
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
-                .orderBy(PRO_SUBJECT_ID)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
-                            subjectNames = new ArrayList<>();
-                            for (DocumentSnapshot documentSnapshot : querySnapshot)
-                                subjectNames.add(documentSnapshot.toObject(Subject.class).getName());
-
-                            actSubject.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, subjectNames));
-                            prgBar.setVisibility(View.GONE);
-                            layLedger.setVisibility(View.VISIBLE);
-                        }else
-                            Toast.makeText(context, "查詢會計科目失敗", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        loadSubjects();
     }
 
     private void setupSpinner() {
@@ -211,19 +182,31 @@ public class LedgerActivity extends AppCompatActivity {
         spnMonth.setSelection(month);
     }
 
-    private boolean isSubjectExist(String subjectName) {
-        for (String name : subjectNames) {
-            if (name.equals(subjectName))
-                return true;
+    private void loadSubjects() {
+        ArrayAdapter<String> adpSubjectName = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
+
+        for (long subjectId : MyApp.mapSubjectById.keySet()) {
+            adpSubjectName.add(MyApp.mapSubjectById.get(subjectId).getName());
         }
-        getPlainDialog(context, activityTitle, "會計科目不存在").show();
-        return false;
+
+        actSubjectName.setAdapter(adpSubjectName);
+        prgBar.setVisibility(View.GONE);
+    }
+
+    private boolean isSubjectExist(String subjectName) {
+        if (!MyApp.mapSubjectByName.containsKey(subjectName)) {
+            getPlainDialog(context, activityTitle, "會計科目不存在").show();
+            return false;
+        }
+
+        return true;
     }
 
     private void showLedger() {
-        final String subjectName = actSubject.getText().toString();
-        if (!canQuery || subjectName.equals(""))
+        final String subjectName = actSubjectName.getText().toString();
+        if (!canQuery || subjectName.equals("")) {
             return;
+        }
 
         canQuery = false;
         prgBar.setVisibility(View.VISIBLE);
@@ -238,10 +221,10 @@ public class LedgerActivity extends AppCompatActivity {
 
         entries = new ArrayList<>();
         records = new ArrayList<>();
-        queryMonthlyRecord(subjectName, getDateNumber(selectedYear, selectedMonth, 1), getDateNumber(endYear, endMonth, 1));
+        queryMonthlyRecord(MyApp.mapSubjectByName.get(subjectName).getId(), getDateNumber(selectedYear, selectedMonth, 1), getDateNumber(endYear, endMonth, 1));
     }
 
-    private void queryMonthlyRecord(final String subjectName, final int selectedDate, int endDate) {
+    private void queryMonthlyRecord(final long subjectId, final int selectedDate, int endDate) {
         db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
                 .orderBy(PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
@@ -256,17 +239,17 @@ public class LedgerActivity extends AppCompatActivity {
                             return;
                         }
 
-                        List<DocumentSnapshot> docEntry = task.getResult().getDocuments();
+                        List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
                         Entry entry;
 
-                        for (int i = 0, len = docEntry.size(); i < len; i++) {
-                            entry = docEntry.get(i).toObject(Entry.class);
-                            ArrayList<Subject> subjects = entry.getSubjects();
+                        for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
+                            entry = documentSnapshots.get(i).toObject(Entry.class);
+                            List<Subject> subjects = entry.getSubjects();
 
                             for (int j = 0, len2 = subjects.size(); j < len2; j++) {
                                 Subject subject = subjects.get(j);
 
-                                if (subject.getName().equals(subjectName)) {
+                                if (subject.getId() == subjectId) {
                                     //儲存分錄，供點擊清單後能顯示詳情，越前面越新
                                     entries.add(entry);
 
@@ -281,19 +264,20 @@ public class LedgerActivity extends AppCompatActivity {
                             }
                         }
 
-                        if (records.isEmpty())
+                        if (records.isEmpty()) {
                             Toast.makeText(context, "本月沒有紀錄", Toast.LENGTH_SHORT).show();
+                        }
 
                         //若選擇1月，則略過查詢歷史總額，否則繼續查詢
                         if (String.valueOf(selectedDate).substring(4).equals("0101"))
-                            queryOriginBalance(subjectName, selectedDate);
+                            queryOriginBalance(subjectId, selectedDate);
                         else
-                            queryHistoryRecord(subjectName, selectedDate);
+                            queryHistoryRecord(subjectId, selectedDate);
                     }
                 });
     }
 
-    private void queryHistoryRecord(final String subjectName, final int selectedDate) {
+    private void queryHistoryRecord(final long subjectId, final int selectedDate) {
         db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
                 .whereLessThan(PRO_DATE, selectedDate)
                 .get()
@@ -314,7 +298,7 @@ public class LedgerActivity extends AppCompatActivity {
                             entry = docEntry.get(i).toObject(Entry.class);
 
                             for (Subject subject : entry.getSubjects()) {
-                                if (subject.getName().equals(subjectName)) {
+                                if (subject.getId() == subjectId) {
                                     totalCredit += subject.getCredit();
                                     totalDebit += subject.getDebit();
                                 }
@@ -330,47 +314,36 @@ public class LedgerActivity extends AppCompatActivity {
                         entries.add(null);
 
                         //繼續查詢初始餘額
-                        queryOriginBalance(subjectName, selectedDate);
+                        queryOriginBalance(subjectId, selectedDate);
                     }
                 });
     }
 
-    private void queryOriginBalance(final String subjectName, final int selectedDate) {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
-                .whereEqualTo(PRO_NAME, subjectName)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshots = task.getResult();
-                            Subject subject = querySnapshots.getDocuments().get(0).toObject(Subject.class);
+    private void queryOriginBalance(final long subjectId, final int selectedDate) {
+        Subject subject = MyApp.mapSubjectById.get(subjectId);
 
-                            records.add(new LedgerRecord(
-                                    (selectedDate / 10000) * 10000 + 101, //修正為當年1/1，如20180101
-                                    "(初始餘額)",
-                                    subject.getCredit(),
-                                    subject.getDebit()
-                            ));
-                            entries.add(null);
+        LedgerRecord record = new LedgerRecord();
+        record.setDate((selectedDate / 10000) * 10000 + 101); //修正為當年1/1，如20180101
+        record.setMemo("(初始餘額)");
+        record.setCredit(subject.getCredit());
+        record.setDebit(subject.getDebit());
 
-                            //計算清單項目所要顯示的餘額
-                            LedgerRecord r = records.get(records.size() - 1);
-                            r.setBalance(r.getCredit() - r.getDebit());
-                            for (int i = records.size() - 2; i >= 0; i--) {
-                                r = records.get(i);
-                                r.setBalance(records.get(i + 1).getBalance() + r.getCredit() - r.getDebit());
-                            }
+        records.add(record);
+        entries.add(null);
 
-                            //顯示清單
-                            lstLedger.setAdapter(new LedgerListAdapter(context, records));
-                            prgBar.setVisibility(View.GONE);
-                            lstLedger.setVisibility(View.VISIBLE);
-                            canQuery = true;
-                        }else
-                            Toast.makeText(context, "查詢初始餘額失敗", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        //計算清單項目所要顯示的餘額
+        LedgerRecord r = records.get(records.size() - 1);
+        r.setBalance(r.getCredit() - r.getDebit());
+        for (int i = records.size() - 2; i >= 0; i--) {
+            r = records.get(i);
+            r.setBalance(records.get(i + 1).getBalance() + r.getCredit() - r.getDebit());
+        }
+
+        //顯示清單
+        lstLedger.setAdapter(new LedgerListAdapter(context, records));
+        prgBar.setVisibility(View.GONE);
+        lstLedger.setVisibility(View.VISIBLE);
+        canQuery = true;
     }
 
 }

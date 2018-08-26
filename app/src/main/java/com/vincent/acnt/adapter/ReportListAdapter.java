@@ -11,15 +11,15 @@ import com.vincent.acnt.R;
 import com.vincent.acnt.entity.ReportItem;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class ReportListAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
-    private ArrayList<ReportItem> items;
+    private List<ReportItem> items;
 
-    public ReportListAdapter(Context context, ArrayList<ReportItem> items) {
+    public ReportListAdapter(Context context, List<ReportItem> items) {
         this.context = context;
         this.layoutInflater = LayoutInflater.from(context);
         this.items = items;

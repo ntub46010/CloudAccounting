@@ -42,8 +42,9 @@ public class LoginActivity extends RegisterHelper {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        layout = R.layout.activity_login;
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+        context = this;
 
         edtEmail = findViewById(R.id.edtEmail);
         edtPwd = findViewById(R.id.edtPwd);
@@ -52,7 +53,7 @@ public class LoginActivity extends RegisterHelper {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(context, RegisterActivity.class), 0);
+                startActivity(new Intent(context, RegisterActivity.class));
             }
         });
 

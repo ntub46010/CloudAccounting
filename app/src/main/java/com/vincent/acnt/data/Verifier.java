@@ -14,7 +14,7 @@ public class Verifier {
     private String ptnEmail = "^[\\w-]+(\\.[\\w-]+)*@[\\w-]+(\\.[\\w-]+)+$";
 
     private String ptnPassword = String.format(ptnWord, "8", "20");
-    private String ptnSubjectId = String.format(ptnNumber, "3", "3");
+    private String ptnSubjectNo = String.format(ptnNumber, "3", "3");
     private String ptnSubjectName = String.format(ptnChineseWord, "1", "30");
     private String ptnAmount = String.format(ptnNumber, "1", "9");
     private String ptnMemo = String.format(ptnChineseWord, "0", "100");
@@ -29,25 +29,25 @@ public class Verifier {
         else if (s.length() > 20)
             return "暱稱不可超過20字";
         else
-            return null;
+            return "";
     }
 
     public String chkPassword(String s) {
         if (Pattern.matches(ptnPassword, s))
-            return null;
+            return "";
         else
             return "密碼需為8~20位英數字";
     }
 
     public String chkEmail(String s) {
         if (Pattern.matches(ptnEmail, s))
-            return null;
+            return "";
         else
             return c.getString(R.string.chk_format_wrong, "Email");
     }
 
-    public String chkId(String s) {
-        if (Pattern.matches(ptnSubjectId, s) && !s.equals("0"))
+    public String chkSubjectNo(String s) {
+        if (Pattern.matches(ptnSubjectNo, s) && !s.substring(2, 3).equals("0"))
             return "";
         else
             return c.getString(R.string.chk_format_wrong, "編號");

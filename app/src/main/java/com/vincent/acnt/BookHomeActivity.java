@@ -36,10 +36,15 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
 
+import static com.vincent.acnt.MyApp.MODE_CREATE;
+import static com.vincent.acnt.MyApp.KEY_MODE;
+import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.MyApp.PRO_SUBJECT_NO;
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_DELETE;
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_UPDATE;
 import static com.vincent.acnt.MyApp.CODE_QUIT_ACTIVITY;
@@ -91,7 +96,11 @@ public class BookHomeActivity extends AppCompatActivity {
         fabCreateEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(context, EntryCreateActivity.class), 0);
+                Intent it = new Intent(context, EntryEditActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt(KEY_MODE, MODE_CREATE);
+                it.putExtras(bundle);
+                startActivity(it);
             }
         });
 
@@ -102,7 +111,7 @@ public class BookHomeActivity extends AppCompatActivity {
         thisMonthStartDate = Integer.parseInt(new SimpleDateFormat("yyyyMM01").format(date));
         thisMonthEndDate = Integer.parseInt(new SimpleDateFormat("yyyyMM31").format(date));
 
-        startQueryExpanse();
+        loadSubjects();
     }
 
     @Override
@@ -111,55 +120,6 @@ public class BookHomeActivity extends AppCompatActivity {
 
         thisMonthStartDate = Integer.parseInt(new SimpleDateFormat("yyyyMM01").format(new Date()));
         thisMonthEndDate = Integer.parseInt(new SimpleDateFormat("yyyyMM31").format(new Date()));
-    }
-
-    private void startQueryExpanse() {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
-                .whereGreaterThanOrEqualTo(PRO_DATE, thisMonthStartDate)
-                .whereLessThanOrEqualTo(PRO_DATE, thisMonthEndDate)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        thisMonthExpanseCredit = 0;
-                        thisMonthExpanseDebit = 0;
-                        lastMonthExpanseCredit = 0;
-                        lastMonthExpanseDebit = 0;
-
-                        String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
-                        entries = new ArrayList<>();
-                        Entry entry;
-
-                        //取出分錄
-                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            entry = documentSnapshot.toObject(Entry.class);
-
-                            //若為今日的分錄，則保存起來
-                            if (entry.getDate() == Integer.parseInt(today)) {
-                                entry.defineDocumentId(documentSnapshot.getId());
-                                entries.add(entry);
-                            }
-
-                            //檢查分錄內的費用科目，進行總額累計
-                            for (Subject subject : entry.getSubjects()) {
-                                if (subject.getSubjectId().substring(0, 1).equals(CODE_TYPE[4])) {
-                                    thisMonthExpanseCredit += subject.getCredit();
-                                    thisMonthExpanseDebit += subject.getDebit();
-                                }
-                            }
-                        } //本月費用計算完畢
-
-                        //繼續計算上個月的費用
-                        int lastMonthStartDate = thisMonthStartDate;
-
-                        if (String.valueOf(lastMonthStartDate).substring(String.valueOf(lastMonthStartDate).length() - 4).equals("0101")) {
-                            lastMonthStartDate -= 10000;
-                            lastMonthStartDate = (lastMonthStartDate / 10000) * 10000 + 1231;
-                        }else
-                            lastMonthStartDate -= 100;
-
-                        queryLastMonthExpanse(lastMonthStartDate, thisMonthStartDate);
-                    }
-                });
     }
 
     private void setupDrawer(Bundle bundle) {
@@ -216,6 +176,83 @@ public class BookHomeActivity extends AppCompatActivity {
                 });
     }
 
+    private void loadSubjects() {
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
+                .orderBy(PRO_SUBJECT_NO)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        MyApp.mapSubjectById.clear();
+                        MyApp.mapSubjectByName.clear();
+                        Subject subject;
+                        List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
+
+                        for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
+                            subject = documentSnapshots.get(i).toObject(Subject.class);
+                            MyApp.mapSubjectById.put(subject.getId(), subject);
+                            MyApp.mapSubjectByName.put(subject.getName(), subject);
+                        }
+
+                        queryThisMonthExpanse();
+                    }
+                });
+    }
+
+    private void queryThisMonthExpanse() {
+        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
+                .whereGreaterThanOrEqualTo(PRO_DATE, thisMonthStartDate)
+                .whereLessThanOrEqualTo(PRO_DATE, thisMonthEndDate)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        thisMonthExpanseCredit = 0;
+                        thisMonthExpanseDebit = 0;
+                        lastMonthExpanseCredit = 0;
+                        lastMonthExpanseDebit = 0;
+
+                        String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
+                        entries = new ArrayList<>();
+                        Entry entry;
+
+                        //取出分錄
+                        List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
+                        for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
+                            entry = documentSnapshots.get(i).toObject(Entry.class);
+
+                            //若為今日的分錄，則保存起來
+                            if (entry.getDate() == Integer.parseInt(today)) {
+                                entry.defineDocumentId(documentSnapshots.get(i).getId());
+                                entries.add(entry);
+                            }
+
+                            //將分錄中的科目補上名稱，並累計費用科目總額
+                            for (Subject subject : entry.getSubjects()) {
+                                Subject s = MyApp.mapSubjectById.get(subject.getId());
+
+                                subject.setNo(s.getNo());
+                                subject.setName(s.getName());
+
+                                if (subject.getNo().substring(0, 1).equals(CODE_TYPE[4])) {
+                                    thisMonthExpanseCredit += subject.getCredit();
+                                    thisMonthExpanseDebit += subject.getDebit();
+                                }
+                            }
+                        } //本月費用計算完畢
+
+                        //繼續計算上個月的費用
+                        int lastMonthStartDate = thisMonthStartDate;
+
+                        if (String.valueOf(lastMonthStartDate).substring(String.valueOf(lastMonthStartDate).length() - 4).equals("0101")) {
+                            lastMonthStartDate -= 10000;
+                            lastMonthStartDate = (lastMonthStartDate / 10000) * 10000 + 1231;
+                        }else
+                            lastMonthStartDate -= 100;
+
+                        queryLastMonthExpanse(lastMonthStartDate, thisMonthStartDate);
+                    }
+                });
+    }
+
     private void queryLastMonthExpanse(int startDate, int endDate) {
         db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
                 .whereGreaterThanOrEqualTo(PRO_DATE, startDate)
@@ -238,7 +275,7 @@ public class BookHomeActivity extends AppCompatActivity {
 
                             //檢查分錄內的費用科目，進行總額累計
                             for (Subject subject : entry.getSubjects()) {
-                                if (subject.getSubjectId().substring(0, 1).equals(CODE_TYPE[4])) {
+                                if (subject.getNo().substring(0, 1).equals(CODE_TYPE[4])) {
                                     lastMonthExpanseCredit += subject.getCredit();
                                     lastMonthExpanseDebit += subject.getDebit();
                                 }
@@ -273,6 +310,7 @@ public class BookHomeActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         browsingBook = null;
+        MyApp.mapSubjectById.clear();
         super.onDestroy();
     }
 

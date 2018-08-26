@@ -25,12 +25,16 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.EntryCardAdapter;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.data.EntryContextMenuHandler;
+import com.vincent.acnt.entity.Subject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
+import static com.vincent.acnt.MyApp.KEY_MODE;
+import static com.vincent.acnt.MyApp.MODE_CREATE;
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_DELETE;
 import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_UPDATE;
 import static com.vincent.acnt.MyApp.browsingBook;
@@ -87,7 +91,11 @@ public class JournalActivity extends AppCompatActivity {
         fabCreateEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(context, EntryCreateActivity.class));
+                Intent it = new Intent(context, EntryEditActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt(KEY_MODE, MODE_CREATE);
+                it.putExtras(bundle);
+                startActivity(it);
             }
         });
 
@@ -101,12 +109,14 @@ public class JournalActivity extends AppCompatActivity {
 
         //建立年份清單
         ArrayList<Integer> years = new ArrayList<>(), months = new ArrayList<>();
-        for (int i = 2017; i <= year; i++)
+        for (int i = 2017; i <= year; i++) {
             years.add(i);
+        }
         spnYear.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, years));
 
-        for (int i = 1; i<= 12; i++)
+        for (int i = 1; i<= 12; i++) {
             months.add(i);
+        }
         spnMonth.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, months));
 
         //定義清單點擊事件
@@ -176,18 +186,27 @@ public class JournalActivity extends AppCompatActivity {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         entries = new ArrayList<>();
+                        List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
                         Entry entry;
-                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            entry = documentSnapshot.toObject(Entry.class);
-                            entry.defineDocumentId(documentSnapshot.getId());
+
+                        for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
+                            entry = documentSnapshots.get(i).toObject(Entry.class);
+                            entry.defineDocumentId(documentSnapshots.get(i).getId());
+
+                            //將分錄中的科目補上名稱
+                            for (Subject subject : entry.getSubjects()) {
+                                subject.setName(MyApp.mapSubjectById.get(subject.getId()).getName());
+                            }
+
                             entries.add(entry);
                         }
 
                         adapter = new EntryCardAdapter(context, entries);
                         recyEntry.setAdapter(adapter);
 
-                        if (entries.isEmpty())
-                            Toast.makeText(context, "沒有紀錄", Toast.LENGTH_SHORT).show();
+                        if (entries.isEmpty()) {
+                            Toast.makeText(context, "該月沒有紀錄", Toast.LENGTH_SHORT).show();
+                        }
 
                         prgBar.setVisibility(View.GONE);
                         recyEntry.setVisibility(View.VISIBLE);

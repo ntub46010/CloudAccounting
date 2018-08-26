@@ -11,7 +11,7 @@ import com.vincent.acnt.R;
 import com.vincent.acnt.entity.LedgerRecord;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import static com.vincent.acnt.data.Utility.getEngMonth;
@@ -19,9 +19,9 @@ import static com.vincent.acnt.data.Utility.getEngMonth;
 public class LedgerListAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
-    private ArrayList<LedgerRecord> records;
+    private List<LedgerRecord> records;
 
-    public LedgerListAdapter(Context context, ArrayList<LedgerRecord> records) {
+    public LedgerListAdapter(Context context, List<LedgerRecord> records) {
         this.context = context;
         this.layoutInflater = LayoutInflater.from(context);
         this.records = records;

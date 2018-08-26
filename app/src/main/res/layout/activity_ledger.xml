@@ -15,7 +15,7 @@
         app:titleTextColor="#FFFFFF"/>
 
     <LinearLayout
-        android:id="@+id/layLedger"
+        android:id="@+id/layLedgerContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -32,7 +32,7 @@
             android:orientation="horizontal">
 
             <AutoCompleteTextView
-                android:id="@+id/actSubject"
+                android:id="@+id/actSubjectName"
                 android:layout_width="225dp"
                 android:layout_height="wrap_content"
                 android:hint="科目名稱"

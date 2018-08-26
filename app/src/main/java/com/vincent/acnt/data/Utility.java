@@ -12,8 +12,8 @@ import com.vincent.acnt.entity.Subject;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class Utility {
     private static String symbols = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -34,7 +34,7 @@ public class Utility {
         return dialog;
     }
 
-    public static int binarySearchNumber(ArrayList<Integer> ary, Integer target) {
+    public static int binarySearchNumber(List<Integer> ary, Integer target) {
         int left = 0, right = ary.size() - 1;
 
         if (ary.isEmpty())
@@ -91,7 +91,7 @@ public class Utility {
 
     public static int getSubjectColor(Subject subject) {
         MyApp app = MyApp.getInstance();
-        switch (subject.getSubjectId().substring(0, 1)) {
+        switch (subject.getNo().substring(0, 1)) {
             case "1":
                 return app.getResource().getColor(R.color.type_asset);
             case "2":

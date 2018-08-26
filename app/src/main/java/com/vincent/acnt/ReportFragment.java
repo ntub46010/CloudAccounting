@@ -15,7 +15,7 @@ import com.vincent.acnt.adapter.ReportListAdapter;
 import com.vincent.acnt.entity.ReportItem;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import static com.vincent.acnt.MyApp.KEY_SUBJECT;
@@ -27,7 +27,7 @@ public class ReportFragment extends Fragment {
     private ListView lstReport;
 
     private String type;
-    private ArrayList<ReportItem> reportItems;
+    private List<ReportItem> reportItems;
     private ReportListAdapter adapter;
 
     public ReportFragment() {
@@ -98,7 +98,7 @@ public class ReportFragment extends Fragment {
         this.type = type;
     }
 
-    public void setReportItems(ArrayList<ReportItem> reportItems) {
+    public void setReportItems(List<ReportItem> reportItems) {
         this.reportItems = reportItems;
     }
 

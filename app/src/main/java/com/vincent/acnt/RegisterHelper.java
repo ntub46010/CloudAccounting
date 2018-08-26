@@ -30,7 +30,6 @@ import static com.vincent.acnt.data.Utility.getWaitingDialog;
 
 public class RegisterHelper extends AppCompatActivity {
     protected Context context;
-    protected int layout;
     protected FirebaseFirestore db;
     protected FirebaseAuth mAuth;
     protected FirebaseUser currentUser;
@@ -44,7 +43,6 @@ public class RegisterHelper extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(layout);
         context = this;
         db = ((MyApp) getApplication()).getFirestore();
         mAuth = FirebaseAuth.getInstance();

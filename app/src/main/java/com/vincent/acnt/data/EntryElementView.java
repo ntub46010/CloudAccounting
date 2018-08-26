@@ -10,13 +10,13 @@ import static com.vincent.acnt.MyApp.CODE_CREDIT;
 import static com.vincent.acnt.MyApp.CODE_DEBIT;
 
 public class EntryElementView {
-    private AutoCompleteTextView actSubject;
+    private AutoCompleteTextView actSubjectName;
     private Spinner spnDirection;
     private int direction;
     private EditText edtAmount;
 
-    public EntryElementView(AutoCompleteTextView actSubject, Spinner spnDirection, EditText edtAmount) {
-        this.actSubject = actSubject;
+    public EntryElementView(AutoCompleteTextView actSubjectName, Spinner spnDirection, EditText edtAmount) {
+        this.actSubjectName = actSubjectName;
         this.edtAmount = edtAmount;
         this.spnDirection = spnDirection;
 
@@ -36,8 +36,8 @@ public class EntryElementView {
         });
     }
 
-    public AutoCompleteTextView getActSubject() {
-        return actSubject;
+    public AutoCompleteTextView getActSubjectName() {
+        return actSubjectName;
     }
 
     public Spinner getSpnDirection() {
@@ -48,8 +48,8 @@ public class EntryElementView {
         return edtAmount;
     }
 
-    public String getSubject() {
-        return actSubject.getText().toString();
+    public String getSubjectName() {
+        return actSubjectName.getText().toString();
     }
 
     public int getDirection() {

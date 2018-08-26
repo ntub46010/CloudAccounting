@@ -14,15 +14,15 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.vincent.acnt.EntryUpdateActivity;
+import com.vincent.acnt.EntryEditActivity;
 import com.vincent.acnt.entity.Entry;
 
+import static com.vincent.acnt.MyApp.MODE_UPDATE;
 import static com.vincent.acnt.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
+import static com.vincent.acnt.MyApp.KEY_ENTRY;
+import static com.vincent.acnt.MyApp.KEY_MODE;
 import static com.vincent.acnt.MyApp.PRO_DATE;
-import static com.vincent.acnt.MyApp.PRO_DOCUMENT_ID;
-import static com.vincent.acnt.MyApp.PRO_MEMO;
 import static com.vincent.acnt.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getPlainDialog;
 
@@ -45,14 +45,16 @@ public class EntryContextMenuHandler {
         date.insert(4, "/");
         date.insert(7, "/");
 
-        Intent it = new Intent(context, EntryUpdateActivity.class);
+        Intent it = new Intent(context, EntryEditActivity.class);
         Bundle bundle = new Bundle();
 
+        bundle.putInt(KEY_MODE, MODE_UPDATE);
         bundle.putString(PRO_DATE, date.toString());
-        bundle.putString(PRO_MEMO, entry.getMemo());
-        bundle.putString(PRO_DOCUMENT_ID, entry.obtainDocumentId());
+        //bundle.putString(PRO_MEMO, entry.getMemo());
+        //bundle.putString(PRO_DOCUMENT_ID, entry.obtainDocumentId());
+        bundle.putSerializable(KEY_ENTRY, entry);
         it.putExtras(bundle);
-        it.putExtra(KEY_SUBJECTS, entry.getSubjects());
+        //it.putExtra(KEY_SUBJECTS, entry.getSubjects());
 
         context.startActivity(it);
     }

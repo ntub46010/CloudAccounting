@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context=".SubjectEditActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/content_submit_toolbar" />
+
+    <ScrollView
+        android:id="@+id/layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2">
+            <TextView
+                style="@style/text"
+                android:text="類別："/>
+
+            <Spinner
+                android:id="@+id/spnSubjectType"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/ary_subject_type"/>
+
+            <TextView
+                style="@style/text"
+                android:text="科目編號："/>
+
+            <EditText
+                android:id="@+id/edtSubjectNo"
+                style="@style/edit_text"
+                android:hint="兩位數字"
+                android:inputType="number"/>
+
+            <TextView
+                style="@style/text"
+                android:text="科目名稱："/>
+
+            <EditText
+                android:id="@+id/edtSubjectName"
+                style="@style/edit_text"
+                android:hint="中文30字以內"/>
+
+            <TextView
+                style="@style/text"
+                android:text="初始借方金額："/>
+
+            <EditText
+                android:id="@+id/edtCredit"
+                style="@style/edit_text"
+                android:inputType="number"/>
+
+            <TextView
+                style="@style/text"
+                android:text="初始貸方金額："/>
+
+            <EditText
+                android:id="@+id/edtDebit"
+                style="@style/edit_text"
+                android:inputType="number"/>
+
+        </GridLayout>
+
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/prgBar"
+        style="@style/prg_normal"/>
+
+</RelativeLayout>

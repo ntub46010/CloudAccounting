@@ -20,8 +20,9 @@ public class RegisterActivity extends RegisterHelper {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        layout = R.layout.activity_register;
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+        context = this;
 
         tilNickName = findViewById(R.id.tilNickName);
         tilEmail = findViewById(R.id.tilEmail);

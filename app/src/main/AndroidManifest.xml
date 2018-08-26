@@ -19,8 +19,6 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".SubjectActivity" />
         <activity android:name=".JournalActivity" />
-        <activity android:name=".EntryCreateActivity" />
-        <activity android:name=".EntryUpdateActivity" />
         <activity android:name=".EntryDetailActivity" />
         <activity android:name=".LedgerActivity" />
         <activity android:name=".ReportActivity" />
@@ -34,7 +32,9 @@
         <activity android:name=".BookListActivity" />
         <activity android:name=".BookHomeActivity" />
         <activity android:name=".BookOptionActivity" />
-        <activity android:name=".RegisterActivity"></activity>
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".SubjectEditActivity" />
+        <activity android:name=".EntryEditActivity"></activity>
     </application>
 
 </manifest>

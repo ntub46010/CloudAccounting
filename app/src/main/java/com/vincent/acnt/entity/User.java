@@ -1,10 +1,11 @@
 package com.vincent.acnt.entity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class User {
     private String uid, name, email;
-    private ArrayList<String> books;
+    private List<String> books;
     private String documentId;
 
     public User() {
@@ -45,7 +46,7 @@ public class User {
         this.email = email;
     }
 
-    public ArrayList<String> getBooks() {
+    public List<String> getBooks() {
         return books;
     }
 

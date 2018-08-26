@@ -29,20 +29,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static com.vincent.acnt.MyApp.browsingBook;
 import static com.vincent.acnt.data.Utility.getDateNumber;
 import static com.vincent.acnt.data.Utility.getWaitingDialog;
-import static com.vincent.acnt.MyApp.CODE_TYPE;
 import static com.vincent.acnt.MyApp.KEY_BOOKS;
 import static com.vincent.acnt.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
 import static com.vincent.acnt.MyApp.PRO_DATE;
 import static com.vincent.acnt.MyApp.PRO_MEMO;
-import static com.vincent.acnt.MyApp.PRO_SUBJECT_ID;
 
 public class ReportActivity extends AppCompatActivity {
     private Context context;
@@ -53,9 +50,8 @@ public class ReportActivity extends AppCompatActivity {
     private ViewPager vpgHome;
     private FloatingActionButton fabDate;
 
-    private ArrayList<Subject> subjects;
-    private ArrayList<Entry> entries;
-    private Map<String, ReportItem> mapReportItem;
+    private List<Entry> entries;
+    private Map<String, ReportItem> mapReportItem = new TreeMap<>();
     private ReportFragment[] reportFragments = new ReportFragment[5];
 
     private Dialog dlgWaiting;
@@ -121,62 +117,33 @@ public class ReportActivity extends AppCompatActivity {
         collectReportItems(Integer.parseInt(date), null);
     }
 
-    private void setupFragment() {
-        ReportPagerAdapter adapter = new ReportPagerAdapter(getSupportFragmentManager());
-
-        for (int i = 0; i < 5; i++) {
-            reportFragments[i] = new ReportFragment();
-            reportFragments[i].setReportItems(getReportItems(CODE_TYPE[i]));
-            reportFragments[i].setType(CODE_TYPE[i]);
-        }
-
-        adapter.addFragment(reportFragments[0], "資產");
-        adapter.addFragment(reportFragments[1], "負債");
-        adapter.addFragment(reportFragments[2], "權益");
-        adapter.addFragment(reportFragments[3], "收益");
-        adapter.addFragment(reportFragments[4], "費損");
-        vpgHome.setAdapter(adapter);
-    }
-
     private void collectReportItems(final int endDate, final TaskListener listener) {
         dlgWaiting.show();
         fabDate.setVisibility(View.GONE);
 
-        subjects = new ArrayList<>();
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
-                .orderBy(PRO_SUBJECT_ID, Query.Direction.ASCENDING)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
+        //儲存各個科目的初始餘額
+        Subject subject;
+        mapReportItem.clear();
+        ReportItem item;
 
-                            //將科目依類別放入各自陣列
-                            for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments())
-                                subjects.add(documentSnapshot.toObject(Subject.class));
+        for (long subjectId : MyApp.mapSubjectById.keySet()) {
+            subject = MyApp.mapSubjectById.get(subjectId);
+            item = new ReportItem();
 
-                            //儲存各個科目的初始餘額
-                            mapReportItem = new HashMap<>();
-                            ReportItem item;
-                            for (Subject subject : subjects) {
-                                item = new ReportItem(
-                                        subject.getSubjectId(),
-                                        subject.getName(),
-                                        subject.getCredit(),
-                                        subject.getDebit()
-                                );
-                                mapReportItem.put(subject.getSubjectId(), item);
-                            }
-                            searchInEntry(endDate, listener);
-                        }else
-                            Toast.makeText(context, "取得科目資料失敗", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            item.setId(subject.getNo());
+            item.setName(subject.getName());
+            item.addCredit(subject.getCredit());
+            item.addDebit(subject.getDebit());
+
+            mapReportItem.put(subject.getNo(), item);
+        }
+
+        searchInEntry(endDate, listener);
     }
 
     private void searchInEntry(final int endDate, final TaskListener listener) {
         entries = new ArrayList<>();
+
         db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
                 .orderBy(PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
@@ -187,42 +154,46 @@ public class ReportActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             QuerySnapshot querySnapshot = task.getResult();
+                            List<DocumentSnapshot> documentSnapshots = querySnapshot.getDocuments();
 
                             //儲存分錄
-                            List<DocumentSnapshot> docEntry = querySnapshot.getDocuments();
-                            for (int i = 0, len = docEntry.size(); i < len; i++)
-                                entries.add(docEntry.get(i).toObject(Entry.class));
+                            for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
+                                entries.add(documentSnapshots.get(i).toObject(Entry.class));
+                            }
 
                             //從各個分錄中將科目金額逐一儲存
                             ReportItem item;
                             for (int i = 0, len = entries.size(); i < len; i++) {
-                                ArrayList<Subject> subjects = entries.get(i).getSubjects();
+                                List<Subject> subjects = entries.get(i).getSubjects();
 
                                 for (int j = 0, len2 = subjects.size(); j < len2; j++) {
                                     Subject subject = subjects.get(j);
+                                    Subject s = MyApp.mapSubjectById.get(subject.getId());
 
-                                    if (mapReportItem.containsKey(subject.getSubjectId())) {
-                                        //科目已存在，則取出累積金額，再放置回去
-                                        item = mapReportItem.get(subject.getSubjectId());
+                                    if (mapReportItem.containsKey(s.getNo())) {
+                                        //科目已存在，取出累積金額，再放置回去；尚未實驗可否簡化為不需要宣告item物件
+                                        item = mapReportItem.get(s.getNo());
+
                                         item.addCredit(subject.getCredit());
                                         item.addDebit(subject.getDebit());
-                                        mapReportItem.put(subject.getSubjectId(), item);
-                                    }else {
-                                        item = new ReportItem(
-                                                subject.getSubjectId(),
-                                                subject.getName(),
-                                                subject.getCredit(),
-                                                subject.getDebit()
-                                        );
-                                        mapReportItem.put(subject.getSubjectId(), item);
-                                    }
-                                }
-                            }//各個科目金額計算完畢
+                                    } else {
+                                        item = new ReportItem();
 
-                            if (listener == null)
+                                        item.setId(s.getNo());
+                                        item.setName(s.getName());
+                                        item.addCredit(subject.getCredit());
+                                        item.addDebit(subject.getDebit());
+                                    }
+
+                                    mapReportItem.put(s.getNo(), item);
+                                }
+                            } //各個科目金額計算完畢
+
+                            if (listener == null) {
                                 setupFragment(); //加入頁面
-                            else
+                            } else {
                                 listener.onFinish();
+                            }
 
                             String date = String.valueOf(endDate);
                             toolbar.setTitle(String.format("財務報告  %s/%s/%s",
@@ -230,25 +201,47 @@ public class ReportActivity extends AppCompatActivity {
                                     date.substring(4, 6),
                                     date.substring(6, 8)
                             ));
+
                             fabDate.setVisibility(View.VISIBLE);
                             dlgWaiting.dismiss();
-                        }else
-                            Toast.makeText(context, "取得分錄失敗", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, "查詢分錄失敗", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
 
-    private ArrayList<ReportItem> getReportItems(String type) {
-        ArrayList<ReportItem> reportItems = new ArrayList<>();
+    private void setupFragment() {
+        ReportPagerAdapter adapter = new ReportPagerAdapter(getSupportFragmentManager());
+
+        for (int i = 0; i < 5; i++) {
+            reportFragments[i] = new ReportFragment();
+            reportFragments[i].setReportItems(getReportItems(MyApp.CODE_TYPE[i]));
+            reportFragments[i].setType(MyApp.CODE_TYPE[i]);
+        }
+
+        adapter.addFragment(reportFragments[0], "資產");
+        adapter.addFragment(reportFragments[1], "負債");
+        adapter.addFragment(reportFragments[2], "權益");
+        adapter.addFragment(reportFragments[3], "收入");
+        adapter.addFragment(reportFragments[4], "支出");
+
+        vpgHome.setAdapter(adapter);
+    }
+
+    private List<ReportItem> getReportItems(String type) {
+        List<ReportItem> reportItems = new ArrayList<>();
         ReportItem item;
 
-        for (Subject subject : subjects) {
-            if (subject.getSubjectId().substring(0, 1).equals(type)) {
-                item = mapReportItem.get(subject.getSubjectId());
+        for (String subjectNo : mapReportItem.keySet()) {
+            if (subjectNo.substring(0, 1).equals(type)) {
+                item = mapReportItem.get(subjectNo);
                 item.calBalance();
+
                 reportItems.add(item);
             }
         }
+
         return reportItems;
     }
 
@@ -264,7 +257,7 @@ public class ReportActivity extends AppCompatActivity {
                             @Override
                             public void onFinish() {
                                 for (int i = 0; i < 5; i++) {
-                                    reportFragments[i].setType(CODE_TYPE[i]);
+                                    reportFragments[i].setType(MyApp.CODE_TYPE[i]);
                                     reportFragments[i].onResume();
                                 }
                             }

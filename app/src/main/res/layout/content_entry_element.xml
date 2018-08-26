@@ -7,7 +7,7 @@
     android:orientation="horizontal">
 
     <AutoCompleteTextView
-        android:id="@+id/actSubject"
+        android:id="@+id/actSubjectName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="4"

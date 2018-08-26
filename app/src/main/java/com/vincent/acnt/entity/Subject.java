@@ -3,31 +3,23 @@ package com.vincent.acnt.entity;
 import java.io.Serializable;
 
 public class Subject implements Serializable {
-    private long stamp;
+    private long id;
     private int credit, debit;
-    private String subjectId, name;
+    private String no, name;
     private String documentId;
 
     public Subject() {}
 
-    public Subject(String subjectId, String name, int credit, int debit, long stamp) {
-        this.subjectId = subjectId;
-        this.name = name;
-        this.credit = credit;
-        this.debit = debit;
-        this.stamp = stamp;
-    }
-
-    public long getStamp() {
-        return stamp;
+    public long getId() {
+        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getSubjectId() {
-        return subjectId;
+    public String getNo() {
+        return no;
     }
 
     public int getCredit() {
@@ -42,16 +34,16 @@ public class Subject implements Serializable {
         return documentId;
     }
 
-    public void setStamp(long stamp) {
-        this.stamp = stamp;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setSubjectId(String subjectId) {
-        this.subjectId = subjectId;
+    public void setNo(String no) {
+        this.no = no;
     }
 
     public void setCredit(int credit) {
