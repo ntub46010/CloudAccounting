@@ -14,13 +14,6 @@ public class Entry implements Serializable {
 
     }
 
-    public Entry(int date, String memo, String ps) {
-        this.subjects = new ArrayList<>();
-        this.date = date;
-        this.memo = memo;
-        this.ps = ps;
-    }
-
     public int getDate() {
         return date;
     }
@@ -71,15 +64,19 @@ public class Entry implements Serializable {
 
     public int calTotalCredit() {
         int credit = 0;
-        for (Subject subject : subjects)
+        for (Subject subject : subjects) {
             credit += subject.getCredit();
+        }
+
         return credit;
     }
 
     public int calTotalDebit() {
         int debit = 0;
-        for (Subject subject : subjects)
+        for (Subject subject : subjects) {
             debit += subject.getDebit();
+        }
+
         return debit;
     }
 

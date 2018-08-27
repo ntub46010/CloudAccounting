@@ -84,7 +84,7 @@ public class LoginActivity extends RegisterHelper {
                         if (task.isSuccessful()) {
                             Toast.makeText(context, "Email登入成功", Toast.LENGTH_SHORT).show();
                             prepareLogin();
-                        }else {
+                        } else {
                             Toast.makeText(context, "Email登入失敗", Toast.LENGTH_SHORT).show();
                             Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_LONG).show();
                             dlgWaiting.dismiss();
@@ -159,7 +159,7 @@ public class LoginActivity extends RegisterHelper {
             // Google Sign In was successful, authenticate with Firebase
             GoogleSignInAccount account = task.getResult(ApiException.class);
             loginWithCredential(GoogleAuthProvider.getCredential(account.getIdToken(), null), account.getDisplayName());
-        }catch (ApiException e) {
+        } catch (ApiException e) {
             // Google Sign In failed
             dlgWaiting.dismiss();
             e.printStackTrace();
@@ -176,14 +176,19 @@ public class LoginActivity extends RegisterHelper {
                             // Sign in success, update UI with the signed-in user's information
                             currentUser = mAuth.getCurrentUser();
 
-                            findUserDocument(new User(currentUser.getUid(), name, currentUser.getEmail()),
+                            User user = new User();
+                            user.setUid(currentUser.getUid());
+                            user.setName(name);
+                            user.setEmail(currentUser.getEmail());
+
+                            findUserDocument(user,
                                     new TaskListener() {
                                         @Override
                                         public void onFinish(User user) {
                                             prepareLogin();
                                         }
                                     });
-                        }else {
+                        } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -196,7 +201,8 @@ public class LoginActivity extends RegisterHelper {
         super.onActivityResult(requestCode, resultCode, data);
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CODE_GOOGLE_LOGIN)
+        if (requestCode == CODE_GOOGLE_LOGIN) {
             handleGoogleSignResult(GoogleSignIn.getSignedInAccountFromIntent(data));
+        }
     }
 }

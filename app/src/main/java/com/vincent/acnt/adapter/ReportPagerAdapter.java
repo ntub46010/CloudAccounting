@@ -5,10 +5,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ReportPagerAdapter extends FragmentPagerAdapter {
-    private ArrayList<Fragment> fragments;
-    private ArrayList<String> titles;
+    private List<Fragment> fragments;
+    private List<String> titles;
 
     public ReportPagerAdapter(FragmentManager manager) {
         super(manager);

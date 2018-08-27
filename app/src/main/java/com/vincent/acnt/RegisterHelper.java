@@ -19,14 +19,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.vincent.acnt.data.Constant;
+import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.vincent.acnt.MyApp.KEY_USERS;
-import static com.vincent.acnt.MyApp.PRO_UID;
-import static com.vincent.acnt.data.Utility.getWaitingDialog;
 
 public class RegisterHelper extends AppCompatActivity {
     protected Context context;
@@ -47,7 +45,7 @@ public class RegisterHelper extends AppCompatActivity {
         db = ((MyApp) getApplication()).getFirestore();
         mAuth = FirebaseAuth.getInstance();
 
-        dlgWaiting = getWaitingDialog(context);
+        dlgWaiting = Utility.getWaitingDialog(context);
     }
 
     protected void prepareLogin() {
@@ -58,9 +56,10 @@ public class RegisterHelper extends AppCompatActivity {
             //Facebook sign out
             LoginManager.getInstance().logOut();
             FacebookSdk.sdkInitialize(context);
-        }else {
-            if (!dlgWaiting.isShowing())
+        } else {
+            if (!dlgWaiting.isShowing()) {
                 dlgWaiting.show();
+            }
 
             findUserDocument(new User(currentUser.getUid()),
                     new TaskListener() {
@@ -77,8 +76,8 @@ public class RegisterHelper extends AppCompatActivity {
     }
 
     protected void findUserDocument(final User user, final TaskListener taskListener) {
-        db.collection(KEY_USERS)
-                .whereEqualTo(PRO_UID, user.getUid())
+        db.collection(Constant.KEY_USERS)
+                .whereEqualTo(Constant.PRO_UID, user.getUid())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -87,17 +86,18 @@ public class RegisterHelper extends AppCompatActivity {
                             List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
 
                             if (documentSnapshots.isEmpty()) {
-                                if (!dlgWaiting.isShowing())
+                                if (!dlgWaiting.isShowing()) {
                                     dlgWaiting.show();
+                                }
 
                                 createUserDocument(user, taskListener);
-                            }else {
+                            } else {
                                 User userDocument = documentSnapshots.get(0).toObject(User.class);
                                 userDocument.defineDocumentId(documentSnapshots.get(0).getId());
 
                                 taskListener.onFinish(userDocument);
                             }
-                        }else {
+                        } else {
                             Toast.makeText(context, "檢查使用者狀態失敗", Toast.LENGTH_SHORT).show();
                             dlgWaiting.dismiss();
                         }
@@ -108,7 +108,7 @@ public class RegisterHelper extends AppCompatActivity {
     protected void createUserDocument(final User user, final TaskListener taskListener) {
         user.setBooks(new ArrayList<String>());
 
-        db.collection(KEY_USERS)
+        db.collection(Constant.KEY_USERS)
                 .add(user)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override

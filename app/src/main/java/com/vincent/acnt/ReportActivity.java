@@ -21,6 +21,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.ReportPagerAdapter;
+import com.vincent.acnt.data.Constant;
+import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.ReportItem;
 import com.vincent.acnt.entity.Subject;
@@ -32,14 +34,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import static com.vincent.acnt.MyApp.browsingBook;
-import static com.vincent.acnt.data.Utility.getDateNumber;
-import static com.vincent.acnt.data.Utility.getWaitingDialog;
-import static com.vincent.acnt.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.MyApp.PRO_DATE;
-import static com.vincent.acnt.MyApp.PRO_MEMO;
 
 public class ReportActivity extends AppCompatActivity {
     private Context context;
@@ -112,7 +106,7 @@ public class ReportActivity extends AppCompatActivity {
             }
         });
 
-        dlgWaiting = getWaitingDialog(context);
+        dlgWaiting = Utility.getWaitingDialog(context);
 
         collectReportItems(Integer.parseInt(date), null);
     }
@@ -144,10 +138,10 @@ public class ReportActivity extends AppCompatActivity {
     private void searchInEntry(final int endDate, final TaskListener listener) {
         entries = new ArrayList<>();
 
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
-                .orderBy(PRO_DATE, Query.Direction.DESCENDING)
-                .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
-                .whereLessThanOrEqualTo(PRO_DATE, endDate)
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+                .orderBy(Constant.PRO_DATE, Query.Direction.DESCENDING)
+                .orderBy(Constant.PRO_MEMO, Query.Direction.ASCENDING)
+                .whereLessThanOrEqualTo(Constant.PRO_DATE, endDate)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -216,8 +210,8 @@ public class ReportActivity extends AppCompatActivity {
 
         for (int i = 0; i < 5; i++) {
             reportFragments[i] = new ReportFragment();
-            reportFragments[i].setReportItems(getReportItems(MyApp.CODE_TYPE[i]));
-            reportFragments[i].setType(MyApp.CODE_TYPE[i]);
+            reportFragments[i].setReportItems(getReportItems(Constant.CODE_TYPE[i]));
+            reportFragments[i].setType(Constant.CODE_TYPE[i]);
         }
 
         adapter.addFragment(reportFragments[0], "資產");
@@ -253,11 +247,11 @@ public class ReportActivity extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         month++;
-                        collectReportItems(getDateNumber(year, month, dayOfMonth), new TaskListener() {
+                        collectReportItems(Utility.getDateNumber(year, month, dayOfMonth), new TaskListener() {
                             @Override
                             public void onFinish() {
                                 for (int i = 0; i < 5; i++) {
-                                    reportFragments[i].setType(MyApp.CODE_TYPE[i]);
+                                    reportFragments[i].setType(Constant.CODE_TYPE[i]);
                                     reportFragments[i].onResume();
                                 }
                             }

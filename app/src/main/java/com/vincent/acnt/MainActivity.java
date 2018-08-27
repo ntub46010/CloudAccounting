@@ -12,11 +12,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.entity.User;
 
 import javax.annotation.Nullable;
-
-import static com.vincent.acnt.MyApp.KEY_USERS;
 
 public class MainActivity extends AppCompatActivity {
     private Context context;
@@ -49,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        db.collection(KEY_USERS).document(MyApp.getInstance().getUser().obtainDocumentId())
+        db.collection(Constant.KEY_USERS).document(MyApp.getInstance().getUser().obtainDocumentId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {

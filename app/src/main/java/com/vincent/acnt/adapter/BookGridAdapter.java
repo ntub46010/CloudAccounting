@@ -11,14 +11,14 @@ import android.widget.TextView;
 import com.vincent.acnt.R;
 import com.vincent.acnt.entity.Book;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class BookGridAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
-    private ArrayList<Book> books;
+    private List<Book> books;
 
-    public BookGridAdapter(Context context, ArrayList<Book> books) {
+    public BookGridAdapter(Context context, List<Book> books) {
         this.context = context;
         this.layoutInflater = LayoutInflater.from(context);
         this.books = books;
@@ -41,8 +41,9 @@ public class BookGridAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View view, ViewGroup parent) {
-        if (view == null)
-            view = layoutInflater.inflate(R.layout.grd_book, parent,false);
+        if (view == null) {
+            view = layoutInflater.inflate(R.layout.grd_book, parent, false);
+        }
 
         ImageView imgBook = view.findViewById(R.id.imgBook);
         TextView txtBookName = view.findViewById(R.id.txtBookName);

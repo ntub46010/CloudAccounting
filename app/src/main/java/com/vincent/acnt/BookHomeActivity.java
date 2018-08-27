@@ -27,6 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.EntryCardAdapter;
+import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.entity.Book;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.data.EntryContextMenuHandler;
@@ -41,21 +42,6 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
-import static com.vincent.acnt.MyApp.MODE_CREATE;
-import static com.vincent.acnt.MyApp.KEY_MODE;
-import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.MyApp.PRO_SUBJECT_NO;
-import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_DELETE;
-import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_UPDATE;
-import static com.vincent.acnt.MyApp.CODE_QUIT_ACTIVITY;
-import static com.vincent.acnt.MyApp.CODE_TYPE;
-import static com.vincent.acnt.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.MyApp.KEY_BOOK_NAME;
-import static com.vincent.acnt.MyApp.KEY_CREATOR;
-import static com.vincent.acnt.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.MyApp.PRO_DATE;
-import static com.vincent.acnt.MyApp.browsingBook;
-
 public class BookHomeActivity extends AppCompatActivity {
     private Context context;
     private FirebaseFirestore db;
@@ -66,7 +52,7 @@ public class BookHomeActivity extends AppCompatActivity {
     private RecyclerView recyEntry;
     private ProgressBar prgBar;
 
-    private ArrayList<Entry> entries;
+    private List<Entry> entries;
     private EntryCardAdapter adapter;
     private int thisMonthStartDate, thisMonthEndDate,
             thisMonthExpanseCredit = 0, thisMonthExpanseDebit = 0, lastMonthExpanseCredit = 0, lastMonthExpanseDebit = 0;
@@ -80,7 +66,7 @@ public class BookHomeActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
 
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(bundle.getString(KEY_BOOK_NAME));
+        toolbar.setTitle(bundle.getString(Constant.KEY_BOOK_NAME));
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -98,7 +84,7 @@ public class BookHomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent it = new Intent(context, EntryEditActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putInt(KEY_MODE, MODE_CREATE);
+                bundle.putInt(Constant.KEY_MODE, Constant.MODE_CREATE);
                 it.putExtras(bundle);
                 startActivity(it);
             }
@@ -127,7 +113,7 @@ public class BookHomeActivity extends AppCompatActivity {
         toggle.syncState();
         drawerLayout.addDrawerListener(toggle);
 
-        navigationView.getMenu().findItem(R.id.nav_member).setTitle(String.format("成員（ %d ）", browsingBook.getMemberIds().size()));
+        navigationView.getMenu().findItem(R.id.nav_member).setTitle(String.format("成員（ %d ）", MyApp.browsingBook.getMemberIds().size()));
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -158,10 +144,10 @@ public class BookHomeActivity extends AppCompatActivity {
         View header = navigationView.getHeaderView(0);
         txtBookName = header.findViewById(R.id.txtBookName);
         txtBookCreator = header.findViewById(R.id.txtCreator);
-        txtBookName.setText(bundle.getString(KEY_BOOK_NAME));
-        txtBookCreator.setText("由" + bundle.getString(KEY_CREATOR) + "建立");
+        txtBookName.setText(bundle.getString(Constant.KEY_BOOK_NAME));
+        txtBookCreator.setText("由" + bundle.getString(Constant.KEY_CREATOR) + "建立");
 
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId())
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -177,8 +163,8 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void loadSubjects() {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
-                .orderBy(PRO_SUBJECT_NO)
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
+                .orderBy(Constant.PRO_SUBJECT_NO)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -199,9 +185,9 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void queryThisMonthExpanse() {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
-                .whereGreaterThanOrEqualTo(PRO_DATE, thisMonthStartDate)
-                .whereLessThanOrEqualTo(PRO_DATE, thisMonthEndDate)
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+                .whereGreaterThanOrEqualTo(Constant.PRO_DATE, thisMonthStartDate)
+                .whereLessThanOrEqualTo(Constant.PRO_DATE, thisMonthEndDate)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -232,7 +218,7 @@ public class BookHomeActivity extends AppCompatActivity {
                                 subject.setNo(s.getNo());
                                 subject.setName(s.getName());
 
-                                if (subject.getNo().substring(0, 1).equals(CODE_TYPE[4])) {
+                                if (subject.getNo().substring(0, 1).equals(Constant.CODE_TYPE[4])) {
                                     thisMonthExpanseCredit += subject.getCredit();
                                     thisMonthExpanseDebit += subject.getDebit();
                                 }
@@ -254,9 +240,9 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void queryLastMonthExpanse(int startDate, int endDate) {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
-                .whereGreaterThanOrEqualTo(PRO_DATE, startDate)
-                .whereLessThan(PRO_DATE, endDate)
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+                .whereGreaterThanOrEqualTo(Constant.PRO_DATE, startDate)
+                .whereLessThan(Constant.PRO_DATE, endDate)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -275,7 +261,7 @@ public class BookHomeActivity extends AppCompatActivity {
 
                             //檢查分錄內的費用科目，進行總額累計
                             for (Subject subject : entry.getSubjects()) {
-                                if (subject.getNo().substring(0, 1).equals(CODE_TYPE[4])) {
+                                if (subject.getNo().substring(0, 1).equals(Constant.CODE_TYPE[4])) {
                                     lastMonthExpanseCredit += subject.getCredit();
                                     lastMonthExpanseDebit += subject.getDebit();
                                 }
@@ -309,7 +295,7 @@ public class BookHomeActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        browsingBook = null;
+        MyApp.browsingBook = null;
         MyApp.mapSubjectById.clear();
         super.onDestroy();
     }
@@ -319,11 +305,11 @@ public class BookHomeActivity extends AppCompatActivity {
 
         EntryContextMenuHandler handler = new EntryContextMenuHandler(context, adapter.getItem(adapter.longClickPosition), db);
         switch (item.getItemId()) {
-            case MENU_UPDATE:
+            case Constant.MODE_UPDATE:
                 handler.updateEntry();
                 break;
 
-            case MENU_DELETE:
+            case Constant.MODE_DELETE:
                 handler.deleteEntry(toolbar.getTitle().toString(), prgBar, recyEntry);
                 break;
         }
@@ -334,8 +320,8 @@ public class BookHomeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == CODE_QUIT_ACTIVITY) {
-            setResult(CODE_QUIT_ACTIVITY);
+        if (resultCode == Constant.MODE_QUIT) {
+            setResult(Constant.MODE_QUIT);
             finish();
         }
     }

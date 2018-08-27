@@ -23,6 +23,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.data.Verifier;
 import com.vincent.acnt.entity.Subject;
@@ -31,14 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
-
-import static com.vincent.acnt.MyApp.MODE_CREATE;
-import static com.vincent.acnt.MyApp.MODE_UPDATE;
-import static com.vincent.acnt.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.MyApp.KEY_MODE;
-import static com.vincent.acnt.MyApp.KEY_SUBJECT;
-import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.MyApp.browsingBook;
 
 public class SubjectEditActivity extends AppCompatActivity {
     private Context context;
@@ -104,7 +97,7 @@ public class SubjectEditActivity extends AppCompatActivity {
 
                 dlgWaiting.show();
 
-                if (bundle.getInt(KEY_MODE) == MODE_CREATE) {
+                if (bundle.getInt(Constant.KEY_MODE) == Constant.MODE_CREATE) {
                     createSubject(subject);
                 } else {
                     subject.defineDocumentId(documentId);
@@ -113,8 +106,8 @@ public class SubjectEditActivity extends AppCompatActivity {
             }
         });
 
-        if (bundle.getInt(KEY_MODE) == MODE_UPDATE) {
-            Subject subject = (Subject) bundle.getSerializable(KEY_SUBJECT);
+        if (bundle.getInt(Constant.KEY_MODE) == Constant.MODE_UPDATE) {
+            Subject subject = (Subject) bundle.getSerializable(Constant.KEY_SUBJECT);
             documentId = subject.obtainDocumentId();
             spnType.setSelection(Integer.parseInt(subject.getNo().substring(0, 1)));
             edtNo.setText(subject.getNo().substring(1, 3));
@@ -131,7 +124,7 @@ public class SubjectEditActivity extends AppCompatActivity {
     private void loadSubjectNos() {
         layout.setVisibility(View.INVISIBLE);
 
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -149,7 +142,7 @@ public class SubjectEditActivity extends AppCompatActivity {
     }
 
     private void createSubject(Subject subject) {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
                 .add(subject)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -174,7 +167,7 @@ public class SubjectEditActivity extends AppCompatActivity {
     }
 
     private void updateSubject(Subject subject) {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS).document(subject.obtainDocumentId())
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS).document(subject.obtainDocumentId())
                 .set(subject)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -201,7 +194,7 @@ public class SubjectEditActivity extends AppCompatActivity {
             errMsg.append("科目類別未選擇\n");
         }
 
-        if (bundle.getInt(KEY_MODE) == MODE_CREATE) {
+        if (bundle.getInt(Constant.KEY_MODE) == Constant.MODE_CREATE) {
             if (subjectNos.indexOf(Integer.parseInt(subject.getNo())) >= 0) {
                 errMsg.append("科目編號").append(subject.getNo()).append("已被使用\n");
             }

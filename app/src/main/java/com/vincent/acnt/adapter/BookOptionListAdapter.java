@@ -50,19 +50,20 @@ public class BookOptionListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        if (view == null)
+        if (view == null) {
             view = layoutInflater.inflate(R.layout.lst_book_option, parent, false);
+        }
 
         TextView txtTitle = view.findViewById(R.id.txtTitle);
         TextView txtContent = view.findViewById(R.id.txtContent);
         txtTitle.setText(titles[position]);
 
-        if (contents[position] == null)
+        if (contents[position] == null) {
             txtContent.setVisibility(View.GONE);
-        else {
+        } else {
+            txtContent.setVisibility(View.VISIBLE);
             txtContent.setText(contents[position]);
         }
-
 
         return view;
     }

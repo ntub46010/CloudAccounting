@@ -26,22 +26,14 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.SubjectListAdapter;
+import com.vincent.acnt.data.Constant;
+import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Subject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
-
-import static com.vincent.acnt.MyApp.MODE_CREATE;
-import static com.vincent.acnt.MyApp.MODE_UPDATE;
-import static com.vincent.acnt.MyApp.KEY_MODE;
-import static com.vincent.acnt.MyApp.KEY_SUBJECT;
-import static com.vincent.acnt.MyApp.browsingBook;
-import static com.vincent.acnt.data.Utility.getPlainDialog;
-import static com.vincent.acnt.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.MyApp.KEY_SUBJECTS;
-import static com.vincent.acnt.MyApp.PRO_SUBJECT_NO;
 
 public class SubjectActivity extends AppCompatActivity {
     private Context context;
@@ -52,7 +44,6 @@ public class SubjectActivity extends AppCompatActivity {
     private ProgressBar prgBar;
 
     private SubjectListAdapter adapter;
-    private final int mnuUpdateSubject = Menu.FIRST, mnuDeleteSubject = Menu.FIRST + 1;
     private int longClickPosition;
 
     private Subject subject;
@@ -84,7 +75,7 @@ public class SubjectActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent it = new Intent(context, SubjectEditActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putInt(KEY_MODE, MODE_CREATE);
+                bundle.putInt(Constant.KEY_MODE, Constant.MODE_CREATE);
                 it.putExtras(bundle);
                 startActivity(it);
             }
@@ -99,8 +90,8 @@ public class SubjectActivity extends AppCompatActivity {
     }
 
     private void loadSubjects() {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS)
-                .orderBy(PRO_SUBJECT_NO, Query.Direction.ASCENDING)
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
+                .orderBy(Constant.PRO_SUBJECT_NO, Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -124,11 +115,11 @@ public class SubjectActivity extends AppCompatActivity {
     }
 
     private void deleteSubject() {
-        getPlainDialog(context, activityTitle, "確定要刪除？\n" + subject.getName())
+        Utility.getPlainDialog(context, activityTitle, "確定要刪除？\n" + subject.getName())
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_SUBJECTS).document(subject.obtainDocumentId())
+                        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS).document(subject.obtainDocumentId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -148,8 +139,8 @@ public class SubjectActivity extends AppCompatActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, mnuUpdateSubject, 0, "編輯");
-        menu.add(0, mnuDeleteSubject, 1, "刪除");
+        menu.add(0, Constant.MODE_UPDATE, 0, "編輯");
+        menu.add(0, Constant.MODE_DELETE, 1, "刪除");
         AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
         longClickPosition = acmi.position;
     }
@@ -160,16 +151,16 @@ public class SubjectActivity extends AppCompatActivity {
 
         subject = (Subject) adapter.getItem(longClickPosition);
         switch (item.getItemId()) {
-            case mnuUpdateSubject:
+            case Constant.MODE_UPDATE:
                 Intent it = new Intent(context, SubjectEditActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putInt(KEY_MODE, MODE_UPDATE);
-                bundle.putSerializable(KEY_SUBJECT, subject);
+                bundle.putInt(Constant.KEY_MODE, Constant.MODE_UPDATE);
+                bundle.putSerializable(Constant.KEY_SUBJECT, subject);
                 it.putExtras(bundle);
                 startActivity(it);
                 break;
 
-            case mnuDeleteSubject:
+            case Constant.MODE_DELETE:
                 deleteSubject();
                 break;
         }

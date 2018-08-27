@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Calendar;
-import java.util.List;
 
 public class Utility {
     private static String symbols = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -32,30 +31,6 @@ public class Utility {
         dialog.setContentView(R.layout.dlg_waiting);
         dialog.setCancelable(false);
         return dialog;
-    }
-
-    public static int binarySearchNumber(List<Integer> ary, Integer target) {
-        int left = 0, right = ary.size() - 1;
-
-        if (ary.isEmpty())
-            return -1;
-
-        if (ary.get(right).compareTo(target) == 0)
-            return right;
-
-        while (left <= right) {
-            int middle = (right + left) / 2;
-
-            if (ary.get(middle).compareTo(target) == 0)
-                return middle;
-
-            if (ary.get(middle) > target)
-                right = middle - 1;
-            else
-                left = middle + 1;
-        }
-
-        return -1;
     }
 
     public static String getEngMonth(String month) {

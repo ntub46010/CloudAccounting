@@ -17,30 +17,28 @@ import android.widget.TextView;
 
 import com.vincent.acnt.EntryDetailActivity;
 import com.vincent.acnt.R;
+import com.vincent.acnt.data.Constant;
+import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.Subject;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
-
-import static com.vincent.acnt.data.Utility.getEngMonth;
-import static com.vincent.acnt.data.Utility.getWeekColor;
-import static com.vincent.acnt.MyApp.KEY_ENTRY;
 
 public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.DataViewHolder> {
     private Context context;
-    private ArrayList<Entry> entries;
+    private List<Entry> entries;
 
     private LayoutInflater inflater;
 
     private final int mnuEditEntry = Menu.FIRST, mnuDelEntry = Menu.FIRST + 1;
     public int longClickPosition;
 
-    public EntryCardAdapter(Context context, ArrayList<Entry> entries) {
+    public EntryCardAdapter(Context context, List<Entry> entries) {
         this.context = context;
         this.entries = entries;
 
@@ -48,11 +46,11 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
     }
 
     public class DataViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
-        int position;
-        CardView cardEntry;
-        TextView txtDate, txtMemo;
-        RelativeLayout layEntry;
-        LinearLayout layContainer;
+        private int position;
+        private CardView cardEntry;
+        private TextView txtDate, txtMemo;
+        private RelativeLayout layEntry;
+        private LinearLayout layContainer;
 
         DataViewHolder(View itemView) {
             super(itemView);
@@ -69,7 +67,7 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
                 public void onClick(View v) {
                     Intent it = new Intent(context, EntryDetailActivity.class);
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable(KEY_ENTRY, getItem(position));
+                    bundle.putSerializable(Constant.KEY_ENTRY, getItem(position));
                     it.putExtras(bundle);
                     context.startActivity(it);
                 }
@@ -99,13 +97,13 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
         Calendar c = Calendar.getInstance();
         try {
             c.setTime(new SimpleDateFormat("yyyyMMdd").parse(date));
-            holder.layEntry.setBackgroundColor(getWeekColor(c));
+            holder.layEntry.setBackgroundColor(Utility.getWeekColor(c));
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         holder.txtDate.setText(String.format("%s. %s",
-                        getEngMonth(date.substring(4, 6)),
+                        Utility.getEngMonth(date.substring(4, 6)),
                         date.substring(6, 8)
         ));
         holder.txtMemo.setText(entry.getMemo());
@@ -120,10 +118,11 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
 
             txtSubject.setText(subject.getName());
 
-            if (subject.getDebit() == 0)
+            if (subject.getDebit() == 0) {
                 txtCredit.setText(NumberFormat.getNumberInstance(Locale.US).format(subject.getCredit()));
-            else
+            } else {
                 txtDebit.setText(NumberFormat.getNumberInstance(Locale.US).format(subject.getDebit()));
+            }
 
             holder.layContainer.addView(layElement);
         }

@@ -41,8 +41,9 @@ public class RegisterActivity extends RegisterHelper {
     }
 
     private void registerWithEmail(String nickName, String email, String password) {
-        if (isNotValid(nickName, email, password))
+        if (isNotValid(nickName, email, password)) {
             return;
+        }
 
         dlgWaiting.show();
 
@@ -52,8 +53,14 @@ public class RegisterActivity extends RegisterHelper {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             currentUser = mAuth.getCurrentUser();
+
+                            User user = new User();
+                            user.setUid(currentUser.getUid());
+                            user.setName(edtNickName.getText().toString());
+                            user.setEmail(currentUser.getEmail());
+
                             createUserDocument(
-                                    new User(currentUser.getUid(), edtNickName.getText().toString(), currentUser.getEmail()),
+                                    user,
                                     new TaskListener() {
                                         @Override
                                         public void onFinish(User user) {
@@ -62,7 +69,7 @@ public class RegisterActivity extends RegisterHelper {
                                         }
                                     }
                             );
-                        }else {
+                        } else {
                             Toast.makeText(context, "註冊失敗", Toast.LENGTH_SHORT).show();
                             String errMsg =  task.getException().getMessage();
 

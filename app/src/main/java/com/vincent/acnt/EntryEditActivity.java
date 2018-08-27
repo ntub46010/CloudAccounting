@@ -24,6 +24,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.EntryElementView;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.data.Verifier;
@@ -35,15 +36,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import static com.vincent.acnt.MyApp.MODE_CREATE;
-import static com.vincent.acnt.MyApp.CODE_CREDIT;
-import static com.vincent.acnt.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.MyApp.KEY_ENTRY;
-import static com.vincent.acnt.MyApp.KEY_MODE;
-import static com.vincent.acnt.MyApp.PRO_DATE;
-import static com.vincent.acnt.MyApp.browsingBook;
 
 public class EntryEditActivity extends AppCompatActivity {
     private Context context;
@@ -114,7 +106,7 @@ public class EntryEditActivity extends AppCompatActivity {
         elementViews = new ArrayList<>();
         now = Calendar.getInstance();
 
-        if (bundle.getInt(KEY_MODE) == MODE_CREATE) {
+        if (bundle.getInt(Constant.KEY_MODE) == Constant.MODE_CREATE) {
             edtDate.setText(new SimpleDateFormat("yyyy/MM/dd").format(new Date()));
             addElementView(null);
             addElementView(null);
@@ -122,9 +114,9 @@ public class EntryEditActivity extends AppCompatActivity {
             activityTitle = "新增分錄";
             txtBarTitle.setText(activityTitle);
         } else {
-            Entry entry = (Entry) bundle.getSerializable(KEY_ENTRY);
+            Entry entry = (Entry) bundle.getSerializable(Constant.KEY_ENTRY);
 
-            edtDate.setText(bundle.getString(PRO_DATE));
+            edtDate.setText(bundle.getString(Constant.PRO_DATE));
             edtMemo.setText(entry.getMemo());
             edtPs.setText(entry.getPs());
 
@@ -203,7 +195,7 @@ public class EntryEditActivity extends AppCompatActivity {
 
         dlgWaiting.show();
 
-        if (bundle.getInt(KEY_MODE) == MODE_CREATE) {
+        if (bundle.getInt(Constant.KEY_MODE) == Constant.MODE_CREATE) {
             createEntry(entry);
         } else {
             entry.defineDocumentId(documentId);
@@ -235,7 +227,7 @@ public class EntryEditActivity extends AppCompatActivity {
             }
 
             //借貸方金額
-            if (view.getDirection() == CODE_CREDIT) {
+            if (view.getDirection() == Constant.CODE_CREDIT) {
                 subject.setCredit(view.getAmount());
             } else {
                 subject.setDebit(view.getAmount());
@@ -295,7 +287,7 @@ public class EntryEditActivity extends AppCompatActivity {
     }
 
     private void createEntry(Entry entry) {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
                 .add(entry)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -316,7 +308,7 @@ public class EntryEditActivity extends AppCompatActivity {
     }
 
     private void updateEntry(Entry entry) {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES).document(documentId)
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES).document(documentId)
                 .set(entry)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

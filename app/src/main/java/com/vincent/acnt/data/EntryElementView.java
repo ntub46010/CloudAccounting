@@ -6,9 +6,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import static com.vincent.acnt.MyApp.CODE_CREDIT;
-import static com.vincent.acnt.MyApp.CODE_DEBIT;
-
 public class EntryElementView {
     private AutoCompleteTextView actSubjectName;
     private Spinner spnDirection;
@@ -24,9 +21,9 @@ public class EntryElementView {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0)
-                    direction = CODE_CREDIT;
+                    direction = Constant.CODE_CREDIT;
                 else
-                    direction = CODE_DEBIT;
+                    direction = Constant.CODE_DEBIT;
             }
 
             @Override

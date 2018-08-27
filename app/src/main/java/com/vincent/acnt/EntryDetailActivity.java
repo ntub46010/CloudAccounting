@@ -9,14 +9,13 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.vincent.acnt.data.Constant;
+import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.Subject;
 
 import java.text.NumberFormat;
 import java.util.Locale;
-
-import static com.vincent.acnt.data.Utility.getSubjectColor;
-import static com.vincent.acnt.MyApp.KEY_ENTRY;
 
 public class EntryDetailActivity extends AppCompatActivity {
     private Context context;
@@ -39,12 +38,12 @@ public class EntryDetailActivity extends AppCompatActivity {
             }
         });
 
-        Entry entry = (Entry) getIntent().getExtras().getSerializable(KEY_ENTRY);
+        Entry entry = (Entry) getIntent().getExtras().getSerializable(Constant.KEY_ENTRY);
 
         TextView txtDate = findViewById(R.id.txtDate);
         TextView txtMemo = findViewById(R.id.txtMemo);
         TextView txtPs = findViewById(R.id.txtPs);
-        LinearLayout layContainer = findViewById(R.id.layElement);
+        LinearLayout laySubjectContainer = findViewById(R.id.laySubjectContainer);
 
         String date = String.valueOf(entry.getDate());
         txtDate.setText(String.format("%s/%s/%s",
@@ -57,6 +56,7 @@ public class EntryDetailActivity extends AppCompatActivity {
 
         LayoutInflater inflater = LayoutInflater.from(context);
         TextView txtSubject, txtCredit, txtDebit;
+
         for (Subject subject : entry.getSubjects()) {
             LinearLayout layElement = (LinearLayout) inflater.inflate(R.layout.lst_entry_element_detail, null);
             txtSubject = layElement.findViewById(R.id.txtSubject);
@@ -65,14 +65,15 @@ public class EntryDetailActivity extends AppCompatActivity {
 
             Subject s = MyApp.mapSubjectById.get(subject.getId());
             txtSubject.setText(s.getName());
-            txtSubject.setTextColor(getSubjectColor(s));
+            txtSubject.setTextColor(Utility.getSubjectColor(s));
 
-            if (subject.getDebit() == 0)
+            if (subject.getDebit() == 0) {
                 txtCredit.setText(NumberFormat.getNumberInstance(Locale.US).format(subject.getCredit()));
-            else
+            } else {
                 txtDebit.setText(NumberFormat.getNumberInstance(Locale.US).format(subject.getDebit()));
+            }
 
-            layContainer.addView(layElement);
+            laySubjectContainer.addView(layElement);
         }
     }
 }

@@ -10,13 +10,6 @@ public class ReportItem implements Serializable {
 
     }
 
-    public ReportItem(String id, String name, int totalCredit, int totalDebit) {
-        this.id = id;
-        this.name = name;
-        this.totalCredit = totalCredit;
-        this.totalDebit = totalDebit;
-    }
-
     public String getId() {
         return id;
     }

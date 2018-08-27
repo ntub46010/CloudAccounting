@@ -42,8 +42,9 @@ public class ReportListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        if (view == null)
-            view = layoutInflater.inflate(R.layout.lst_report_item, parent,false);
+        if (view == null) {
+            view = layoutInflater.inflate(R.layout.lst_report_item, parent, false);
+        }
 
         TextView txtId = view.findViewById(R.id.txtSubjectId);
         TextView txtName = view.findViewById(R.id.txtSubjectName);
@@ -52,14 +53,12 @@ public class ReportListAdapter extends BaseAdapter {
         TextView txtBalance = view.findViewById(R.id.txtBalance);
 
         ReportItem item = items.get(position);
+
         txtId.setText(String.valueOf(item.getId()));
         txtName.setText(item.getName());
         txtCredit.setText("借：" + NumberFormat.getNumberInstance(Locale.US).format(item.getTotalCredit()));
         txtDebit.setText("貸：" + NumberFormat.getNumberInstance(Locale.US).format(item.getTotalDebit()));
         txtBalance.setText("餘：" + NumberFormat.getNumberInstance(Locale.US).format(item.getBalance()));
-
-        //txtId.setTextColor(getSubjectColor(context, subject));
-
 
         return view;
     }

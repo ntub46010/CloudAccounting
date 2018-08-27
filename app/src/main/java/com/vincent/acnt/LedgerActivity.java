@@ -25,6 +25,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.LedgerListAdapter;
+import com.vincent.acnt.data.Constant;
+import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.LedgerRecord;
 import com.vincent.acnt.entity.Subject;
@@ -32,16 +34,6 @@ import com.vincent.acnt.entity.Subject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import static com.vincent.acnt.MyApp.browsingBook;
-import static com.vincent.acnt.data.Utility.getDateNumber;
-import static com.vincent.acnt.data.Utility.getPlainDialog;
-import static com.vincent.acnt.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.MyApp.KEY_ENTRY;
-import static com.vincent.acnt.MyApp.KEY_SUBJECT;
-import static com.vincent.acnt.MyApp.PRO_DATE;
-import static com.vincent.acnt.MyApp.PRO_MEMO;
 
 public class LedgerActivity extends AppCompatActivity {
     private Context context;
@@ -88,7 +80,7 @@ public class LedgerActivity extends AppCompatActivity {
         prgBar = findViewById(R.id.prgBar);
 
         if (getIntent().getExtras() != null) {
-            actSubjectName.setText(getIntent().getExtras().getString(KEY_SUBJECT));
+            actSubjectName.setText(getIntent().getExtras().getString(Constant.KEY_SUBJECT));
             queryFlag++;
         }
 
@@ -114,7 +106,7 @@ public class LedgerActivity extends AppCompatActivity {
                 if (entry != null) {
                     Intent it = new Intent(context, EntryDetailActivity.class);
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable(KEY_ENTRY, entry);
+                    bundle.putSerializable(Constant.KEY_ENTRY, entry);
                     it.putExtras(bundle);
                     startActivity(it);
                 }
@@ -130,13 +122,15 @@ public class LedgerActivity extends AppCompatActivity {
         int month = Calendar.getInstance().get(Calendar.MONTH);
 
         //建立年份清單
-        ArrayList<Integer> years = new ArrayList<>(), months = new ArrayList<>();
-        for (int i = 2017; i <= year; i++)
+        List<Integer> years = new ArrayList<>(), months = new ArrayList<>();
+        for (int i = 2017; i <= year; i++) {
             years.add(i);
+        }
         spnYear.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, years));
 
-        for (int i = 1; i<= 12; i++)
+        for (int i = 1; i<= 12; i++) {
             months.add(i);
+        }
         spnMonth.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, months));
 
         //定義清單點擊事件
@@ -146,8 +140,9 @@ public class LedgerActivity extends AppCompatActivity {
                 selectedYear = Integer.parseInt(parent.getSelectedItem().toString());
 
                 queryFlag++;
-                if (queryFlag > 0)
+                if (queryFlag > 0) {
                     showLedger();
+                }
             }
 
             @Override
@@ -162,8 +157,9 @@ public class LedgerActivity extends AppCompatActivity {
                 selectedMonth = position + 1;
 
                 queryFlag++;
-                if (queryFlag > 0)
+                if (queryFlag > 0) {
                     showLedger();
+                }
             }
 
             @Override
@@ -195,7 +191,7 @@ public class LedgerActivity extends AppCompatActivity {
 
     private boolean isSubjectExist(String subjectName) {
         if (!MyApp.mapSubjectByName.containsKey(subjectName)) {
-            getPlainDialog(context, activityTitle, "會計科目不存在").show();
+            Utility.getPlainDialog(context, activityTitle, "會計科目不存在").show();
             return false;
         }
 
@@ -203,7 +199,7 @@ public class LedgerActivity extends AppCompatActivity {
     }
 
     private void showLedger() {
-        final String subjectName = actSubjectName.getText().toString();
+        String subjectName = actSubjectName.getText().toString();
         if (!canQuery || subjectName.equals("")) {
             return;
         }
@@ -221,15 +217,19 @@ public class LedgerActivity extends AppCompatActivity {
 
         entries = new ArrayList<>();
         records = new ArrayList<>();
-        queryMonthlyRecord(MyApp.mapSubjectByName.get(subjectName).getId(), getDateNumber(selectedYear, selectedMonth, 1), getDateNumber(endYear, endMonth, 1));
+        queryMonthlyRecord(
+                MyApp.mapSubjectByName.get(subjectName).getId(),
+                Utility.getDateNumber(selectedYear, selectedMonth, 1),
+                Utility.getDateNumber(endYear, endMonth, 1)
+        );
     }
 
     private void queryMonthlyRecord(final long subjectId, final int selectedDate, int endDate) {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
-                .orderBy(PRO_DATE, Query.Direction.DESCENDING)
-                .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
-                .whereGreaterThanOrEqualTo(PRO_DATE, selectedDate)
-                .whereLessThan(PRO_DATE, endDate)
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+                .orderBy(Constant.PRO_DATE, Query.Direction.DESCENDING)
+                .orderBy(Constant.PRO_MEMO, Query.Direction.ASCENDING)
+                .whereGreaterThanOrEqualTo(Constant.PRO_DATE, selectedDate)
+                .whereLessThan(Constant.PRO_DATE, endDate)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -241,6 +241,7 @@ public class LedgerActivity extends AppCompatActivity {
 
                         List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
                         Entry entry;
+                        LedgerRecord record;
 
                         for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
                             entry = documentSnapshots.get(i).toObject(Entry.class);
@@ -254,12 +255,13 @@ public class LedgerActivity extends AppCompatActivity {
                                     entries.add(entry);
 
                                     //儲存明細，越前面是越新的紀錄
-                                    records.add(new LedgerRecord(
-                                            entry.getDate(),
-                                            entry.getMemo(),
-                                            subject.getCredit(),
-                                            subject.getDebit()
-                                    ));
+                                    record = new LedgerRecord();
+                                    record.setDate(entry.getDate());
+                                    record.setMemo(entry.getMemo());
+                                    record.setCredit(subject.getCredit());
+                                    record.setDebit(subject.getDebit());
+
+                                    records.add(record);
                                 }
                             }
                         }
@@ -269,17 +271,18 @@ public class LedgerActivity extends AppCompatActivity {
                         }
 
                         //若選擇1月，則略過查詢歷史總額，否則繼續查詢
-                        if (String.valueOf(selectedDate).substring(4).equals("0101"))
+                        if (String.valueOf(selectedDate).substring(4).equals("0101")) {
                             queryOriginBalance(subjectId, selectedDate);
-                        else
+                        } else {
                             queryHistoryRecord(subjectId, selectedDate);
+                        }
                     }
                 });
     }
 
     private void queryHistoryRecord(final long subjectId, final int selectedDate) {
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
-                .whereLessThan(PRO_DATE, selectedDate)
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+                .whereLessThan(Constant.PRO_DATE, selectedDate)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -293,9 +296,9 @@ public class LedgerActivity extends AppCompatActivity {
                         int totalCredit = 0, totalDebit = 0;
 
                         //從歷史分錄中計算累積借貸總額
-                        List<DocumentSnapshot > docEntry = task.getResult().getDocuments();
-                        for (int i = 0, len = docEntry.size(); i < len; i++) {
-                            entry = docEntry.get(i).toObject(Entry.class);
+                        List<DocumentSnapshot > documentSnapshots = task.getResult().getDocuments();
+                        for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
+                            entry = documentSnapshots.get(i).toObject(Entry.class);
 
                             for (Subject subject : entry.getSubjects()) {
                                 if (subject.getId() == subjectId) {
@@ -305,12 +308,13 @@ public class LedgerActivity extends AppCompatActivity {
                             }
                         }
 
-                        records.add(new LedgerRecord(
-                                selectedDate,
-                                "(歷史累積紀錄)",
-                                totalCredit,
-                                totalDebit
-                        ));
+                        LedgerRecord record = new LedgerRecord();
+                        record.setDate(selectedDate);
+                        record.setMemo("(歷史累積紀錄)");
+                        record.setCredit(totalCredit);
+                        record.setDebit(totalDebit);
+
+                        records.add(record);
                         entries.add(null);
 
                         //繼續查詢初始餘額

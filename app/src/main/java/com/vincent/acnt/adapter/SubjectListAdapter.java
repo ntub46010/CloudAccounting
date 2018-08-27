@@ -8,20 +8,19 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.vincent.acnt.R;
+import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Subject;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
-
-import static com.vincent.acnt.data.Utility.getSubjectColor;
 
 public class SubjectListAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
-    private ArrayList<Subject> subjects;
+    private List<Subject> subjects;
 
-    public SubjectListAdapter(Context context, ArrayList<Subject> subjects) {
+    public SubjectListAdapter(Context context, List<Subject> subjects) {
         this.context = context;
         this.layoutInflater = LayoutInflater.from(context);
         this.subjects = subjects;
@@ -44,8 +43,9 @@ public class SubjectListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        if (view == null)
-            view = layoutInflater.inflate(R.layout.lst_subject, parent,false);
+        if (view == null) {
+            view = layoutInflater.inflate(R.layout.lst_subject, parent, false);
+        }
 
         TextView txtId = view.findViewById(R.id.txtSubjectId);
         TextView txtName = view.findViewById(R.id.txtSubjectName);
@@ -58,7 +58,7 @@ public class SubjectListAdapter extends BaseAdapter {
         txtCredit.setText("借：" + NumberFormat.getNumberInstance(Locale.US).format(subject.getCredit()));
         txtDebit.setText("貸：" + NumberFormat.getNumberInstance(Locale.US).format(subject.getDebit()));
 
-        txtId.setTextColor(getSubjectColor(subject));
+        txtId.setTextColor(Utility.getSubjectColor(subject));
 
         return view;
     }

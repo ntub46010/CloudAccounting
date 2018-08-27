@@ -9,13 +9,6 @@ public class LedgerRecord {
 
     }
 
-    public LedgerRecord(int date, String memo, int credit, int debit) {
-        this.date = date;
-        this.memo = memo;
-        this.credit = credit;
-        this.debit = debit;
-    }
-
     public int getDate() {
         return date;
     }

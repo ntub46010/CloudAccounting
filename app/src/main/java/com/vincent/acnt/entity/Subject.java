@@ -8,7 +8,9 @@ public class Subject implements Serializable {
     private String no, name;
     private String documentId;
 
-    public Subject() {}
+    public Subject() {
+
+    }
 
     public long getId() {
         return id;

@@ -23,6 +23,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.EntryCardAdapter;
+import com.vincent.acnt.data.Constant;
+import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.data.EntryContextMenuHandler;
 import com.vincent.acnt.entity.Subject;
@@ -33,17 +35,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import static com.vincent.acnt.MyApp.KEY_MODE;
-import static com.vincent.acnt.MyApp.MODE_CREATE;
-import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_DELETE;
-import static com.vincent.acnt.data.EntryContextMenuHandler.MENU_UPDATE;
-import static com.vincent.acnt.MyApp.browsingBook;
-import static com.vincent.acnt.data.Utility.getDateNumber;
-import static com.vincent.acnt.MyApp.KEY_BOOKS;
-import static com.vincent.acnt.MyApp.KEY_ENTRIES;
-import static com.vincent.acnt.MyApp.PRO_DATE;
-import static com.vincent.acnt.MyApp.PRO_MEMO;
-
 public class JournalActivity extends AppCompatActivity {
     private Context context;
     private String activityTitle = "日記簿";
@@ -53,7 +44,7 @@ public class JournalActivity extends AppCompatActivity {
     private RecyclerView recyEntry;
     private ProgressBar prgBar;
 
-    private ArrayList<Entry> entries;
+    private List<Entry> entries;
     private EntryCardAdapter adapter;
 
     private int selectedYear, selectedMonth;
@@ -93,7 +84,7 @@ public class JournalActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent it = new Intent(context, EntryEditActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putInt(KEY_MODE, MODE_CREATE);
+                bundle.putInt(Constant.KEY_MODE, Constant.MODE_CREATE);
                 it.putExtras(bundle);
                 startActivity(it);
             }
@@ -108,7 +99,7 @@ public class JournalActivity extends AppCompatActivity {
         int month = Calendar.getInstance().get(Calendar.MONTH);
 
         //建立年份清單
-        ArrayList<Integer> years = new ArrayList<>(), months = new ArrayList<>();
+        List<Integer> years = new ArrayList<>(), months = new ArrayList<>();
         for (int i = 2017; i <= year; i++) {
             years.add(i);
         }
@@ -126,8 +117,9 @@ public class JournalActivity extends AppCompatActivity {
                 selectedYear = Integer.parseInt(parent.getSelectedItem().toString());
 
                 queryFlag++;
-                if (queryFlag > 0)
+                if (queryFlag > 0) {
                     showEntry();
+                }
             }
 
             @Override
@@ -142,8 +134,9 @@ public class JournalActivity extends AppCompatActivity {
                 selectedMonth = position + 1;
 
                 queryFlag++;
-                if (queryFlag > 0)
+                if (queryFlag > 0) {
                     showEntry();
+                }
             }
 
             @Override
@@ -163,8 +156,9 @@ public class JournalActivity extends AppCompatActivity {
     }
 
     private void showEntry() {
-        if (!canQuery)
+        if (!canQuery) {
             return;
+        }
 
         canQuery = false;
         prgBar.setVisibility(View.VISIBLE);
@@ -177,11 +171,11 @@ public class JournalActivity extends AppCompatActivity {
             endMonth = 1;
         }
 
-        db.collection(KEY_BOOKS).document(browsingBook.obtainDocumentId()).collection(KEY_ENTRIES)
-                .orderBy(PRO_DATE, Query.Direction.DESCENDING)
-                .orderBy(PRO_MEMO, Query.Direction.ASCENDING)
-                .whereGreaterThanOrEqualTo(PRO_DATE, getDateNumber(selectedYear, selectedMonth, 1))
-                .whereLessThan(PRO_DATE, getDateNumber(endYear, endMonth, 1))
+        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+                .orderBy(Constant.PRO_DATE, Query.Direction.DESCENDING)
+                .orderBy(Constant.PRO_MEMO, Query.Direction.ASCENDING)
+                .whereGreaterThanOrEqualTo(Constant.PRO_DATE, Utility.getDateNumber(selectedYear, selectedMonth, 1))
+                .whereLessThan(Constant.PRO_DATE, Utility.getDateNumber(endYear, endMonth, 1))
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -221,11 +215,11 @@ public class JournalActivity extends AppCompatActivity {
 
         EntryContextMenuHandler handler = new EntryContextMenuHandler(context, adapter.getItem(adapter.longClickPosition), db);
         switch (item.getItemId()) {
-            case MENU_UPDATE:
+            case Constant.MODE_UPDATE:
                 handler.updateEntry();
                 break;
 
-            case MENU_DELETE:
+            case Constant.MODE_DELETE:
                 handler.deleteEntry(activityTitle, prgBar, recyEntry);
                 break;
         }

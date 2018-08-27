@@ -1,22 +1,16 @@
 package com.vincent.acnt.entity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Book {
     private String id;
     private String name, creator;
-    private ArrayList<String> memberIds;
+    private List<String> memberIds;
     private String documentId;
 
     public Book() {
 
-    }
-
-    public Book(String id, String name, String creator) {
-        this.id = id;
-        this.name = name;
-        this.creator = creator;
-        this.memberIds = new ArrayList<>();
     }
 
     public String getId() {
@@ -43,19 +37,22 @@ public class Book {
         this.creator = creator;
     }
 
-    public ArrayList<String> getMemberIds() {
+    public List<String> getMemberIds() {
         return memberIds;
     }
 
-    public void setMemberIds(ArrayList<String> memberIds) {
-        if (memberIds == null)
+    public void setMemberIds(List<String> memberIds) {
+        if (memberIds == null) {
             memberIds = new ArrayList<>();
+        }
+
         this.memberIds = memberIds;
     }
 
     public void addMember(String userId) {
-        if (memberIds == null)
+        if (memberIds == null) {
             memberIds = new ArrayList<>();
+        }
         memberIds.add(userId);
     }
 

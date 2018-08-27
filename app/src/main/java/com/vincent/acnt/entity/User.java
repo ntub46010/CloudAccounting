@@ -16,12 +16,6 @@ public class User {
         this.uid = uid;
     }
 
-    public User(String uid, String name, String email) {
-        this.uid = uid;
-        this.name = name;
-        this.email = email;
-    }
-
     public String getUid() {
         return uid;
     }
@@ -50,9 +44,11 @@ public class User {
         return books;
     }
 
-    public void setBooks(ArrayList<String> books) {
-        if (books == null)
+    public void setBooks(List<String> books) {
+        if (books == null) {
             books = new ArrayList<>();
+        }
+
         this.books = books;
     }
 
@@ -65,6 +61,10 @@ public class User {
     }
 
     public void addBooks(String bookId) {
+        if (books == null) {
+            books = new ArrayList<>();
+        }
+
         books.add(0, bookId);
     }
 }
