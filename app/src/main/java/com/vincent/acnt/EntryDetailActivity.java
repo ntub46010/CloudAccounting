@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vincent.acnt.data.Constant;
@@ -58,7 +59,7 @@ public class EntryDetailActivity extends AppCompatActivity {
         TextView txtSubject, txtCredit, txtDebit;
 
         for (Subject subject : entry.getSubjects()) {
-            LinearLayout layElement = (LinearLayout) inflater.inflate(R.layout.lst_entry_element_detail, null);
+            RelativeLayout layElement = (RelativeLayout) inflater.inflate(R.layout.lst_entry_element_detail, null);
             txtSubject = layElement.findViewById(R.id.txtSubject);
             txtCredit = layElement.findViewById(R.id.txtCredit);
             txtDebit = layElement.findViewById(R.id.txtDebit);

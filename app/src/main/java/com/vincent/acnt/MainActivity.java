@@ -19,7 +19,6 @@ import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity {
     private Context context;
-    private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
     @Override
@@ -27,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
-        db = MyApp.getInstance().getFirestore();
         mAuth = FirebaseAuth.getInstance();
 
         ImageButton btnBook = findViewById(R.id.btnBook);
@@ -48,13 +46,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        db.collection(Constant.KEY_USERS).document(MyApp.getInstance().getUser().obtainDocumentId())
+        MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                         User user = documentSnapshot.toObject(User.class);
                         user.defineDocumentId(documentSnapshot.getId());
-                        MyApp.getInstance().setUser(user);
+                        MyApp.user = user;
                     }
                 });
     }

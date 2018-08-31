@@ -41,7 +41,6 @@ public class EntryEditActivity extends AppCompatActivity {
     private Context context;
     private String activityTitle;
     private Bundle bundle;
-    private FirebaseFirestore db;
 
     private EditText edtDate, edtMemo, edtPs;
     private LinearLayout layEntryContainer;
@@ -59,7 +58,6 @@ public class EntryEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry_edit);
         context = this;
-        db = MyApp.getInstance().getFirestore();
         bundle = getIntent().getExtras();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -137,8 +135,8 @@ public class EntryEditActivity extends AppCompatActivity {
     private void loadSubjects() {
         ArrayAdapter<String> adpSubjectName = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
 
-        for (long subjectId : MyApp.mapSubjectById.keySet()) {
-            adpSubjectName.add(MyApp.mapSubjectById.get(subjectId).getName());
+        for (int i = 0, len = MyApp.mapSubjectById.size(); i < len; i++) {
+            adpSubjectName.add(MyApp.mapSubjectById.valueAt(i).getName());
         }
 
         for (EntryElementView view : elementViews) {
@@ -287,7 +285,7 @@ public class EntryEditActivity extends AppCompatActivity {
     }
 
     private void createEntry(Entry entry) {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
                 .add(entry)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -308,7 +306,7 @@ public class EntryEditActivity extends AppCompatActivity {
     }
 
     private void updateEntry(Entry entry) {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES).document(documentId)
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES).document(documentId)
                 .set(entry)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

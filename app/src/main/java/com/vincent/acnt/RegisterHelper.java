@@ -28,8 +28,6 @@ import java.util.List;
 
 public class RegisterHelper extends AppCompatActivity {
     protected Context context;
-    protected FirebaseFirestore db;
-    protected FirebaseAuth mAuth;
     protected FirebaseUser currentUser;
 
     protected EditText edtEmail, edtPwd;
@@ -42,14 +40,12 @@ public class RegisterHelper extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
-        db = ((MyApp) getApplication()).getFirestore();
-        mAuth = FirebaseAuth.getInstance();
-
+        
         dlgWaiting = Utility.getWaitingDialog(context);
     }
 
     protected void prepareLogin() {
-        currentUser = mAuth.getCurrentUser();
+        currentUser = MyApp.mAuth.getCurrentUser();
         if (currentUser == null) {
             Toast.makeText(context, "未登入", Toast.LENGTH_SHORT).show();
 
@@ -67,7 +63,7 @@ public class RegisterHelper extends AppCompatActivity {
                         public void onFinish(User user) {
                             dlgWaiting.dismiss();
 
-                            MyApp.getInstance().setUser(user);
+                            MyApp.user = user;
                             startActivity(new Intent(context, MainActivity.class));
                             finish();
                         }
@@ -76,7 +72,7 @@ public class RegisterHelper extends AppCompatActivity {
     }
 
     protected void findUserDocument(final User user, final TaskListener taskListener) {
-        db.collection(Constant.KEY_USERS)
+        MyApp.db.collection(Constant.KEY_USERS)
                 .whereEqualTo(Constant.PRO_UID, user.getUid())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -108,7 +104,7 @@ public class RegisterHelper extends AppCompatActivity {
     protected void createUserDocument(final User user, final TaskListener taskListener) {
         user.setBooks(new ArrayList<String>());
 
-        db.collection(Constant.KEY_USERS)
+        MyApp.db.collection(Constant.KEY_USERS)
                 .add(user)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override

@@ -37,8 +37,6 @@ import java.util.List;
 public class BookListActivity extends AppCompatActivity {
     private Context context;
     private String activityTitle = "我的帳本";
-    private FirebaseFirestore db;
-    private User user;
 
     private GridView grdBook;
     private ProgressBar prgBar;
@@ -53,8 +51,6 @@ public class BookListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
         context = this;
-        db = MyApp.getInstance().getFirestore();
-        user = MyApp.getInstance().getUser();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -149,22 +145,22 @@ public class BookListActivity extends AppCompatActivity {
             grdBook.setVisibility(View.INVISIBLE);
         }
 
-        if (user.getBooks().isEmpty()) {
+        if (MyApp.user.getBooks().isEmpty()) {
             prgBar.setVisibility(View.GONE);
             grdBook.setVisibility(View.VISIBLE);
             Toast.makeText(context, "您目前沒有帳本", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        cnt = user.getBooks().size();
-        books = new ArrayList<>();
+        cnt = MyApp.user.getBooks().size();
+        books = new ArrayList<>(16);
         downloadBook();
     }
 
     private void downloadBook() {
         if (cnt > 0) {
-            final String bookId = user.getBooks().get(user.getBooks().size() - cnt);
-            db.collection(Constant.KEY_BOOKS)
+            final String bookId = MyApp.user.getBooks().get(MyApp.user.getBooks().size() - cnt);
+            MyApp.db.collection(Constant.KEY_BOOKS)
                     .whereEqualTo(Constant.PRO_ID, bookId)
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -175,9 +171,8 @@ public class BookListActivity extends AppCompatActivity {
 
                                 if (documentSnapshots.isEmpty()) {
                                     //若發現帳本已不存在，則把帳本ID由使用者資料中移除
-                                    User user = MyApp.getInstance().getUser();
-                                    user.getBooks().remove(bookId);
-                                    db.collection(Constant.KEY_USERS).document(user.obtainDocumentId()).update(Constant.PRO_BOOKS, user.getBooks());
+                                    MyApp.user.getBooks().remove(bookId);
+                                    MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId()).update(Constant.PRO_BOOKS, MyApp.user.getBooks());
                                 } else {
                                     DocumentSnapshot documentSnapshot = documentSnapshots.get(0);
                                     Book book = documentSnapshot.toObject(Book.class);
@@ -203,9 +198,9 @@ public class BookListActivity extends AppCompatActivity {
         final Book book = new Book();
         book.setId(Utility.convertTo62Notation(String.valueOf(System.currentTimeMillis())));
         book.setName(bookName);
-        book.setCreator(user.getName());
+        book.setCreator(MyApp.user.getName());
 
-        db.collection(Constant.KEY_BOOKS)
+        MyApp.db.collection(Constant.KEY_BOOKS)
                 .add(book)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -225,7 +220,7 @@ public class BookListActivity extends AppCompatActivity {
     private void importBook(final String bookId) {
         prgBar.setVisibility(View.VISIBLE);
 
-        for (String id : user.getBooks()) {
+        for (String id : MyApp.user.getBooks()) {
             if (id.equals(bookId)) {
                 Toast.makeText(context, "您先前已經匯入該帳本", Toast.LENGTH_SHORT).show();
                 prgBar.setVisibility(View.GONE);
@@ -233,7 +228,7 @@ public class BookListActivity extends AppCompatActivity {
             }
         }
 
-        db.collection(Constant.KEY_BOOKS)
+        MyApp.db.collection(Constant.KEY_BOOKS)
                 .whereEqualTo(Constant.PRO_ID, bookId)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -258,10 +253,10 @@ public class BookListActivity extends AppCompatActivity {
     }
 
     private void addToBookList(final String bookId, final Book book) {
-        user.addBooks(bookId);
+        MyApp.user.addBooks(bookId);
 
-        db.collection(Constant.KEY_USERS).document(user.obtainDocumentId())
-                .update(Constant.PRO_BOOKS, user.getBooks())
+        MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
+                .update(Constant.PRO_BOOKS, MyApp.user.getBooks())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -278,9 +273,9 @@ public class BookListActivity extends AppCompatActivity {
     }
 
     private void addMember(Book book) {
-        book.addMember(user.getUid());
+        book.addMember(MyApp.user.getUid());
 
-        db.collection(Constant.KEY_BOOKS)
+        MyApp.db.collection(Constant.KEY_BOOKS)
                 .document(book.obtainDocumentId())
                 .update(Constant.PRO_MEMBER_IDS, book.getMemberIds());
     }

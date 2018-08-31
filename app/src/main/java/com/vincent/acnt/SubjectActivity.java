@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,12 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.SubjectListAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
@@ -33,12 +27,9 @@ import com.vincent.acnt.entity.Subject;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 public class SubjectActivity extends AppCompatActivity {
     private Context context;
     private String activityTitle = "會計科目";
-    private FirebaseFirestore db;
 
     private ListView lstSubject;
     private ProgressBar prgBar;
@@ -53,7 +44,6 @@ public class SubjectActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subject);
         context = this;
-        db = MyApp.getInstance().getFirestore();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -85,33 +75,27 @@ public class SubjectActivity extends AppCompatActivity {
 
         prgBar.setVisibility(View.VISIBLE);
         lstSubject.setVisibility(View.GONE);
+        loadSubjects();
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
         loadSubjects();
     }
 
     private void loadSubjects() {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
-                .orderBy(Constant.PRO_SUBJECT_NO, Query.Direction.ASCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        ArrayList<Subject> subjects = new ArrayList<>();
-                        Subject subject;
+        List<Subject> subjects = new ArrayList<>(64);
 
-                        List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
-                        for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
-                            subject = documentSnapshots.get(i).toObject(Subject.class);
-                            subject.defineDocumentId(documentSnapshots.get(i).getId());
-                            subjects.add(subject);
-                        }
+        for (String subjectNo : MyApp.mapSubjectByNo.keySet()) {
+            subjects.add(MyApp.mapSubjectByNo.get(subjectNo));
+        }
 
-                        adapter = new SubjectListAdapter(context, subjects);
-                        lstSubject.setAdapter(adapter);
+        adapter = new SubjectListAdapter(context, subjects);
+        lstSubject.setAdapter(adapter);
 
-                        prgBar.setVisibility(View.GONE);
-                        lstSubject.setVisibility(View.VISIBLE);
-                    }
-                });
+        prgBar.setVisibility(View.GONE);
+        lstSubject.setVisibility(View.VISIBLE);
     }
 
     private void deleteSubject() {
@@ -119,15 +103,17 @@ public class SubjectActivity extends AppCompatActivity {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS).document(subject.obtainDocumentId())
+                        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS).document(subject.obtainDocumentId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful())
+                                        if (task.isSuccessful()) {
                                             Toast.makeText(context, "科目刪除成功", Toast.LENGTH_SHORT).show();
-                                        else
+                                            loadSubjects();
+                                        } else {
                                             Toast.makeText(context, "科目刪除失敗", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
                                 });
                     }

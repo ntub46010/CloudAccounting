@@ -47,12 +47,12 @@ public class RegisterActivity extends RegisterHelper {
 
         dlgWaiting.show();
 
-        mAuth.createUserWithEmailAndPassword(email, password)
+        MyApp.mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            currentUser = mAuth.getCurrentUser();
+                            currentUser = MyApp.mAuth.getCurrentUser();
 
                             User user = new User();
                             user.setUid(currentUser.getUid());

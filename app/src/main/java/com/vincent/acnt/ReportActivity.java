@@ -39,7 +39,6 @@ public class ReportActivity extends AppCompatActivity {
     private Context context;
     private Toolbar toolbar;
     private String activityTitle = "財務報告";
-    private FirebaseFirestore db;
 
     private ViewPager vpgHome;
     private FloatingActionButton fabDate;
@@ -57,7 +56,6 @@ public class ReportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
         context = this;
-        db = MyApp.getInstance().getFirestore();
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
         toolbar = findViewById(R.id.toolbar);
@@ -120,8 +118,8 @@ public class ReportActivity extends AppCompatActivity {
         mapReportItem.clear();
         ReportItem item;
 
-        for (long subjectId : MyApp.mapSubjectById.keySet()) {
-            subject = MyApp.mapSubjectById.get(subjectId);
+        for (int i = 0, len = MyApp.mapSubjectById.size(); i < len; i++) {
+            subject = MyApp.mapSubjectById.valueAt(i);
             item = new ReportItem();
 
             item.setId(subject.getNo());
@@ -136,9 +134,9 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void searchInEntry(final int endDate, final TaskListener listener) {
-        entries = new ArrayList<>();
+        entries = new ArrayList<>(256);
 
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
                 .orderBy(Constant.PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(Constant.PRO_MEMO, Query.Direction.ASCENDING)
                 .whereLessThanOrEqualTo(Constant.PRO_DATE, endDate)
@@ -224,7 +222,7 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private List<ReportItem> getReportItems(String type) {
-        List<ReportItem> reportItems = new ArrayList<>();
+        List<ReportItem> reportItems = new ArrayList<>(32);
         ReportItem item;
 
         for (String subjectNo : mapReportItem.keySet()) {

@@ -9,8 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,33 +16,20 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.data.Verifier;
 import com.vincent.acnt.entity.Subject;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 public class SubjectEditActivity extends AppCompatActivity {
     private Context context;
     private String activityTitle = "會計科目";
     private Bundle bundle;
-    private FirebaseFirestore db;
 
-    private ScrollView layout;
     private Spinner spnType;
     private EditText edtNo, edtName, edtCredit, edtDebit;
-    private ProgressBar prgBar;
 
-    private List<Integer> subjectNos;
     private String documentId;
 
     private Dialog dlgWaiting;
@@ -54,7 +39,6 @@ public class SubjectEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subject_edit);
         context = this;
-        db = MyApp.getInstance().getFirestore();
         bundle = getIntent().getExtras();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -70,13 +54,11 @@ public class SubjectEditActivity extends AppCompatActivity {
         });
 
         ImageView btnSubmit = findViewById(R.id.btnSubmit);
-        layout = findViewById(R.id.layout);
         spnType = findViewById(R.id.spnSubjectType);
         edtNo = findViewById(R.id.edtSubjectNo);
         edtName = findViewById(R.id.edtSubjectName);
         edtCredit = findViewById(R.id.edtCredit);
         edtDebit = findViewById(R.id.edtDebit);
-        prgBar = findViewById(R.id.prgBar);
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,32 +99,10 @@ public class SubjectEditActivity extends AppCompatActivity {
         }
 
         dlgWaiting = Utility.getWaitingDialog(context);
-
-        loadSubjectNos();
-    }
-
-    private void loadSubjectNos() {
-        layout.setVisibility(View.INVISIBLE);
-
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        subjectNos = new ArrayList<>();
-
-                        List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
-                        for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
-                            subjectNos.add(Integer.parseInt(documentSnapshots.get(i).toObject(Subject.class).getNo()));
-                        }
-
-                        prgBar.setVisibility(View.GONE);
-                        layout.setVisibility(View.VISIBLE);
-                    }
-                });
     }
 
     private void createSubject(Subject subject) {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
                 .add(subject)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -167,7 +127,7 @@ public class SubjectEditActivity extends AppCompatActivity {
     }
 
     private void updateSubject(Subject subject) {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS).document(subject.obtainDocumentId())
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS).document(subject.obtainDocumentId())
                 .set(subject)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -195,7 +155,7 @@ public class SubjectEditActivity extends AppCompatActivity {
         }
 
         if (bundle.getInt(Constant.KEY_MODE) == Constant.MODE_CREATE) {
-            if (subjectNos.indexOf(Integer.parseInt(subject.getNo())) >= 0) {
+            if (MyApp.mapSubjectByNo.containsKey(subject.getNo())) {
                 errMsg.append("科目編號").append(subject.getNo()).append("已被使用\n");
             }
         }

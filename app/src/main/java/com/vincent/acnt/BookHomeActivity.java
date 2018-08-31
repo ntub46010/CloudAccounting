@@ -44,7 +44,6 @@ import javax.annotation.Nullable;
 
 public class BookHomeActivity extends AppCompatActivity {
     private Context context;
-    private FirebaseFirestore db;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -62,7 +61,6 @@ public class BookHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_home);
         context = this;
-        db = MyApp.getInstance().getFirestore();
         Bundle bundle = getIntent().getExtras();
 
         toolbar = findViewById(R.id.toolbar);
@@ -147,7 +145,7 @@ public class BookHomeActivity extends AppCompatActivity {
         txtBookName.setText(bundle.getString(Constant.KEY_BOOK_NAME));
         txtBookCreator.setText("由" + bundle.getString(Constant.KEY_CREATOR) + "建立");
 
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -163,29 +161,32 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void loadSubjects() {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
-                .orderBy(Constant.PRO_SUBJECT_NO)
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         MyApp.mapSubjectById.clear();
                         MyApp.mapSubjectByName.clear();
+                        MyApp.mapSubjectByNo.clear();
                         Subject subject;
                         List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
 
                         for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
                             subject = documentSnapshots.get(i).toObject(Subject.class);
+                            subject.defineDocumentId(documentSnapshots.get(i).getId());
+
                             MyApp.mapSubjectById.put(subject.getId(), subject);
+                            MyApp.mapSubjectByNo.put(subject.getNo(), subject);
                             MyApp.mapSubjectByName.put(subject.getName(), subject);
                         }
-
-                        queryThisMonthExpanse();
                     }
                 });
+
+        queryThisMonthExpanse();
     }
 
     private void queryThisMonthExpanse() {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
                 .whereGreaterThanOrEqualTo(Constant.PRO_DATE, thisMonthStartDate)
                 .whereLessThanOrEqualTo(Constant.PRO_DATE, thisMonthEndDate)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -197,7 +198,7 @@ public class BookHomeActivity extends AppCompatActivity {
                         lastMonthExpanseDebit = 0;
 
                         String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
-                        entries = new ArrayList<>();
+                        entries = new ArrayList<>(128);
                         Entry entry;
 
                         //取出分錄
@@ -240,7 +241,7 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void queryLastMonthExpanse(int startDate, int endDate) {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
                 .whereGreaterThanOrEqualTo(Constant.PRO_DATE, startDate)
                 .whereLessThan(Constant.PRO_DATE, endDate)
                 .get()
@@ -297,13 +298,15 @@ public class BookHomeActivity extends AppCompatActivity {
     public void onDestroy() {
         MyApp.browsingBook = null;
         MyApp.mapSubjectById.clear();
+        MyApp.mapSubjectByNo.clear();
+        MyApp.mapSubjectByName.clear();
         super.onDestroy();
     }
 
     public boolean onContextItemSelected(MenuItem item) {
         onOptionsItemSelected(item);
 
-        EntryContextMenuHandler handler = new EntryContextMenuHandler(context, adapter.getItem(adapter.longClickPosition), db);
+        EntryContextMenuHandler handler = new EntryContextMenuHandler(context, adapter.getItem(adapter.longClickPosition), MyApp.db);
         switch (item.getItemId()) {
             case Constant.MODE_UPDATE:
                 handler.updateEntry();

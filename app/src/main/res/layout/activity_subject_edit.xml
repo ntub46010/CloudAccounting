@@ -76,8 +76,4 @@
 
     </ScrollView>
 
-    <ProgressBar
-        android:id="@+id/prgBar"
-        style="@style/prg_normal"/>
-
 </RelativeLayout>

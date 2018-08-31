@@ -38,7 +38,6 @@ import java.util.List;
 public class LedgerActivity extends AppCompatActivity {
     private Context context;
     private String activityTitle = "分類帳";
-    private FirebaseFirestore db;
 
     private LinearLayout layLedgerContainer;
     private Spinner spnYear, spnMonth;
@@ -58,7 +57,6 @@ public class LedgerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ledger);
         context = this;
-        db = ((MyApp) getApplication()).getFirestore();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -181,8 +179,8 @@ public class LedgerActivity extends AppCompatActivity {
     private void loadSubjects() {
         ArrayAdapter<String> adpSubjectName = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
 
-        for (long subjectId : MyApp.mapSubjectById.keySet()) {
-            adpSubjectName.add(MyApp.mapSubjectById.get(subjectId).getName());
+        for (int i = 0, len = MyApp.mapSubjectById.size(); i < len; i++) {
+            adpSubjectName.add(MyApp.mapSubjectById.valueAt(i).getName());
         }
 
         actSubjectName.setAdapter(adpSubjectName);
@@ -215,8 +213,8 @@ public class LedgerActivity extends AppCompatActivity {
             endMonth = 1;
         }
 
-        entries = new ArrayList<>();
-        records = new ArrayList<>();
+        entries = new ArrayList<>(256);
+        records = new ArrayList<>(64);
         queryMonthlyRecord(
                 MyApp.mapSubjectByName.get(subjectName).getId(),
                 Utility.getDateNumber(selectedYear, selectedMonth, 1),
@@ -225,7 +223,7 @@ public class LedgerActivity extends AppCompatActivity {
     }
 
     private void queryMonthlyRecord(final long subjectId, final int selectedDate, int endDate) {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
                 .orderBy(Constant.PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(Constant.PRO_MEMO, Query.Direction.ASCENDING)
                 .whereGreaterThanOrEqualTo(Constant.PRO_DATE, selectedDate)
@@ -281,7 +279,7 @@ public class LedgerActivity extends AppCompatActivity {
     }
 
     private void queryHistoryRecord(final long subjectId, final int selectedDate) {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
                 .whereLessThan(Constant.PRO_DATE, selectedDate)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

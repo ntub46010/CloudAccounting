@@ -76,8 +76,8 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(0, mnuEditEntry, 0, "編輯");
-            menu.add(0, mnuDelEntry, 1, "刪除");
+            menu.add(0, Constant.MODE_UPDATE, 0, "編輯");
+            menu.add(0, Constant.MODE_DELETE, 1, "刪除");
         }
     }
 

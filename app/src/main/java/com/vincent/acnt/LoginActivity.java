@@ -77,7 +77,7 @@ public class LoginActivity extends RegisterHelper {
 
     private void loginWithEmail(String account, String password) {
         dlgWaiting.show();
-        mAuth.signInWithEmailAndPassword(account, password)
+        MyApp.mAuth.signInWithEmailAndPassword(account, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -168,13 +168,13 @@ public class LoginActivity extends RegisterHelper {
 
     private void loginWithCredential(AuthCredential credential, final String name) {
         //在Auth中登錄會員
-        mAuth.signInWithCredential(credential)
+        MyApp.mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            currentUser = mAuth.getCurrentUser();
+                            currentUser = MyApp.mAuth.getCurrentUser();
 
                             User user = new User();
                             user.setUid(currentUser.getUid());

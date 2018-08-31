@@ -65,42 +65,40 @@ public class Utility {
     }
 
     public static int getSubjectColor(Subject subject) {
-        MyApp app = MyApp.getInstance();
         switch (subject.getNo().substring(0, 1)) {
             case "1":
-                return app.getResource().getColor(R.color.type_asset);
+                return MyApp.res.getColor(R.color.type_asset);
             case "2":
-                return app.getResource().getColor(R.color.type_liability);
+                return MyApp.res.getColor(R.color.type_liability);
             case "3":
-                return app.getResource().getColor(R.color.type_capital);
+                return MyApp.res.getColor(R.color.type_capital);
             case "4":
-                return app.getResource().getColor(R.color.type_revenue);
+                return MyApp.res.getColor(R.color.type_revenue);
             case "5":
-                return app.getResource().getColor(R.color.type_expense);
+                return MyApp.res.getColor(R.color.type_expense);
             default:
-                return app.getResource().getColor(R.color.type_asset);
+                return MyApp.res.getColor(R.color.type_asset);
         }
     }
 
     public static int getWeekColor(Calendar calendar) {
-        MyApp app =  MyApp.getInstance();
         switch (calendar.get(Calendar.DAY_OF_WEEK)) {
             case 1:
-                return app.getResource().getColor(R.color.week_sun);
+                return MyApp.res.getColor(R.color.week_sun);
             case 2:
-                return app.getResource().getColor(R.color.week_mon);
+                return MyApp.res.getColor(R.color.week_mon);
             case 3:
-                return app.getResource().getColor(R.color.week_tue);
+                return MyApp.res.getColor(R.color.week_tue);
             case 4:
-                return app.getResource().getColor(R.color.week_wen);
+                return MyApp.res.getColor(R.color.week_wen);
             case 5:
-                return app.getResource().getColor(R.color.week_thr);
+                return MyApp.res.getColor(R.color.week_thr);
             case 6:
-                return app.getResource().getColor(R.color.week_fri);
+                return MyApp.res.getColor(R.color.week_fri);
             case 7:
-                return app.getResource().getColor(R.color.week_sat);
+                return MyApp.res.getColor(R.color.week_sat);
             default:
-                return app.getResource().getColor(R.color.week_sun);
+                return MyApp.res.getColor(R.color.week_sun);
         }
     }
 

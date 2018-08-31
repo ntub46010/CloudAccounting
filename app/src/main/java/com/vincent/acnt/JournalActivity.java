@@ -38,7 +38,6 @@ import javax.annotation.Nullable;
 public class JournalActivity extends AppCompatActivity {
     private Context context;
     private String activityTitle = "日記簿";
-    private FirebaseFirestore db;
 
     private Spinner spnYear, spnMonth;
     private RecyclerView recyEntry;
@@ -57,7 +56,6 @@ public class JournalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_journal);
         context = this;
-        db = MyApp.getInstance().getFirestore();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -171,7 +169,7 @@ public class JournalActivity extends AppCompatActivity {
             endMonth = 1;
         }
 
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
                 .orderBy(Constant.PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(Constant.PRO_MEMO, Query.Direction.ASCENDING)
                 .whereGreaterThanOrEqualTo(Constant.PRO_DATE, Utility.getDateNumber(selectedYear, selectedMonth, 1))
@@ -179,7 +177,7 @@ public class JournalActivity extends AppCompatActivity {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        entries = new ArrayList<>();
+                        entries = new ArrayList<>(128);
                         List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
                         Entry entry;
 
@@ -213,7 +211,7 @@ public class JournalActivity extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item) {
         onOptionsItemSelected(item);
 
-        EntryContextMenuHandler handler = new EntryContextMenuHandler(context, adapter.getItem(adapter.longClickPosition), db);
+        EntryContextMenuHandler handler = new EntryContextMenuHandler(context, adapter.getItem(adapter.longClickPosition), MyApp.db);
         switch (item.getItemId()) {
             case Constant.MODE_UPDATE:
                 handler.updateEntry();

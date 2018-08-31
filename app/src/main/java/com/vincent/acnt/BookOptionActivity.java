@@ -25,7 +25,6 @@ import com.vincent.acnt.entity.User;
 public class BookOptionActivity extends AppCompatActivity {
     private Context context;
     private String activityTitle = "帳本選項";
-    private FirebaseFirestore db;
 
     private Dialog dialog;
 
@@ -36,7 +35,6 @@ public class BookOptionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_option);
         context = this;
-        db = MyApp.getInstance().getFirestore();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -150,7 +148,7 @@ public class BookOptionActivity extends AppCompatActivity {
     }
 
     private void updateBookName(String bookName) {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
                 .update(Constant.PRO_NAME, bookName)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -165,15 +163,14 @@ public class BookOptionActivity extends AppCompatActivity {
     }
 
     private void leaveBook(final TaskListener taskListener) {
-        final User user = MyApp.getInstance().getUser();
-        user.getBooks().remove(MyApp.browsingBook.getId());
+        MyApp.user.getBooks().remove(MyApp.browsingBook.getId());
 
-        db.collection(Constant.KEY_USERS).document(user.obtainDocumentId())
-                .update(Constant.PRO_BOOKS, user.getBooks())
+        MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
+                .update(Constant.PRO_BOOKS, MyApp.user.getBooks())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        taskListener.onFinish(user);
+                        taskListener.onFinish(MyApp.user);
                     }
                 });
     }
@@ -181,7 +178,7 @@ public class BookOptionActivity extends AppCompatActivity {
     private void removeMember(String userId) {
         MyApp.browsingBook.getMemberIds().remove(userId);
 
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
                 .update(Constant.PRO_MEMBER_IDS, MyApp.browsingBook.getMemberIds())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -198,7 +195,7 @@ public class BookOptionActivity extends AppCompatActivity {
     }
 
     private void deleteBook() {
-        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
                 .delete()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
