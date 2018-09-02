@@ -95,10 +95,11 @@ public class BookListActivity extends AppCompatActivity {
         rgpAddMode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.rdoCreateBook)
+                if (checkedId == R.id.rdoCreateBook) {
                     edtBookIdentity.setHint("輸入帳本名稱");
-                else
+                } else {
                     edtBookIdentity.setHint("輸入帳本ID");
+                }
             }
         });
 
@@ -163,7 +164,7 @@ public class BookListActivity extends AppCompatActivity {
                                 List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
 
                                 if (documentSnapshots.isEmpty()) {
-                                    //若發現帳本已不存在，則把帳本ID由使用者資料中移除
+                                    //若發現帳本已不存在，則默默地將帳本ID由使用者資料中移除
                                     MyApp.user.getBooks().remove(bookId);
                                     MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
                                             .update(Constant.PRO_BOOKS, MyApp.user.getBooks());

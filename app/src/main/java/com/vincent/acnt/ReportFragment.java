@@ -27,7 +27,6 @@ public class ReportFragment extends Fragment {
 
     private String type;
     private List<ReportItem> reportItems;
-    private ReportListAdapter adapter;
 
     public ReportFragment() {
 
@@ -61,8 +60,7 @@ public class ReportFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        adapter = new ReportListAdapter(context, reportItems);
-        lstReport.setAdapter(adapter);
+        lstReport.setAdapter(new ReportListAdapter(context, reportItems));
         showBalance();
     }
 
@@ -84,10 +82,10 @@ public class ReportFragment extends Fragment {
                 text = "權益餘額：";
                 break;
             case "4":
-                text = "收益餘額：";
+                text = "收入餘額：";
                 break;
             case "5":
-                text = "費損餘額：";
+                text = "支出餘額：";
                 break;
         }
 

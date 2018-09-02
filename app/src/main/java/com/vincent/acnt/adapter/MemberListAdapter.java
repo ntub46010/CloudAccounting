@@ -1,13 +1,16 @@
 package com.vincent.acnt.adapter;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +27,7 @@ public class MemberListAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
     private int type;
+    public int clickIndex;
     private List<User> members;
 
     public MemberListAdapter(Context context, int type, List<User> members) {
@@ -56,37 +60,14 @@ public class MemberListAdapter extends BaseAdapter {
 
         ImageView imgProfile = view.findViewById(R.id.imgProfile);
         TextView txtMemberName = view.findViewById(R.id.txtMemberName);
-        Button btnApprove = view.findViewById(R.id.btnApprove);
-        Button btnRemove = view.findViewById(R.id.btnRemove);
 
-        final User user = members.get(position);
+        User user = members.get(position);
         txtMemberName.setText(user.getName());
-
-        btnApprove.setVisibility(type == Constant.CODE_APPROVED ? View.GONE : View.VISIBLE);
-        btnRemove.setVisibility(type == Constant.CODE_APPROVED ? View.GONE : View.VISIBLE);
-
-        if (type == Constant.CODE_WAITING) {
-            btnApprove.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    approveUser(user);
-                }
-            });
-            btnRemove.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    rejectUser(user);
-                }
-            });
-        } else {
-            btnApprove.setOnClickListener(null);
-            btnRemove.setOnClickListener(null);
-        }
 
         return view;
     }
 
-    private void approveUser(final User user) {
+    public void approveUser(final User user) {
         removeWaitingUser(user);
         MyApp.browsingBook.getApprovedMembers().add(user);
         MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
@@ -99,7 +80,7 @@ public class MemberListAdapter extends BaseAdapter {
                 });
     }
 
-    private void rejectUser(final User user) {
+    public void rejectUser(final User user) {
         removeWaitingUser(user);
         MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
                 .set(MyApp.browsingBook)

@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.EntryElementView;
 import com.vincent.acnt.data.Utility;

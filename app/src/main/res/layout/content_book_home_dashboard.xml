@@ -26,6 +26,7 @@
             style="@style/txt_normal_title"
             android:layout_gravity="end"
             android:textSize="18sp"
+            android:text=".."
             android:textColor="#FFFFFF"/>
 
         <TextView
@@ -41,6 +42,7 @@
             style="@style/txt_normal_title"
             android:layout_gravity="end"
             android:textSize="22sp"
+            android:text=".."
             android:textColor="#FFFFFF"/>
 
     </GridLayout>

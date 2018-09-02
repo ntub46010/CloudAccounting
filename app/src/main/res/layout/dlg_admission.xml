@@ -2,6 +2,56 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingTop="15dp">
+
+    <ImageView
+        android:id="@+id/imgProfile"
+        android:layout_width="90dp"
+        android:layout_height="120dp"
+        android:layout_centerHorizontal="true"
+        android:background="#DDDDDD"/>
+
+    <TextView
+        android:id="@+id/txtMemberName"
+        style="@style/txt_normal_title"
+        android:layout_below="@id/imgProfile"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:textSize="20sp"/>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="1dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/txtMemberName"
+        android:layout_centerHorizontal="true"
+        android:background="#808080"/>
+
+    <Button
+        android:id="@+id/btnAccept"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@id/txtMemberName"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/view"
+        android:textColor="#00AA00"
+        android:background="#E0E0E0"
+        android:text="接受"
+        android:textSize="18sp"/>
+
+    <Button
+        android:id="@+id/btnReject"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@id/txtMemberName"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/btnAccept"
+        android:layout_toEndOf="@+id/view"
+        android:textColor="#AA0000"
+        android:background="#E0E0E0"
+        android:text="拒絕"
+        android:textSize="18sp"/>
 
 </RelativeLayout>

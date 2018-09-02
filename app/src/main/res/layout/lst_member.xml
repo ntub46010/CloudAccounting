@@ -20,20 +20,4 @@
         android:layout_marginStart="10dp"
         android:textSize="20sp"/>
 
-    <Button
-        android:id="@+id/btnRemove"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_alignParentEnd="true"
-        android:text="X"/>
-
-    <Button
-        android:id="@+id/btnApprove"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:layout_toStartOf="@id/btnRemove"
-        android:layout_centerInParent="true"
-        android:text="O"/>
-
 </RelativeLayout>
