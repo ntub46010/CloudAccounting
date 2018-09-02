@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.ReportPagerAdapter;
@@ -40,7 +39,7 @@ public class ReportActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private String activityTitle = "財務報告";
 
-    private ViewPager vpgHome;
+    private ViewPager vpgReport;
     private FloatingActionButton fabDate;
 
     private List<Entry> entries;
@@ -73,12 +72,12 @@ public class ReportActivity extends AppCompatActivity {
             }
         });
 
-        vpgHome = findViewById(R.id.vpgReport);
+        vpgReport = findViewById(R.id.vpgReport);
         fabDate = findViewById(R.id.fabSelectDate);
         TabLayout tabHome = findViewById(R.id.tabs);
 
-        vpgHome.setOffscreenPageLimit(15);
-        vpgHome.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        vpgReport.setOffscreenPageLimit(15);
+        vpgReport.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -95,7 +94,7 @@ public class ReportActivity extends AppCompatActivity {
             }
         });
 
-        tabHome.setupWithViewPager(vpgHome);
+        tabHome.setupWithViewPager(vpgReport);
 
         fabDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,7 +217,7 @@ public class ReportActivity extends AppCompatActivity {
         adapter.addFragment(reportFragments[3], "收入");
         adapter.addFragment(reportFragments[4], "支出");
 
-        vpgHome.setAdapter(adapter);
+        vpgReport.setAdapter(adapter);
     }
 
     private List<ReportItem> getReportItems(String type) {

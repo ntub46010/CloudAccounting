@@ -23,8 +23,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.EntryCardAdapter;
 import com.vincent.acnt.data.Constant;
@@ -55,6 +55,8 @@ public class BookHomeActivity extends AppCompatActivity {
     private EntryCardAdapter adapter;
     private int thisMonthStartDate, thisMonthEndDate,
             thisMonthExpanseCredit = 0, thisMonthExpanseDebit = 0, lastMonthExpanseCredit = 0, lastMonthExpanseDebit = 0;
+
+    private ListenerRegistration lsrBook, lsrSubject, lsrEntry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +113,6 @@ public class BookHomeActivity extends AppCompatActivity {
         toggle.syncState();
         drawerLayout.addDrawerListener(toggle);
 
-        navigationView.getMenu().findItem(R.id.nav_member).setTitle(String.format("成員（ %d ）", MyApp.browsingBook.getMemberIds().size()));
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -129,6 +130,7 @@ public class BookHomeActivity extends AppCompatActivity {
                         startActivity(new Intent(context, SubjectActivity.class));
                         break;
                     case R.id.nav_member:
+                        startActivity(new Intent(context, BookMemberActivity.class));
                         break;
                     case R.id.nav_options:
                         startActivityForResult(new Intent(context, BookOptionActivity.class), 0);
@@ -145,7 +147,7 @@ public class BookHomeActivity extends AppCompatActivity {
         txtBookName.setText(bundle.getString(Constant.KEY_BOOK_NAME));
         txtBookCreator.setText("由" + bundle.getString(Constant.KEY_CREATOR) + "建立");
 
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+        lsrBook = MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -154,14 +156,15 @@ public class BookHomeActivity extends AppCompatActivity {
                             toolbar.setTitle(book.getName());
                             txtBookName.setText(book.getName());
                             txtBookCreator.setText("由" + book.getCreator() + "建立");
-                        }else
+                        } else {
                             Toast.makeText(context, "該帳本不存在！", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
 
     private void loadSubjects() {
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
+        lsrSubject = MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -186,7 +189,7 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void queryThisMonthExpanse() {
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+        lsrEntry = MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
                 .whereGreaterThanOrEqualTo(Constant.PRO_DATE, thisMonthStartDate)
                 .whereLessThanOrEqualTo(Constant.PRO_DATE, thisMonthEndDate)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -262,7 +265,7 @@ public class BookHomeActivity extends AppCompatActivity {
 
                             //檢查分錄內的費用科目，進行總額累計
                             for (Subject subject : entry.getSubjects()) {
-                                if (subject.getNo().substring(0, 1).equals(Constant.CODE_TYPE[4])) {
+                                if (MyApp.mapSubjectById.get(subject.getId()).getNo().substring(0, 1).equals(Constant.CODE_TYPE[4])) {
                                     lastMonthExpanseCredit += subject.getCredit();
                                     lastMonthExpanseDebit += subject.getDebit();
                                 }
@@ -280,8 +283,9 @@ public class BookHomeActivity extends AppCompatActivity {
 
         adapter = new EntryCardAdapter(context, entries);
         recyEntry.setAdapter(adapter);
-        if (entries.isEmpty())
+        if (entries.isEmpty()) {
             Toast.makeText(context, "今日尚未記帳", Toast.LENGTH_SHORT).show();
+        }
 
         prgBar.setVisibility(View.GONE);
     }
@@ -300,6 +304,9 @@ public class BookHomeActivity extends AppCompatActivity {
         MyApp.mapSubjectById.clear();
         MyApp.mapSubjectByNo.clear();
         MyApp.mapSubjectByName.clear();
+        lsrBook.remove();
+        lsrSubject.remove();
+        lsrEntry.remove();
         super.onDestroy();
     }
 

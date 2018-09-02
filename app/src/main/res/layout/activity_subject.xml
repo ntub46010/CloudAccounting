@@ -26,8 +26,6 @@
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabCreateSubject"
         style="@style/fab"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
         android:layout_marginEnd="@dimen/fab_margin"
         app:srcCompat="@drawable/icon_add"
         app:fabSize="normal"/>

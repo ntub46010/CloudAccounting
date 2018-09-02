@@ -23,7 +23,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.BookGridAdapter;
 import com.vincent.acnt.data.Constant;
@@ -44,6 +43,7 @@ public class BookListActivity extends AppCompatActivity {
     private Dialog dialog;
 
     private List<Book> books;
+    private BookGridAdapter adapter;
     private int cnt;
 
     @Override
@@ -77,13 +77,7 @@ public class BookListActivity extends AppCompatActivity {
         grdBook.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent it = new Intent(context, BookHomeActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString(Constant.KEY_BOOK_NAME, books.get(position).getName());
-                bundle.putString(Constant.KEY_CREATOR, books.get(position).getCreator());
-                it.putExtras(bundle);
-                MyApp.browsingBook = books.get(position);
-                startActivityForResult(it, 0);
+                requestToUseBook(books.get(position));
             }
         });
 
@@ -121,7 +115,7 @@ public class BookListActivity extends AppCompatActivity {
                             } else {
                                 createBook(bookIdentity);
                             }
-                        }else {
+                        } else {
                             if (bookIdentity.equals("")) {
                                 Utility.getPlainDialog(context, activityTitle, "帳本ID未輸入").show();
                             } else {
@@ -140,20 +134,19 @@ public class BookListActivity extends AppCompatActivity {
     }
 
     private void loadBooksData(boolean showPrgBar) {
-        if (showPrgBar) {
-            prgBar.setVisibility(View.VISIBLE);
-            grdBook.setVisibility(View.INVISIBLE);
-        }
-
         if (MyApp.user.getBooks().isEmpty()) {
             prgBar.setVisibility(View.GONE);
-            grdBook.setVisibility(View.VISIBLE);
+            grdBook.setVisibility(View.INVISIBLE);
             Toast.makeText(context, "您目前沒有帳本", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        prgBar.setVisibility(showPrgBar ? View.VISIBLE : View.GONE);
+        grdBook.setVisibility(showPrgBar ? View.INVISIBLE : View.VISIBLE);
+
         cnt = MyApp.user.getBooks().size();
         books = new ArrayList<>(16);
+
         downloadBook();
     }
 
@@ -172,7 +165,8 @@ public class BookListActivity extends AppCompatActivity {
                                 if (documentSnapshots.isEmpty()) {
                                     //若發現帳本已不存在，則把帳本ID由使用者資料中移除
                                     MyApp.user.getBooks().remove(bookId);
-                                    MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId()).update(Constant.PRO_BOOKS, MyApp.user.getBooks());
+                                    MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
+                                            .update(Constant.PRO_BOOKS, MyApp.user.getBooks());
                                 } else {
                                     DocumentSnapshot documentSnapshot = documentSnapshots.get(0);
                                     Book book = documentSnapshot.toObject(Book.class);
@@ -186,7 +180,8 @@ public class BookListActivity extends AppCompatActivity {
                         }
                     });
         } else {
-            grdBook.setAdapter(new BookGridAdapter(context, books));
+            adapter = new BookGridAdapter(context, books);
+            grdBook.setAdapter(adapter);
             prgBar.setVisibility(View.GONE);
             grdBook.setVisibility(View.VISIBLE);
         }
@@ -199,6 +194,7 @@ public class BookListActivity extends AppCompatActivity {
         book.setId(Utility.convertTo62Notation(String.valueOf(System.currentTimeMillis())));
         book.setName(bookName);
         book.setCreator(MyApp.user.getName());
+        book.addApprovedMember(getMySimpleUser());
 
         MyApp.db.collection(Constant.KEY_BOOKS)
                 .add(book)
@@ -208,8 +204,8 @@ public class BookListActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Book fakeBook = new Book();
                             fakeBook.defineDocumentId(task.getResult().getId());
-                            addToBookList(book.getId(), fakeBook);
-                        }else {
+                            addToMyBookList(book.getId(), fakeBook, Constant.MODE_CREATE);
+                        } else {
                             Toast.makeText(context, "新增帳本失敗", Toast.LENGTH_SHORT).show();
                             prgBar.setVisibility(View.GONE);
                         }
@@ -218,15 +214,12 @@ public class BookListActivity extends AppCompatActivity {
     }
 
     private void importBook(final String bookId) {
-        prgBar.setVisibility(View.VISIBLE);
-
-        for (String id : MyApp.user.getBooks()) {
-            if (id.equals(bookId)) {
-                Toast.makeText(context, "您先前已經匯入該帳本", Toast.LENGTH_SHORT).show();
-                prgBar.setVisibility(View.GONE);
-                return;
-            }
+        if (MyApp.user.getBooks().contains(bookId)) {
+            Toast.makeText(context, "您已經擁有該帳本", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        prgBar.setVisibility(View.VISIBLE);
 
         MyApp.db.collection(Constant.KEY_BOOKS)
                 .whereEqualTo(Constant.PRO_ID, bookId)
@@ -239,12 +232,13 @@ public class BookListActivity extends AppCompatActivity {
                             if (documentSnapshot.isEmpty()) {
                                 Toast.makeText(context, "該帳本不存在，請確認帳本ID", Toast.LENGTH_SHORT).show();
                                 prgBar.setVisibility(View.GONE);
-                            }else {
-                                Book fakeBook = new Book();
-                                fakeBook.defineDocumentId(task.getResult().getDocuments().get(0).getId());
-                                addToBookList(bookId, fakeBook);
+                            } else {
+                                DocumentSnapshot bookDocument = task.getResult().getDocuments().get(0);
+                                Book book = bookDocument.toObject(Book.class);
+                                book.defineDocumentId(bookDocument.getId());
+                                addToMyBookList(bookId, book, Constant.MODE_IMPORT);
                             }
-                        }else {
+                        } else {
                             Toast.makeText(context, "帳本確認失敗", Toast.LENGTH_SHORT).show();
                             prgBar.setVisibility(View.GONE);
                         }
@@ -252,7 +246,7 @@ public class BookListActivity extends AppCompatActivity {
                 });
     }
 
-    private void addToBookList(final String bookId, final Book book) {
+    private void addToMyBookList(final String bookId, final Book book, final int mode) {
         MyApp.user.addBooks(bookId);
 
         MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
@@ -263,7 +257,10 @@ public class BookListActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(context, "加入帳本成功", Toast.LENGTH_SHORT).show();
                             loadBooksData(true);
-                            addMember(book);
+
+                            if (mode == Constant.MODE_IMPORT) {
+                                addMemberToBook(book);
+                            }
                         } else {
                             Toast.makeText(context, "加入帳本失敗", Toast.LENGTH_SHORT).show();
                             prgBar.setVisibility(View.GONE);
@@ -272,12 +269,64 @@ public class BookListActivity extends AppCompatActivity {
                 });
     }
 
-    private void addMember(Book book) {
-        book.addMember(MyApp.user.getUid());
+    private void addMemberToBook(Book book) {
+        book.addWaitingMember(getMySimpleUser());
 
         MyApp.db.collection(Constant.KEY_BOOKS)
                 .document(book.obtainDocumentId())
-                .update(Constant.PRO_MEMBER_IDS, book.getMemberIds());
+                .set(book);
+    }
+
+    private User getMySimpleUser() {
+        User user = new User();
+        user.setId(MyApp.user.getId());
+        user.setName(MyApp.user.getName());
+        user.setEmail(MyApp.user.getEmail());
+
+        return user;
+    }
+
+    private void requestToUseBook(Book book) {
+        // 自己在核准名單才可打開帳本
+        User testUser;
+        for (int i = 0, len = book.getApprovedMembers().size(); i < len; i++) {
+            testUser = book.getApprovedMembers().get(i);
+
+            if (testUser.getId().equals(MyApp.user.getId())) {
+                Intent it = new Intent(context, BookHomeActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString(Constant.KEY_BOOK_NAME, book.getName());
+                bundle.putString(Constant.KEY_CREATOR, book.getCreator());
+                it.putExtras(bundle);
+                startActivityForResult(it, 0);
+
+                MyApp.browsingBook = book;
+                return;
+            }
+        }
+
+        for (int i = 0, len = book.getWaitingMembers().size(); i < len; i++) {
+            testUser = book.getWaitingMembers().get(i);
+            if (testUser.getId().equals(MyApp.user.getId())) {
+                Toast.makeText(context, "尚未被帳本成員批准加入", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        Toast.makeText(context, "您被拒絕使用該帳本，將從清單中移除", Toast.LENGTH_SHORT).show();
+        MyApp.user.getBooks().remove(book.getId());
+        MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
+                .update(Constant.PRO_BOOKS, MyApp.user.getBooks())
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            loadBooksData(true);
+                        } else {
+                            Toast.makeText(context, "移除帳本失敗", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     @Override

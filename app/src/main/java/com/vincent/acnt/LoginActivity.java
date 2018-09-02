@@ -177,7 +177,7 @@ public class LoginActivity extends RegisterHelper {
                             currentUser = MyApp.mAuth.getCurrentUser();
 
                             User user = new User();
-                            user.setUid(currentUser.getUid());
+                            user.setId(String.valueOf(currentUser.getUid()));
                             user.setName(name);
                             user.setEmail(currentUser.getEmail());
 

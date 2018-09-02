@@ -31,6 +31,8 @@
         <item name="android:layout_marginTop">@dimen/fab_margin</item>
         <item name="android:layout_marginBottom">@dimen/fab_margin</item>
         <item name="android:layout_marginStart">@dimen/fab_margin</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:layout_alignParentEnd">true</item>
     </style>
 
     <style name="text">

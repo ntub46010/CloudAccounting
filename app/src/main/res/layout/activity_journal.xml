@@ -36,8 +36,6 @@
         android:id="@+id/fabCreateEntry"
         style="@style/fab"
         android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
         app:srcCompat="@drawable/icon_write"
         app:fabSize="normal"/>
 

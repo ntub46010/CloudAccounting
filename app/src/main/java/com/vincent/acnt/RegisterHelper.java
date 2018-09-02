@@ -13,11 +13,9 @@ import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
@@ -73,7 +71,7 @@ public class RegisterHelper extends AppCompatActivity {
 
     protected void findUserDocument(final User user, final TaskListener taskListener) {
         MyApp.db.collection(Constant.KEY_USERS)
-                .whereEqualTo(Constant.PRO_UID, user.getUid())
+                .whereEqualTo(Constant.PRO_ID, user.getId())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -81,11 +79,13 @@ public class RegisterHelper extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
 
+                            //檢查資料庫有無該使用者
                             if (documentSnapshots.isEmpty()) {
                                 if (!dlgWaiting.isShowing()) {
                                     dlgWaiting.show();
                                 }
 
+                                //若無則建立一個
                                 createUserDocument(user, taskListener);
                             } else {
                                 User userDocument = documentSnapshots.get(0).toObject(User.class);
@@ -114,8 +114,9 @@ public class RegisterHelper extends AppCompatActivity {
                             user.defineDocumentId(documentReference.getId());
 
                             taskListener.onFinish(user);
-                        }else
+                        } else {
                             Toast.makeText(context, "建立使用者失敗", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }

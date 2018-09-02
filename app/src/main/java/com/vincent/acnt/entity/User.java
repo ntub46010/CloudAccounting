@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    private String uid, name, email;
+    private String id;
+    private String name, email;
     private List<String> books;
     private String documentId;
 
@@ -12,16 +13,16 @@ public class User {
 
     }
 
-    public User(String uid) {
-        this.uid = uid;
+    public User(String id) {
+        this.id = id;
     }
 
-    public String getUid() {
-        return uid;
+    public String getId() {
+        return id;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {

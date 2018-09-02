@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.vincent.acnt.adapter.BookOptionListAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
@@ -96,7 +95,7 @@ public class BookOptionActivity extends AppCompatActivity {
                 dialog.show();
                 break;
             case 2:
-                if (MyApp.browsingBook.getMemberIds().size() == 1) {
+                if (MyApp.browsingBook.getApprovedMembers().size() == 1) {
                     Utility.getPlainDialog(context, activityTitle, "由於帳本成員只剩下您一個人，因此會同時刪除帳本。\n將無法再參與帳務，並從您的帳本清單中移除。\n確定要退出這個帳本？")
                             .setPositiveButton("是", new DialogInterface.OnClickListener() {
                                 @Override
@@ -119,7 +118,7 @@ public class BookOptionActivity extends AppCompatActivity {
                                     leaveBook(new TaskListener() {
                                         @Override
                                         public void onFinish(User user) {
-                                            removeMember(user.getUid());
+                                            removeMember(MyApp.user);
                                         }
                                     });
                                 }
@@ -175,11 +174,11 @@ public class BookOptionActivity extends AppCompatActivity {
                 });
     }
 
-    private void removeMember(String userId) {
-        MyApp.browsingBook.getMemberIds().remove(userId);
+    private void removeMember(User member) {
+        MyApp.browsingBook.getApprovedMembers().remove(member.getId());
 
         MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
-                .update(Constant.PRO_MEMBER_IDS, MyApp.browsingBook.getMemberIds())
+                .set(MyApp.browsingBook)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {

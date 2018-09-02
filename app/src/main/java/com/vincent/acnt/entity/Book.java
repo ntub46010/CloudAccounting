@@ -1,12 +1,13 @@
 package com.vincent.acnt.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Book {
+public class Book implements Serializable {
     private String id;
     private String name, creator;
-    private List<String> memberIds;
+    private List<User> approvedMembers = new ArrayList<>(), waitingMembers = new ArrayList<>();
     private String documentId;
 
     public Book() {
@@ -37,23 +38,41 @@ public class Book {
         this.creator = creator;
     }
 
-    public List<String> getMemberIds() {
-        return memberIds;
+    public List<User> getApprovedMembers() {
+        return approvedMembers;
     }
 
-    public void setMemberIds(List<String> memberIds) {
-        if (memberIds == null) {
-            memberIds = new ArrayList<>();
+    public void setApprovedMembers(List<User> approvedMembers) {
+        if (approvedMembers == null) {
+            approvedMembers = new ArrayList<>();
         }
 
-        this.memberIds = memberIds;
+        this.approvedMembers = approvedMembers;
     }
 
-    public void addMember(String userId) {
-        if (memberIds == null) {
-            memberIds = new ArrayList<>();
+    public List<User> getWaitingMembers() {
+        return waitingMembers;
+    }
+
+    public void setWaitingMembers(List<User> waitingMembers) {
+        if (waitingMembers == null) {
+            waitingMembers = new ArrayList<>();
         }
-        memberIds.add(userId);
+        this.waitingMembers = waitingMembers;
+    }
+
+    public void addApprovedMember(User member) {
+        if (approvedMembers == null) {
+            approvedMembers = new ArrayList<>();
+        }
+        approvedMembers.add(member);
+    }
+
+    public void addWaitingMember(User member) {
+        if (waitingMembers == null) {
+            waitingMembers = new ArrayList<>();
+        }
+        waitingMembers.add(member);
     }
 
     public String obtainDocumentId() {

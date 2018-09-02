@@ -20,6 +20,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.adapter.EntryCardAdapter;
@@ -50,6 +51,7 @@ public class JournalActivity extends AppCompatActivity {
 
     private int queryFlag = -1;
     private boolean canQuery = true;
+    private ListenerRegistration lsrEntry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,7 +171,7 @@ public class JournalActivity extends AppCompatActivity {
             endMonth = 1;
         }
 
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+        lsrEntry = MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
                 .orderBy(Constant.PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(Constant.PRO_MEMO, Query.Direction.ASCENDING)
                 .whereGreaterThanOrEqualTo(Constant.PRO_DATE, Utility.getDateNumber(selectedYear, selectedMonth, 1))
@@ -205,6 +207,12 @@ public class JournalActivity extends AppCompatActivity {
                         canQuery = true;
                     }
                 });
+    }
+
+    @Override
+    public void onDestroy() {
+        lsrEntry.remove();
+        super.onDestroy();
     }
 
     @Override

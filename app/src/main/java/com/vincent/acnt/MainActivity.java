@@ -12,6 +12,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.entity.User;
 
@@ -19,14 +20,14 @@ import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity {
     private Context context;
-    private FirebaseAuth mAuth;
+
+    private ListenerRegistration lsrUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
-        mAuth = FirebaseAuth.getInstance();
 
         ImageButton btnBook = findViewById(R.id.btnBook);
         btnBook.setOnClickListener(new View.OnClickListener() {
@@ -40,13 +41,13 @@ public class MainActivity extends AppCompatActivity {
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAuth.signOut();
+                MyApp.mAuth.signOut();
                 startActivity(new Intent(context, LoginActivity.class));
                 finish();
             }
         });
 
-        MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
+        lsrUser = MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -55,6 +56,12 @@ public class MainActivity extends AppCompatActivity {
                         MyApp.user = user;
                     }
                 });
+    }
+
+    @Override
+    public void onDestroy() {
+        lsrUser.remove();
+        super.onDestroy();
     }
 
 }

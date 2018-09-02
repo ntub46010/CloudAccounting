@@ -21,7 +21,7 @@ public class RegisterActivity extends RegisterHelper {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_register);
         context = this;
 
         tilNickName = findViewById(R.id.tilNickName);
@@ -42,6 +42,7 @@ public class RegisterActivity extends RegisterHelper {
 
     private void registerWithEmail(String nickName, String email, String password) {
         if (isNotValid(nickName, email, password)) {
+            Toast.makeText(context, "XXX", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -55,7 +56,7 @@ public class RegisterActivity extends RegisterHelper {
                             currentUser = MyApp.mAuth.getCurrentUser();
 
                             User user = new User();
-                            user.setUid(currentUser.getUid());
+                            user.setId(String.valueOf(System.currentTimeMillis()));
                             user.setName(edtNickName.getText().toString());
                             user.setEmail(currentUser.getEmail());
 

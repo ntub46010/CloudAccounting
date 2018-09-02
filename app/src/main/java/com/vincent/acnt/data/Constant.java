@@ -11,19 +11,22 @@ public class Constant {
     public static final String KEY_ENTRY = "Entry";
     public static final String KEY_MODE = "mode";
 
-    public static final String PRO_UID = "uid";
+    public static final String PRO_ID = "id";
     public static final String PRO_NAME = "name";
     public static final String PRO_BOOKS = "books";
-    public static final String PRO_ID = "id";
-    public static final String PRO_MEMBER_IDS = "memberIds";
+    public static final String PRO_APPROVED_MEMBERS = "approvedMembers";
+    public static final String PRO_WAITING_MEMBERS = "waitingMembers";
     public static final String PRO_SUBJECT_NO = "no";
     public static final String PRO_DATE = "date";
     public static final String PRO_MEMO = "memo";
 
     public static final int CODE_CREDIT = 1;
     public static final int CODE_DEBIT = 2;
+    public static final int CODE_APPROVED = 3;
+    public static final int CODE_WAITING = 4;
     public static final String[] CODE_TYPE = new String[5];
 
+    public static final int MODE_IMPORT = 995;
     public static final int MODE_CREATE = 996;
     public static final int MODE_UPDATE = 997;
     public static final int MODE_DELETE = 998;

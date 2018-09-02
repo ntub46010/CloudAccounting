@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/imgProfile"
+        android:layout_width="60dp"
+        android:layout_height="80dp"
+        android:background="#DDDDDD"/>
+
+    <TextView
+        android:id="@+id/txtMemberName"
+        style="@style/txt_normal_title"
+        android:layout_toEndOf="@id/imgProfile"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="10dp"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/btnRemove"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentEnd="true"
+        android:text="X"/>
+
+    <Button
+        android:id="@+id/btnApprove"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@id/btnRemove"
+        android:layout_centerInParent="true"
+        android:text="O"/>
+
+</RelativeLayout>
