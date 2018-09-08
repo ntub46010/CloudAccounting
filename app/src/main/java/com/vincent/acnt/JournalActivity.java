@@ -218,7 +218,7 @@ public class JournalActivity extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item) {
         onOptionsItemSelected(item);
 
-        EntryContextMenuHandler handler = new EntryContextMenuHandler(context, adapter.getItem(adapter.longClickPosition), MyApp.db);
+        EntryContextMenuHandler handler = new EntryContextMenuHandler(context, adapter.getItem(adapter.longClickPosition));
         switch (item.getItemId()) {
             case Constant.MODE_UPDATE:
                 handler.updateEntry();

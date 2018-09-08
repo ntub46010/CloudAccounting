@@ -7,7 +7,7 @@ import java.util.List;
 public class Entry implements Serializable {
     private int date;
     private List<Subject> subjects = new ArrayList<>();
-    private String memo, ps;
+    private String memo, ps, creator;
     private String documentId;
 
     public Entry() {
@@ -44,6 +44,14 @@ public class Entry implements Serializable {
 
     public void setPs(String ps) {
         this.ps = ps;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
     public void setSubjects(ArrayList<Subject> subjects) {

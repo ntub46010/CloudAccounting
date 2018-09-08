@@ -21,12 +21,10 @@ import com.vincent.acnt.entity.Entry;
 public class EntryContextMenuHandler {
     private Context context;
     private Entry entry;
-    private FirebaseFirestore db;
 
-    public EntryContextMenuHandler(Context context, Entry entry, FirebaseFirestore db) {
+    public EntryContextMenuHandler(Context context, Entry entry) {
         this.context = context;
         this.entry = entry;
-        this.db = db;
     }
 
     public void updateEntry() {
@@ -54,7 +52,8 @@ public class EntryContextMenuHandler {
                         prgBar.setVisibility(View.VISIBLE);
                         recyEntry.setVisibility(View.INVISIBLE);
 
-                        db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES).document(entry.obtainDocumentId())
+                        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                                .collection(Constant.KEY_ENTRIES).document(entry.obtainDocumentId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override

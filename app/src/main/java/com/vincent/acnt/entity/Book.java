@@ -7,7 +7,7 @@ import java.util.List;
 public class Book implements Serializable {
     private String id;
     private String name, creator;
-    private List<User> approvedMembers = new ArrayList<>(), waitingMembers = new ArrayList<>();
+    private List<User> approvedMembers = new ArrayList<>(), waitingMembers = new ArrayList<>(), adminMembers = new ArrayList<>();
     private String documentId;
 
     public Book() {
@@ -61,6 +61,14 @@ public class Book implements Serializable {
         this.waitingMembers = waitingMembers;
     }
 
+    public List<User> getAdminMembers() {
+        return adminMembers;
+    }
+
+    public void setAdminMembers(List<User> adminMembers) {
+        this.adminMembers = adminMembers;
+    }
+
     public void addApprovedMember(User member) {
         if (approvedMembers == null) {
             approvedMembers = new ArrayList<>();
@@ -75,11 +83,55 @@ public class Book implements Serializable {
         waitingMembers.add(member);
     }
 
+    public void addAdminMember(User member) {
+        if (adminMembers == null) {
+            adminMembers = new ArrayList<>();
+        }
+        adminMembers.add(member);
+    }
+
+    public void removeApprovedMember(String userId) {
+        for (int i = 0, len = approvedMembers.size(); i < len; i++) {
+            if (approvedMembers.get(i).getId().equals(userId)) {
+                approvedMembers.remove(i);
+                return;
+            }
+        }
+    }
+
+    public void removeWaitingMember(String userId) {
+        for (int i = 0, len = waitingMembers.size(); i < len; i++) {
+            if (waitingMembers.get(i).getId().equals(userId)) {
+                waitingMembers.remove(i);
+                return;
+            }
+        }
+    }
+
+    public void removeAdminMember(String userId) {
+        for (int i = 0, len = adminMembers.size(); i < len; i++) {
+            if (adminMembers.get(i).getId().equals(userId)) {
+                adminMembers.remove(i);
+                return;
+            }
+        }
+    }
+
     public String obtainDocumentId() {
         return documentId;
     }
 
     public void defineDocumentId(String documentId) {
         this.documentId = documentId;
+    }
+
+    public boolean isAdmin(String userId) {
+        for (int i = 0, len = adminMembers.size(); i < len; i++) {
+            if (adminMembers.get(i).getId().equals(userId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

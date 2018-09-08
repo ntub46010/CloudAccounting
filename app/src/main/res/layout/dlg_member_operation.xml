@@ -30,7 +30,7 @@
         android:background="#808080"/>
 
     <Button
-        android:id="@+id/btnAccept"
+        android:id="@+id/btnPositive"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_below="@id/txtMemberName"
@@ -42,12 +42,12 @@
         android:textSize="18sp"/>
 
     <Button
-        android:id="@+id/btnReject"
+        android:id="@+id/btnNegative"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_below="@id/txtMemberName"
         android:layout_alignParentEnd="true"
-        android:layout_alignTop="@+id/btnAccept"
+        android:layout_alignTop="@+id/btnPositive"
         android:layout_toEndOf="@+id/view"
         android:textColor="#AA0000"
         android:background="#E0E0E0"

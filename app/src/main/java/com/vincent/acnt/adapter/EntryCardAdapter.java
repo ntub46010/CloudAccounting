@@ -8,14 +8,15 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vincent.acnt.EntryDetailActivity;
+import com.vincent.acnt.MyApp;
 import com.vincent.acnt.R;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
@@ -35,7 +36,6 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
 
     private LayoutInflater inflater;
 
-    private final int mnuEditEntry = Menu.FIRST, mnuDelEntry = Menu.FIRST + 1;
     public int longClickPosition;
 
     public EntryCardAdapter(Context context, List<Entry> entries) {
@@ -49,6 +49,7 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
         private int position;
         private CardView cardEntry;
         private TextView txtDate, txtMemo;
+        private ImageView imgCreator;
         private RelativeLayout layEntry;
         private LinearLayout layContainer;
 
@@ -59,6 +60,7 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
             cardEntry = itemView.findViewById(R.id.cardEntry);
             txtDate = itemView.findViewById(R.id.txtDate);
             txtMemo = itemView.findViewById(R.id.txtMemo);
+            imgCreator = itemView.findViewById(R.id.imgCreator);
             layEntry = itemView.findViewById(R.id.layEntry);
             layContainer = itemView.findViewById(R.id.layContainer);
 
@@ -76,8 +78,10 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(0, Constant.MODE_UPDATE, 0, "編輯");
-            menu.add(0, Constant.MODE_DELETE, 1, "刪除");
+            if (getItem(longClickPosition).getCreator().equals(MyApp.user.getId()) || MyApp.browsingBook.isAdmin(MyApp.user.getId())) {
+                menu.add(0, Constant.MODE_UPDATE, 0, "編輯");
+                menu.add(0, Constant.MODE_DELETE, 1, "刪除");
+            }
         }
     }
 
@@ -107,6 +111,12 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
                         date.substring(6, 8)
         ));
         holder.txtMemo.setText(entry.getMemo());
+
+        if (entry.getCreator().equals(MyApp.user.getId())) {
+            holder.imgCreator.setVisibility(View.VISIBLE);
+        } else {
+            holder.imgCreator.setVisibility(View.GONE);
+        }
 
         holder.layContainer.removeAllViews();
         TextView txtSubject, txtCredit, txtDebit;

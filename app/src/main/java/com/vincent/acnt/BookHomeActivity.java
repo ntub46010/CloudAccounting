@@ -145,7 +145,7 @@ public class BookHomeActivity extends AppCompatActivity {
         txtBookName = header.findViewById(R.id.txtBookName);
         txtBookCreator = header.findViewById(R.id.txtCreator);
         txtBookName.setText(bundle.getString(Constant.KEY_BOOK_NAME));
-        txtBookCreator.setText("由" + bundle.getString(Constant.KEY_CREATOR) + "建立");
+        //txtBookCreator.setText("由" + bundle.getString(Constant.KEY_CREATOR) + "建立");
 
         lsrBook = MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -164,7 +164,8 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void loadSubjects() {
-        lsrSubject = MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
+        lsrSubject = MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .collection(Constant.KEY_SUBJECTS)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -313,7 +314,7 @@ public class BookHomeActivity extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item) {
         onOptionsItemSelected(item);
 
-        EntryContextMenuHandler handler = new EntryContextMenuHandler(context, adapter.getItem(adapter.longClickPosition), MyApp.db);
+        EntryContextMenuHandler handler = new EntryContextMenuHandler(context, adapter.getItem(adapter.longClickPosition));
         switch (item.getItemId()) {
             case Constant.MODE_UPDATE:
                 handler.updateEntry();

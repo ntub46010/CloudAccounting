@@ -60,16 +60,28 @@ public class MemberListAdapter extends BaseAdapter {
 
         ImageView imgProfile = view.findViewById(R.id.imgProfile);
         TextView txtMemberName = view.findViewById(R.id.txtMemberName);
+        ImageView imgMgr = view.findViewById(R.id.imgMgr);
 
         User user = members.get(position);
         txtMemberName.setText(user.getName());
 
+        if (MyApp.browsingBook.isAdmin(user.getId())) {
+            imgMgr.setVisibility(View.VISIBLE);
+        } else {
+            imgMgr.setVisibility(View.GONE);
+        }
+
         return view;
     }
 
+    public void setMembers(List<User> members) {
+        this.members = members;
+    }
+
     public void approveUser(final User user) {
-        removeWaitingUser(user);
+        MyApp.browsingBook.removeWaitingMember(user.getId());
         MyApp.browsingBook.getApprovedMembers().add(user);
+
         MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
                 .set(MyApp.browsingBook)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -81,7 +93,8 @@ public class MemberListAdapter extends BaseAdapter {
     }
 
     public void rejectUser(final User user) {
-        removeWaitingUser(user);
+        MyApp.browsingBook.removeWaitingMember(user.getId());
+
         MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
                 .set(MyApp.browsingBook)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -92,17 +105,46 @@ public class MemberListAdapter extends BaseAdapter {
                 });
     }
 
-    private void removeWaitingUser(User user) {
-        List<User> waitingMembers = MyApp.browsingBook.getWaitingMembers();
-        for (int i = 0, len = waitingMembers.size(); i < len; i++) {
-            if (waitingMembers.get(i).getId().equals(user.getId())) {
-                waitingMembers.remove(i);
-                break;
-            }
-        }
+    public void upgradeUser(final User user) {
+        MyApp.browsingBook.removeApprovedMember(user.getId());
+        MyApp.browsingBook.addAdminMember(user);
+
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .set(MyApp.browsingBook)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(context, "已給予" + user.getName() + "管理員身份", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    public void setMembers(List<User> members) {
-        this.members = members;
+    public void degradeUser(final User user) {
+        MyApp.browsingBook.removeAdminMember(user.getId());
+        MyApp.browsingBook.addApprovedMember(user);
+
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .set(MyApp.browsingBook)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(context, "已移除"  + user.getName() + "的管理員身份", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
+
+    public void removeUser(final User user) {
+        MyApp.browsingBook.removeApprovedMember(user.getId());
+        MyApp.browsingBook.removeAdminMember(user.getId());
+
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .set(MyApp.browsingBook)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(context, "已移除" + user.getName(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
 }

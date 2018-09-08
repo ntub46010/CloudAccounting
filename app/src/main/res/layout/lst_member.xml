@@ -15,9 +15,19 @@
     <TextView
         android:id="@+id/txtMemberName"
         style="@style/txt_normal_title"
+        android:layout_width="match_parent"
         android:layout_toEndOf="@id/imgProfile"
         android:layout_centerInParent="true"
         android:layout_marginStart="10dp"
         android:textSize="20sp"/>
+
+    <ImageView
+        android:id="@+id/imgMgr"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_toEndOf="@id/txtMemberName"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="-40dp"
+        android:background="#DDDDDD"/>
 
 </RelativeLayout>

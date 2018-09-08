@@ -28,7 +28,7 @@ public class BookMemberActivity extends AppCompatActivity {
 
     private ViewPager vpgMember;
 
-    private MemberFragment[] memberFragments;
+    private BookMemberFragment[] memberFragments;
     private MemberPagerAdapter adapter;
 
     private boolean isFirstIn = true;
@@ -79,9 +79,9 @@ public class BookMemberActivity extends AppCompatActivity {
 
     private void loadMembers() {
         adapter = new MemberPagerAdapter(getSupportFragmentManager());
-        memberFragments = new MemberFragment[2];
-        memberFragments[0] = new MemberFragment();
-        memberFragments[1] = new MemberFragment();
+        memberFragments = new BookMemberFragment[2];
+        memberFragments[0] = new BookMemberFragment();
+        memberFragments[1] = new BookMemberFragment();
         memberFragments[0].setType(Constant.CODE_APPROVED);
         memberFragments[1].setType(Constant.CODE_WAITING);
 
@@ -91,20 +91,22 @@ public class BookMemberActivity extends AppCompatActivity {
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                         Book book = documentSnapshot.toObject(Book.class);
 
-                        List<User> approvedMembers = book.getApprovedMembers();
+                        List<User> legalMembers = book.getAdminMembers();
+                        legalMembers.addAll(book.getApprovedMembers());
+
                         List<User> waitingMembers = book.getWaitingMembers();
 
-                        memberFragments[0].setMembers(approvedMembers);
+                        memberFragments[0].setMembers(legalMembers);
                         memberFragments[1].setMembers(waitingMembers);
 
                         if (isFirstIn) {
-                            adapter.addFragment(memberFragments[0], String.format("全部（ %d ）", approvedMembers.size()));
+                            adapter.addFragment(memberFragments[0], String.format("全部（ %d ）", legalMembers.size()));
                             adapter.addFragment(memberFragments[1], String.format("待批准（ %d ）", waitingMembers.size()));
                             vpgMember.setAdapter(adapter);
 
                             isFirstIn = false;
                         } else {
-                            adapter.setTitle(0, String.format("全部（ %d ）", approvedMembers.size()));
+                            adapter.setTitle(0, String.format("全部（ %d ）", legalMembers.size()));
                             adapter.setTitle(1, String.format("待批准（ %d ）", waitingMembers.size()));
                             adapter.notifyDataSetChanged();
                             memberFragments[0].getAdapter().notifyDataSetChanged();

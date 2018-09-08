@@ -284,6 +284,8 @@ public class EntryEditActivity extends AppCompatActivity {
     }
 
     private void createEntry(Entry entry) {
+        entry.setCreator(MyApp.user.getId());
+
         MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
                 .add(entry)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {

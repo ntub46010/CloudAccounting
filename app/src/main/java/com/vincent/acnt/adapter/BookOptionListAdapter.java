@@ -7,25 +7,31 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.vincent.acnt.MyApp;
 import com.vincent.acnt.R;
 import com.vincent.acnt.entity.Book;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BookOptionListAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
-    private String[] titles;
+    private List<String> titles;
     private String[] contents;
 
     public BookOptionListAdapter(Context context, Book book) {
         layoutInflater = LayoutInflater.from(context);
 
-        this.titles = new String[] {
-                "帳本名稱",
-                "帳本ID",
-                "退出帳本",
-                "刪除帳本"
-        };
+        titles = new ArrayList<>();
+        titles.add("帳本名稱");
+        titles.add("帳本ID");
+        titles.add("退出帳本");
 
-        this.contents = new String[] {
+        if (MyApp.browsingBook.getCreator().equals(MyApp.user.getId())) {
+            titles.add("刪除帳本");
+        }
+
+        contents = new String[] {
                 book.getName(),
                 book.getId(),
                 null,
@@ -35,7 +41,7 @@ public class BookOptionListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return titles.length;
+        return titles.size();
     }
 
     @Override
@@ -56,7 +62,7 @@ public class BookOptionListAdapter extends BaseAdapter {
 
         TextView txtTitle = view.findViewById(R.id.txtTitle);
         TextView txtContent = view.findViewById(R.id.txtContent);
-        txtTitle.setText(titles[position]);
+        txtTitle.setText(titles.get(position));
 
         if (contents[position] == null) {
             txtContent.setVisibility(View.GONE);

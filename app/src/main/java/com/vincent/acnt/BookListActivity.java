@@ -152,6 +152,30 @@ public class BookListActivity extends AppCompatActivity {
     }
 
     private void downloadBook() {
+        /*
+        MyApp.db.collection(Constant.KEY_BOOKS)
+                .whereEqualTo(Constant.PRO_ID, MyApp.user.getBooks())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+
+                            for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
+                                Book book = documentSnapshots.get(i).toObject(Book.class);
+                                book.defineDocumentId(documentSnapshots.get(i).getId());
+                                books.add(book);
+                            }
+
+                            adapter = new BookGridAdapter(context, books);
+                            grdBook.setAdapter(adapter);
+                            prgBar.setVisibility(View.GONE);
+                            grdBook.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+        */
         if (cnt > 0) {
             final String bookId = MyApp.user.getBooks().get(MyApp.user.getBooks().size() - cnt);
             MyApp.db.collection(Constant.KEY_BOOKS)
@@ -186,6 +210,7 @@ public class BookListActivity extends AppCompatActivity {
             prgBar.setVisibility(View.GONE);
             grdBook.setVisibility(View.VISIBLE);
         }
+
     }
 
     private void createBook(String bookName) {
@@ -194,8 +219,8 @@ public class BookListActivity extends AppCompatActivity {
         final Book book = new Book();
         book.setId(Utility.convertTo62Notation(String.valueOf(System.currentTimeMillis())));
         book.setName(bookName);
-        book.setCreator(MyApp.user.getName());
-        book.addApprovedMember(getMySimpleUser());
+        book.setCreator(MyApp.user.getId());
+        book.addAdminMember(getMySimpleUser());
 
         MyApp.db.collection(Constant.KEY_BOOKS)
                 .add(book)
@@ -290,10 +315,31 @@ public class BookListActivity extends AppCompatActivity {
     private void requestToUseBook(Book book) {
         // 自己在核准名單才可打開帳本
         User testUser;
+
         for (int i = 0, len = book.getApprovedMembers().size(); i < len; i++) {
             testUser = book.getApprovedMembers().get(i);
 
             if (testUser.getId().equals(MyApp.user.getId())) {
+                updateUserName(testUser, book);
+
+                Intent it = new Intent(context, BookHomeActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString(Constant.KEY_BOOK_NAME, book.getName());
+                bundle.putString(Constant.KEY_CREATOR, book.getCreator());
+                it.putExtras(bundle);
+                startActivityForResult(it, 0);
+
+                MyApp.browsingBook = book;
+                return;
+            }
+        }
+
+        for (int i = 0, len = book.getAdminMembers().size(); i < len; i++) {
+            testUser = book.getAdminMembers().get(i);
+
+            if (testUser.getId().equals(MyApp.user.getId())) {
+                updateUserName(testUser, book);
+
                 Intent it = new Intent(context, BookHomeActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString(Constant.KEY_BOOK_NAME, book.getName());
@@ -309,12 +355,15 @@ public class BookListActivity extends AppCompatActivity {
         for (int i = 0, len = book.getWaitingMembers().size(); i < len; i++) {
             testUser = book.getWaitingMembers().get(i);
             if (testUser.getId().equals(MyApp.user.getId())) {
+                updateUserName(testUser, book);
+
                 Toast.makeText(context, "尚未被帳本成員批准加入", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
 
         Toast.makeText(context, "您被拒絕使用該帳本，將從清單中移除", Toast.LENGTH_SHORT).show();
+
         MyApp.user.getBooks().remove(book.getId());
         MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
                 .update(Constant.PRO_BOOKS, MyApp.user.getBooks())
@@ -328,6 +377,14 @@ public class BookListActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void updateUserName(User origUser, Book book) {
+        if (!origUser.getName().equals(MyApp.user.getName())) {
+            origUser.setName(MyApp.user.getName());
+            MyApp.db.collection(Constant.KEY_BOOKS).document(book.obtainDocumentId())
+                    .set(book);
+        }
     }
 
     @Override
