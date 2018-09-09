@@ -110,7 +110,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private void collectReportItems(final int endDate, final TaskListener listener) {
         dlgWaiting.show();
-        fabDate.setVisibility(View.GONE);
+        fabDate.setVisibility(View.INVISIBLE);
 
         //儲存各個科目的初始餘額
         Subject subject;
@@ -162,7 +162,7 @@ public class ReportActivity extends AppCompatActivity {
                                     Subject s = MyApp.mapSubjectById.get(subject.getId());
 
                                     if (mapReportItem.containsKey(s.getNo())) {
-                                        //科目已存在，取出累積金額，再放置回去；尚未實驗可否簡化為不需要宣告item物件
+                                        //科目已存在，取出累積金額，再放置回去
                                         item = mapReportItem.get(s.getNo());
 
                                         item.addCredit(subject.getCredit());
@@ -207,7 +207,7 @@ public class ReportActivity extends AppCompatActivity {
 
         for (int i = 0; i < 5; i++) {
             reportFragments[i] = new ReportFragment();
-            reportFragments[i].setReportItems(getReportItems(Constant.CODE_TYPE[i]));
+            reportFragments[i].setReportItems(getReportItemsByType(Constant.CODE_TYPE[i]));
             reportFragments[i].setType(Constant.CODE_TYPE[i]);
         }
 
@@ -220,10 +220,11 @@ public class ReportActivity extends AppCompatActivity {
         vpgReport.setAdapter(adapter);
     }
 
-    private List<ReportItem> getReportItems(String type) {
+    private List<ReportItem> getReportItemsByType(String type) {
         List<ReportItem> reportItems = new ArrayList<>(32);
         ReportItem item;
 
+        // 由於mapReportItem使用TreeMap實作，因此取得的項目將會依照科目編號排列並依序存入List
         for (String subjectNo : mapReportItem.keySet()) {
             if (subjectNo.substring(0, 1).equals(type)) {
                 item = mapReportItem.get(subjectNo);

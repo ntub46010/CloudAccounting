@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.vincent.acnt.MyApp;
 import com.vincent.acnt.R;
 import com.vincent.acnt.entity.Book;
 
@@ -48,8 +49,17 @@ public class BookGridAdapter extends BaseAdapter {
         ImageView imgBook = view.findViewById(R.id.imgBook);
         TextView txtBookName = view.findViewById(R.id.txtBookName);
 
-        imgBook.setImageResource(R.drawable.icon_default_book);
-        txtBookName.setText(books.get(position).getName());
+        Book book = books.get(position);
+
+        txtBookName.setText(book.getName());
+
+        if (book.isLegalUser(MyApp.user.getId())) {
+            imgBook.setImageResource(R.drawable.img_book_legal);
+        } else if (book.isWaitingUser(MyApp.user.getId())) {
+            imgBook.setImageResource(R.drawable.img_book_waiting);
+        } else {
+            imgBook.setImageResource(R.drawable.img_book_reject);
+        }
 
         return view;
     }

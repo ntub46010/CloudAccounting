@@ -38,11 +38,18 @@ public class RegisterActivity extends RegisterHelper {
                 registerWithEmail(edtNickName.getText().toString(), edtEmail.getText().toString(), edtPwd.getText().toString());
             }
         });
+
+        Button btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void registerWithEmail(String nickName, String email, String password) {
         if (isNotValid(nickName, email, password)) {
-            Toast.makeText(context, "XXX", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -56,7 +63,7 @@ public class RegisterActivity extends RegisterHelper {
                             currentUser = MyApp.mAuth.getCurrentUser();
 
                             User user = new User();
-                            user.setId(String.valueOf(System.currentTimeMillis()));
+                            user.setId(currentUser.getUid());
                             user.setName(edtNickName.getText().toString());
                             user.setEmail(currentUser.getEmail());
 

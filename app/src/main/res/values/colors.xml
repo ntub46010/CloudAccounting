@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#F28001</color><!--FB9019 FF8D0E-->
-    <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#FF7C80</color>
+    <color name="colorPrimary">#50A250</color>
+    <color name="colorPrimaryDark">#318231</color>
+    <color name="colorAccent">#50A250</color><!--7AB07A-->
 
-    <color name="normal_background">#FFDDA5</color>
+    <color name="normal_background">#C3E4C3</color><!--ACD5AC-->
 
     <color name="type_asset">#F56800</color>
     <color name="type_liability">#0D8F06</color>

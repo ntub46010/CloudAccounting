@@ -78,7 +78,7 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            if (getItem(longClickPosition).getCreator().equals(MyApp.user.getId()) || MyApp.browsingBook.isAdmin(MyApp.user.getId())) {
+            if (getItem(longClickPosition).getCreator().equals(MyApp.user.getId()) || MyApp.browsingBook.isAdminUser(MyApp.user.getId())) {
                 menu.add(0, Constant.MODE_UPDATE, 0, "編輯");
                 menu.add(0, Constant.MODE_DELETE, 1, "刪除");
             }

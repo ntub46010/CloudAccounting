@@ -41,6 +41,7 @@ public class JournalActivity extends AppCompatActivity {
 
     private Spinner spnYear, spnMonth;
     private RecyclerView recyEntry;
+    private FloatingActionButton fabCreateEntry;
     private ProgressBar prgBar;
 
     private List<Entry> entries;
@@ -72,7 +73,7 @@ public class JournalActivity extends AppCompatActivity {
         spnYear = findViewById(R.id.spnYear);
         spnMonth = findViewById(R.id.spnMonth);
         recyEntry = findViewById(R.id.recyEntry);
-        FloatingActionButton fabCreateEntry = findViewById(R.id.fabCreateEntry);
+        fabCreateEntry = findViewById(R.id.fabCreateEntry);
         prgBar = findViewById(R.id.prgBar);
 
         recyEntry.setHasFixedSize(true);
@@ -161,7 +162,8 @@ public class JournalActivity extends AppCompatActivity {
 
         canQuery = false;
         prgBar.setVisibility(View.VISIBLE);
-        recyEntry.setVisibility(View.GONE);
+        recyEntry.setVisibility(View.INVISIBLE);
+        fabCreateEntry.setVisibility(View.INVISIBLE);
 
         int endYear = selectedYear;
         int endMonth = selectedMonth + 1;
@@ -203,6 +205,7 @@ public class JournalActivity extends AppCompatActivity {
 
                         prgBar.setVisibility(View.GONE);
                         recyEntry.setVisibility(View.VISIBLE);
+                        fabCreateEntry.setVisibility(View.VISIBLE);
                         canQuery = true;
                     }
                 });

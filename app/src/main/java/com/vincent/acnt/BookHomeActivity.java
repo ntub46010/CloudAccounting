@@ -49,6 +49,7 @@ public class BookHomeActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private TextView txtLastMonthExpanse, txtThisMonthExpanse, txtBookName, txtBookCreator;
     private RecyclerView recyEntry;
+    private FloatingActionButton fabCreateEntry;
     private ProgressBar prgBar;
 
     private List<Entry> entries;
@@ -71,7 +72,7 @@ public class BookHomeActivity extends AppCompatActivity {
 
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigation_view);
-        FloatingActionButton fabCreateEntry = findViewById(R.id.fabCreateEntry);
+        fabCreateEntry = findViewById(R.id.fabCreateEntry);
         txtLastMonthExpanse = findViewById(R.id.txtLastMonthExpanse);
         txtThisMonthExpanse = findViewById(R.id.txtThisMonthExpanse);
         recyEntry = findViewById(R.id.recyEntry);
@@ -155,7 +156,7 @@ public class BookHomeActivity extends AppCompatActivity {
                             Book book = documentSnapshot.toObject(Book.class);
                             toolbar.setTitle(book.getName());
                             txtBookName.setText(book.getName());
-                            txtBookCreator.setText("由" + book.getCreator() + "建立");
+                            //txtBookCreator.setText("由" + book.getCreator() + "建立");
                         } else {
                             Toast.makeText(context, "該帳本不存在！", Toast.LENGTH_SHORT).show();
                         }
@@ -164,6 +165,8 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void loadSubjects() {
+        fabCreateEntry.setVisibility(View.INVISIBLE);
+
         lsrSubject = MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
                 .collection(Constant.KEY_SUBJECTS)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -245,7 +248,8 @@ public class BookHomeActivity extends AppCompatActivity {
     }
 
     private void queryLastMonthExpanse(int startDate, int endDate) {
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .collection(Constant.KEY_ENTRIES)
                 .whereGreaterThanOrEqualTo(Constant.PRO_DATE, startDate)
                 .whereLessThan(Constant.PRO_DATE, endDate)
                 .get()
@@ -289,6 +293,7 @@ public class BookHomeActivity extends AppCompatActivity {
         }
 
         prgBar.setVisibility(View.GONE);
+        fabCreateEntry.setVisibility(View.VISIBLE);
     }
 
     @Override

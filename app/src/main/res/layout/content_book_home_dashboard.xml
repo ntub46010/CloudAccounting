@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/type_asset">
+    android:background="#40C040">
 
     <GridLayout
         android:layout_width="wrap_content"
@@ -46,6 +46,5 @@
             android:textColor="#FFFFFF"/>
 
     </GridLayout>
-
 
 </RelativeLayout>

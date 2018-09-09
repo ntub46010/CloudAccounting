@@ -125,7 +125,27 @@ public class Book implements Serializable {
         this.documentId = documentId;
     }
 
-    public boolean isAdmin(String userId) {
+    public boolean isLegalUser(String userId) {
+        for (int i = 0, len = approvedMembers.size(); i < len; i++) {
+            if (approvedMembers.get(i).getId().equals(userId)) {
+                return true;
+            }
+        }
+
+        return isAdminUser(userId);
+    }
+
+    public boolean isWaitingUser(String userId) {
+        for (int i = 0, len = waitingMembers.size(); i < len; i++) {
+            if (waitingMembers.get(i).getId().equals(userId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isAdminUser(String userId) {
         for (int i = 0, len = adminMembers.size(); i < len; i++) {
             if (adminMembers.get(i).getId().equals(userId)) {
                 return true;

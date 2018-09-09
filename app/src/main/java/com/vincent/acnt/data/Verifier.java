@@ -29,19 +29,19 @@ public class Verifier {
         else if (s.length() > 20)
             return "暱稱不可超過20字";
         else
-            return "";
+            return null;
     }
 
     public String chkPassword(String s) {
         if (Pattern.matches(ptnPassword, s))
-            return "";
+            return null;
         else
             return "密碼需為8~20位英數字";
     }
 
     public String chkEmail(String s) {
         if (Pattern.matches(ptnEmail, s))
-            return "";
+            return null;
         else
             return c.getString(R.string.chk_format_wrong, "Email");
     }

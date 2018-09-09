@@ -3,6 +3,7 @@ package com.vincent.acnt;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import com.vincent.acnt.adapter.MemberListAdapter;
 import com.vincent.acnt.data.Constant;
+import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.User;
 
 import java.util.List;
@@ -123,7 +125,7 @@ public class BookMemberFragment extends Fragment {
 
         txtMemberName.setText(user.getName());
 
-        if (user.getName().equals(MyApp.user.getName()) || !MyApp.browsingBook.isAdmin(MyApp.user.getId())) {
+        if (user.getName().equals(MyApp.user.getName()) || !MyApp.browsingBook.isAdminUser(MyApp.user.getId())) {
             btnPositive.setVisibility(View.GONE);
             btnNegative.setVisibility(View.GONE);
 
@@ -132,13 +134,22 @@ public class BookMemberFragment extends Fragment {
                     .setCancelable(true);
         }
 
-        if (MyApp.browsingBook.isAdmin(user.getId())) {
+        if (MyApp.browsingBook.isAdminUser(user.getId())) {
             btnPositive.setText("移除管理員");
             btnPositive.setTextColor(Color.parseColor("#00AA00"));
             btnPositive.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    adapter.degradeUser(members.get(index));
+                    Utility.getPlainDialog(context, "成員", "確定要移除" + members.get(index).getName() + "的管理員身份嗎？")
+                            .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    adapter.degradeUser(members.get(index));
+                                }
+                            })
+                            .setNegativeButton("否", null)
+                            .show();
+
                     dialog.dismiss();
                 }
             });
@@ -148,7 +159,16 @@ public class BookMemberFragment extends Fragment {
             btnPositive.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    adapter.upgradeUser(members.get(index));
+                    Utility.getPlainDialog(context, "成員", "確定要將" + members.get(index).getName() + "升為管理員嗎？")
+                            .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    adapter.upgradeUser(members.get(index));
+                                }
+                            })
+                            .setNegativeButton("否", null)
+                            .show();
+
                     dialog.dismiss();
                 }
             });
@@ -159,7 +179,16 @@ public class BookMemberFragment extends Fragment {
         btnNegative.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapter.removeUser(members.get(index));
+                Utility.getPlainDialog(context, "成員", "確定要移除" + members.get(index).getName() + "嗎？")
+                    .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            adapter.removeUser(members.get(index));
+                        }
+                    })
+                    .setNegativeButton("否", null)
+                    .show();
+
                 dialog.dismiss();
             }
         });
@@ -168,6 +197,4 @@ public class BookMemberFragment extends Fragment {
                 .setView(layout)
                 .setCancelable(true);
     }
-
-
 }

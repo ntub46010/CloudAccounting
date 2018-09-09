@@ -25,7 +25,7 @@
             android:background="@color/colorPrimary"
             android:elevation="4dp"
             app:tabTextAppearance="@android:style/TextAppearance.Holo.Small"
-            app:tabIndicatorColor="@android:color/holo_red_dark"
+            app:tabIndicatorColor="@android:color/holo_green_light"
             app:tabMode="fixed"
             app:tabGravity="fill" />
 

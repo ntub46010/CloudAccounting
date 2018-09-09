@@ -1,16 +1,12 @@
 package com.vincent.acnt.adapter;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,7 +61,7 @@ public class MemberListAdapter extends BaseAdapter {
         User user = members.get(position);
         txtMemberName.setText(user.getName());
 
-        if (MyApp.browsingBook.isAdmin(user.getId())) {
+        if (MyApp.browsingBook.isAdminUser(user.getId())) {
             imgMgr.setVisibility(View.VISIBLE);
         } else {
             imgMgr.setVisibility(View.GONE);

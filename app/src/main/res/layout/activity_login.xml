@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center_horizontal"
+    android:gravity="center_vertical"
+    android:background="@color/normal_background"
     tools:context=".LoginActivity">
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/tilEmail"
-        style="@style/til_account"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        style="@style/til_account">
 
         <EditText
             android:id="@+id/edtEmail"
-            style="@style/edit_text"
+            style="@style/edt_account"
             android:hint="電子郵件"
             android:text="zxcveric@yahoo.com.tw"/>
 
@@ -26,12 +24,11 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/tilPwd"
         style="@style/til_account"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_below="@id/tilEmail">
 
         <EditText
             android:id="@+id/edtPwd"
-            style="@style/edit_text"
+            style="@style/edt_account"
             android:hint="密碼"
             android:text="12345678"
             android:inputType="textPassword" />
@@ -40,30 +37,33 @@
 
     <Button
         android:id="@+id/btnLogin"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
+        style="@style/btn_login"
+        android:layout_below="@id/tilPwd"
+        android:layout_centerHorizontal="true"
         android:text="登入"/>
 
     <Button
-        android:id="@+id/btnRegister"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-        android:text="Email註冊"/>
-
-    <Button
         android:id="@+id/btnFBLogin"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-        android:text="Facebook登入"/>
+        style="@style/btn_login"
+        android:layout_below="@id/btnLogin"
+        android:layout_centerHorizontal="true"
+        android:drawableStart="@drawable/icon_facebook"
+        android:text="Facebook 登入"/>
 
     <Button
         android:id="@+id/btnGoogleLogin"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-        android:text="Google登入"/>
+        style="@style/btn_login"
+        android:layout_below="@id/btnFBLogin"
+        android:layout_centerHorizontal="true"
+        android:drawableStart="@drawable/icon_google"
+        android:text="Google 登入"/>
 
-</LinearLayout>
+    <Button
+        android:id="@+id/btnRegister"
+        style="@style/btn_login"
+        android:layout_below="@id/btnGoogleLogin"
+        android:layout_centerHorizontal="true"
+        android:drawableStart="@drawable/icon_email"
+        android:text="使用 Email 註冊"/>
+
+</RelativeLayout>

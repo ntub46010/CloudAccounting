@@ -86,6 +86,7 @@ public class RegisterHelper extends AppCompatActivity {
                                 }
 
                                 //若無則建立一個
+                                Toast.makeText(context, "沒有document", Toast.LENGTH_SHORT).show();
                                 createUserDocument(user, taskListener);
                             } else {
                                 User userDocument = documentSnapshots.get(0).toObject(User.class);
