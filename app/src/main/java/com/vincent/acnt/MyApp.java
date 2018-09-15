@@ -10,9 +10,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.entity.Book;
+import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.Subject;
 import com.vincent.acnt.entity.User;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -27,6 +30,7 @@ public class MyApp extends Application {
     public static LongSparseArray<Subject> mapSubjectById = new LongSparseArray<>();
     public static Map<String, Subject> mapSubjectByNo = new TreeMap<>();
     public static Map<String, Subject> mapSubjectByName = new ArrayMap<>();
+    public static List<Entry> thisMonthEntries = new ArrayList<>(64);
 
     @Override
     public void onCreate() {

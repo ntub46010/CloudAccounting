@@ -3,36 +3,34 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/normal_background">
+    android:layout_height="match_parent">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         style="@style/toolbar"
         app:titleTextColor="#FFFFFF"/>
 
-    <LinearLayout
-        android:id="@+id/layBookHome"
+    <include
+        android:id="@+id/dashboard"
+        layout="@layout/content_book_home_dashboard"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_below="@id/toolbar"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyEntry"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_below="@id/toolbar">
+        android:layout_below="@id/dashboard"
+        android:layout_margin="5dp"/>
 
-        <include
-            android:id="@+id/dashboard"
-            layout="@layout/content_book_home_dashboard"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyEntry"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="3"
-            android:layout_margin="5dp"/>
-
-    </LinearLayout>
+    <include
+        android:id="@+id/layContentHint"
+        layout="@layout/content_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
 
     <ProgressBar
         android:id="@+id/prgBar"

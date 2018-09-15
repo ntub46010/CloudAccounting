@@ -19,6 +19,14 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"/>
 
+    <include
+        android:id="@+id/layContentHint"
+        layout="@layout/content_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
     <ProgressBar
         android:id="@+id/prgBar"
         style="@style/prg_normal"/>

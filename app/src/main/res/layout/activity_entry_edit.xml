@@ -23,67 +23,72 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <GridLayout
-                android:id="@+id/layEntryInfo"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/txtDate"
+                style="@style/text"
+                android:layout_alignBaseline="@id/edtDate"
+                android:text="日期："
+                android:textSize="19sp"/>
+
+            <EditText
+                android:id="@+id/edtDate"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:columnCount="2">
+                android:layout_toEndOf="@id/txtDate"
+                android:hint="點此選擇日期"
+                android:editable="false"
+                android:singleLine="true"/>
 
-                <TextView
-                    style="@style/text"
-                    android:text="日期："
-                    android:textSize="19sp"/>
+            <TextView
+                android:id="@+id/txtMemo"
+                style="@style/text"
+                android:layout_below="@id/txtDate"
+                android:layout_alignBaseline="@id/edtMemo"
+                android:text="摘要："
+                android:textSize="19sp"/>
 
-                <EditText
-                    android:id="@+id/edtDate"
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:hint="點此選擇日期"
-                    android:editable="false"
-                    android:singleLine="true"/>
+            <EditText
+                android:id="@+id/edtMemo"
+                android:layout_width="280dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/edtDate"
+                android:layout_toEndOf="@id/txtMemo"
+                android:singleLine="true"
+                android:maxLines="3"/>
 
-                <TextView
-                    style="@style/text"
-                    android:text="摘要："
-                    android:textSize="19sp"/>
+            <TextView
+                android:id="@+id/txtPs"
+                style="@style/text"
+                android:layout_below="@id/txtMemo"
+                android:layout_alignBaseline="@id/edtPs"
+                android:text="備註："
+                android:textSize="19sp"/>
 
-                <EditText
-                    android:id="@+id/edtMemo"
-                    android:layout_width="280dp"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:maxLines="3"/>
-
-                <TextView
-                    style="@style/text"
-                    android:text="備註："
-                    android:textSize="19sp"/>
-
-                <EditText
-                    android:id="@+id/edtPs"
-                    android:layout_width="280dp"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:maxLines="3"/>
-
-            </GridLayout>
+            <EditText
+                android:id="@+id/edtPs"
+                android:layout_width="280dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/edtMemo"
+                android:layout_toEndOf="@id/txtPs"
+                android:singleLine="true"
+                android:maxLines="3"/>
 
             <TextView
                 android:id="@+id/textView"
                 style="@style/text"
-                android:layout_below="@id/layEntryInfo"
-                android:layout_marginTop="3dp"
+                android:layout_below="@id/txtPs"
+                android:layout_marginTop="20dp"
                 android:text="分錄："
                 android:textSize="19sp"/>
 
             <Button
                 android:id="@+id/btnAddField"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_below="@id/textView"
-                android:layout_marginTop="3dp"
-                android:text="新增填寫欄位"/>
+                android:layout_marginTop="15dp"
+                android:text="新增填寫欄位"
+                android:background="@drawable/btn_green_round"/>
 
             <LinearLayout
                 android:id="@+id/layEntryContainer"

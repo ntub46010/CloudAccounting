@@ -154,4 +154,9 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
     public Entry getItem(int position) {
         return entries.get(position);
     }
+
+    public void setEntries(List<Entry> entries) {
+        this.entries = entries;
+        notifyDataSetChanged();
+    }
 }

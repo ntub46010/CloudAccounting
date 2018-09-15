@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,6 +52,7 @@ public class BookHomeActivity extends AppCompatActivity {
     private RecyclerView recyEntry;
     private FloatingActionButton fabCreateEntry;
     private ProgressBar prgBar;
+    private RelativeLayout layHint;
 
     private List<Entry> entries;
     private EntryCardAdapter adapter;
@@ -77,6 +79,7 @@ public class BookHomeActivity extends AppCompatActivity {
         txtThisMonthExpanse = findViewById(R.id.txtThisMonthExpanse);
         recyEntry = findViewById(R.id.recyEntry);
         prgBar = findViewById(R.id.prgBar);
+        layHint = findViewById(R.id.layContentHint);
 
         setupDrawer(bundle);
 
@@ -99,6 +102,8 @@ public class BookHomeActivity extends AppCompatActivity {
         thisMonthEndDate = Integer.parseInt(new SimpleDateFormat("yyyyMM31").format(date));
 
         loadSubjects();
+
+        queryThisMonthExpanse();
     }
 
     @Override
@@ -188,8 +193,6 @@ public class BookHomeActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-        queryThisMonthExpanse();
     }
 
     private void queryThisMonthExpanse() {
@@ -205,13 +208,15 @@ public class BookHomeActivity extends AppCompatActivity {
                         lastMonthExpanseDebit = 0;
 
                         String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
-                        entries = new ArrayList<>(128);
+                        entries = new ArrayList<>(32);
+                        MyApp.thisMonthEntries.clear();
                         Entry entry;
 
                         //取出分錄
                         List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
                         for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
                             entry = documentSnapshots.get(i).toObject(Entry.class);
+                            MyApp.thisMonthEntries.add(entry);
 
                             //若為今日的分錄，則保存起來
                             if (entry.getDate() == Integer.parseInt(today)) {
@@ -286,12 +291,16 @@ public class BookHomeActivity extends AppCompatActivity {
         txtLastMonthExpanse.setText(NumberFormat.getNumberInstance(Locale.US).format(lastMonthExpanseCredit - lastMonthExpanseDebit));
         txtThisMonthExpanse.setText(NumberFormat.getNumberInstance(Locale.US).format(thisMonthExpanseCredit - thisMonthExpanseDebit));
 
-        adapter = new EntryCardAdapter(context, entries);
-        recyEntry.setAdapter(adapter);
         if (entries.isEmpty()) {
-            Toast.makeText(context, "今日尚未記帳", Toast.LENGTH_SHORT).show();
+            TextView txtHint = findViewById(R.id.txtHint);
+            txtHint.setText("今日尚未記帳，點擊右下方按鈕進行記帳");
+            layHint.setVisibility(View.VISIBLE);
+        } else {
+            layHint.setVisibility(View.GONE);
         }
 
+        adapter = new EntryCardAdapter(context, entries);
+        recyEntry.setAdapter(adapter);
         prgBar.setVisibility(View.GONE);
         fabCreateEntry.setVisibility(View.VISIBLE);
     }
@@ -310,6 +319,7 @@ public class BookHomeActivity extends AppCompatActivity {
         MyApp.mapSubjectById.clear();
         MyApp.mapSubjectByNo.clear();
         MyApp.mapSubjectByName.clear();
+        MyApp.thisMonthEntries.clear();
         lsrBook.remove();
         lsrSubject.remove();
         lsrEntry.remove();

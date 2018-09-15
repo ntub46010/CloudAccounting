@@ -21,58 +21,86 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
-        <GridLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="2">
+            android:layout_height="wrap_content">
+
             <TextView
+                android:id="@+id/txtType"
                 style="@style/text"
+                android:layout_alignBaseline="@id/spnSubjectType"
                 android:text="類別："/>
 
             <Spinner
                 android:id="@+id/spnSubjectType"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/txtType"
+                android:layout_alignStart="@id/edtDebit"
                 android:entries="@array/ary_subject_type"/>
 
             <TextView
+                android:id="@+id/txtSubjectId"
                 style="@style/text"
+                android:layout_below="@id/txtType"
+                android:layout_alignBaseline="@id/edtSubjectNo"
                 android:text="科目編號："/>
 
             <EditText
                 android:id="@+id/edtSubjectNo"
                 style="@style/edit_text"
+                android:layout_width="150dp"
+                android:layout_toEndOf="@id/txtSubjectId"
+                android:layout_below="@id/spnSubjectType"
+                android:layout_alignStart="@id/edtDebit"
                 android:hint="兩位數字"
                 android:inputType="number"/>
 
             <TextView
+                android:id="@+id/txtSubjectName"
                 style="@style/text"
+                android:layout_below="@id/txtSubjectId"
+                android:layout_alignBaseline="@id/edtSubjectName"
                 android:text="科目名稱："/>
 
             <EditText
                 android:id="@+id/edtSubjectName"
                 style="@style/edit_text"
+                android:layout_below="@id/edtSubjectNo"
+                android:layout_toEndOf="@id/txtSubjectName"
+                android:layout_alignStart="@id/edtDebit"
                 android:hint="中文30字以內"/>
 
             <TextView
+                android:id="@+id/txtCredit"
                 style="@style/text"
+                android:layout_below="@id/txtSubjectName"
+                android:layout_alignBaseline="@id/edtCredit"
                 android:text="初始借方金額："/>
 
             <EditText
                 android:id="@+id/edtCredit"
                 style="@style/edit_text"
+                android:layout_below="@id/edtSubjectName"
+                android:layout_toEndOf="@id/txtCredit"
+                android:layout_alignStart="@id/edtDebit"
                 android:inputType="number"/>
 
             <TextView
+                android:id="@+id/txtDebit"
                 style="@style/text"
+                android:layout_below="@id/txtCredit"
+                android:layout_alignBaseline="@id/edtDebit"
                 android:text="初始貸方金額："/>
 
             <EditText
                 android:id="@+id/edtDebit"
                 style="@style/edit_text"
+                android:layout_below="@id/edtCredit"
+                android:layout_toEndOf="@id/txtCredit"
                 android:inputType="number"/>
 
-        </GridLayout>
+        </RelativeLayout>
 
     </ScrollView>
 

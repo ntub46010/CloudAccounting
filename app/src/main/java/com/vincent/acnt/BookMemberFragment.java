@@ -28,6 +28,8 @@ public class BookMemberFragment extends Fragment {
     private Context context;
 
     private List<User> members;
+    private RelativeLayout layHint;
+
     private MemberListAdapter adapter;
     private int type;
 
@@ -46,6 +48,16 @@ public class BookMemberFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        layHint = getView().findViewById(R.id.layContentHint);
+
+        if (type == Constant.CODE_WAITING && members.isEmpty()) {
+            TextView txtHint = getView().findViewById(R.id.txtHint);
+            txtHint.setText("沒有待批准的使用者");
+            layHint.setVisibility(View.VISIBLE);
+        } else {
+            layHint.setVisibility(View.GONE);
+        }
 
         ListView lstMember = getView().findViewById(R.id.lstMember);
         adapter = new MemberListAdapter(getActivity(), type, members);

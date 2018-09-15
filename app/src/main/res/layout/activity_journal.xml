@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/normal_background"
     tools:context=".JournalActivity">
 
     <android.support.v7.widget.Toolbar
@@ -25,8 +24,16 @@
         android:id="@+id/recyEntry"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="5dp"
-        android:layout_below="@id/time_filter"/>
+        android:layout_below="@id/time_filter"
+        android:layout_margin="5dp"/>
+
+    <include
+        android:id="@+id/layContentHint"
+        layout="@layout/content_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
 
     <ProgressBar
         android:id="@+id/prgBar"

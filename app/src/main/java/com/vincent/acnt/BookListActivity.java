@@ -17,10 +17,13 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -40,6 +43,7 @@ public class BookListActivity extends AppCompatActivity {
     private GridView grdBook;
     private FloatingActionButton fabAddBook;
     private ProgressBar prgBar;
+    private RelativeLayout layHint;
 
     private Dialog dialog;
 
@@ -66,6 +70,7 @@ public class BookListActivity extends AppCompatActivity {
         fabAddBook = findViewById(R.id.fabAddBook);
         grdBook = findViewById(R.id.grdBook);
         prgBar = findViewById(R.id.prgBar);
+        layHint = findViewById(R.id.layContentHint);
 
         fabAddBook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,47 +151,43 @@ public class BookListActivity extends AppCompatActivity {
         grdBook.setVisibility(showPrgBar ? View.INVISIBLE : View.VISIBLE);
         fabAddBook.setVisibility(showPrgBar ? View.INVISIBLE : View.VISIBLE);
 
-        cnt = MyApp.user.getBooks().size();
         books = new ArrayList<>(16);
 
-        downloadBook();
-    }
+        CollectionReference ref = MyApp.db.collection(Constant.KEY_BOOKS);
 
-    private void downloadBook() {
-        if (cnt > 0) {
-            final String bookId = MyApp.user.getBooks().get(MyApp.user.getBooks().size() - cnt);
-            MyApp.db.collection(Constant.KEY_BOOKS)
-                    .whereEqualTo(Constant.PRO_ID, bookId)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-
-                                if (documentSnapshots.isEmpty()) {
-                                    //若發現帳本已不存在，則默默地將帳本ID由使用者資料中移除
-                                    MyApp.user.getBooks().remove(bookId);
-                                    MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
-                                            .update(Constant.PRO_BOOKS, MyApp.user.getBooks());
-                                } else {
-                                    DocumentSnapshot documentSnapshot = documentSnapshots.get(0);
-                                    Book book = documentSnapshot.toObject(Book.class);
-                                    book.defineDocumentId(documentSnapshot.getId());
-                                    books.add(book);
-                                }
-                            }
-
-                            cnt--;
-                            downloadBook();
-                        }
-                    });
-        } else {
-            grdBook.setAdapter(new BookGridAdapter(context, books));
-            prgBar.setVisibility(View.GONE);
-            grdBook.setVisibility(View.VISIBLE);
-            fabAddBook.setVisibility(View.VISIBLE);
+        for (int i = 0, len = MyApp.user.getBooks().size(); i < len; i++) {
+            ref.whereEqualTo(Constant.PRO_ID, MyApp.user.getBooks().get(i));
         }
+
+        ref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+                    books.clear();
+                    Book book;
+
+                    for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
+                        book = documentSnapshots.get(i).toObject(Book.class);
+                        book.defineDocumentId(documentSnapshots.get(i).getId());
+                        books.add(book);
+                    }
+
+                    if (books.isEmpty()) {
+                        TextView txtHint = findViewById(R.id.txtHint);
+                        txtHint.setText("您現在沒有帳本，點擊右下方按鈕加入帳本");
+                        layHint.setVisibility(View.VISIBLE);
+                    } else {
+                        layHint.setVisibility(View.GONE);
+                    }
+
+                    grdBook.setAdapter(new BookGridAdapter(context, books));
+                    prgBar.setVisibility(View.GONE);
+                    grdBook.setVisibility(View.VISIBLE);
+                    fabAddBook.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     private void createBook(String bookName) {

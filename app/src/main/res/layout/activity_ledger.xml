@@ -14,46 +14,52 @@
         style="@style/toolbar"
         app:titleTextColor="#FFFFFF"/>
 
-    <LinearLayout
-        android:id="@+id/layLedgerContainer"
+    <include
+        android:id="@+id/time_filter"
+        layout="@layout/content_time_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <AutoCompleteTextView
+        android:id="@+id/actSubjectName"
+        android:layout_width="225dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/time_filter"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="科目名稱"
+        android:completionThreshold="1"
+        android:singleLine="true" />
+
+    <Button
+        android:id="@+id/btnShow"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_toEndOf="@id/actSubjectName"
+        android:layout_alignBottom="@id/actSubjectName"
+        android:text="查詢"
+        android:textSize="17sp"
+        android:background="@drawable/btn_green_round"/>
+
+    <ListView
+        android:id="@+id/lstRecord"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingTop="5dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:layout_below="@id/toolbar">
+        android:layout_below="@id/actSubjectName"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
 
-        <include layout="@layout/content_time_filter" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <AutoCompleteTextView
-                android:id="@+id/actSubjectName"
-                android:layout_width="225dp"
-                android:layout_height="wrap_content"
-                android:hint="科目名稱"
-                android:completionThreshold="1"
-                android:singleLine="true" />
-
-            <Button
-                android:id="@+id/btnShow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="查詢"
-                android:textSize="17sp"/>
-
-        </LinearLayout>
-
-        <ListView
-            android:id="@+id/lstRecord"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </LinearLayout>
+    <include
+        android:id="@+id/layContentHint"
+        layout="@layout/content_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
 
     <ProgressBar
         android:id="@+id/prgBar"

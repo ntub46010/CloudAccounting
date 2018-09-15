@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -32,6 +34,7 @@ public class SubjectActivity extends AppCompatActivity {
 
     private ListView lstSubject;
     private ProgressBar prgBar;
+    private RelativeLayout layHint;
 
     private SubjectListAdapter adapter;
     private int longClickPosition;
@@ -58,6 +61,7 @@ public class SubjectActivity extends AppCompatActivity {
         FloatingActionButton fabCreateSubject = findViewById(R.id.fabCreateSubject);
         lstSubject = findViewById(R.id.lstSubject);
         prgBar = findViewById(R.id.prgBar);
+        layHint = findViewById(R.id.layContentHint);
 
         fabCreateSubject.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,6 +92,14 @@ public class SubjectActivity extends AppCompatActivity {
 
         for (String subjectNo : MyApp.mapSubjectByNo.keySet()) {
             subjects.add(MyApp.mapSubjectByNo.get(subjectNo));
+        }
+
+        if (subjects.isEmpty()) {
+            TextView txtHint = findViewById(R.id.txtHint);
+            txtHint.setText("尚未建立會計科目，點擊右下方按鈕進行新增");
+            layHint.setVisibility(View.VISIBLE);
+        } else {
+            layHint.setVisibility(View.GONE);
         }
 
         adapter = new SubjectListAdapter(context, subjects);

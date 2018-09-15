@@ -15,7 +15,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,11 +40,11 @@ public class LedgerActivity extends AppCompatActivity {
     private Context context;
     private String activityTitle = "分類帳";
 
-    private LinearLayout layLedgerContainer;
     private Spinner spnYear, spnMonth;
     private AutoCompleteTextView actSubjectName;
     private ListView lstLedger;
     private ProgressBar prgBar;
+    private RelativeLayout layHint;
 
     private int selectedYear, selectedMonth;
     private int queryFlag = -2;
@@ -68,13 +70,13 @@ public class LedgerActivity extends AppCompatActivity {
             }
         });
 
-        layLedgerContainer = findViewById(R.id.layLedgerContainer);
         spnYear = findViewById(R.id.spnYear);
         spnMonth = findViewById(R.id.spnMonth);
         actSubjectName = findViewById(R.id.actSubjectName);
         Button btnShow = findViewById(R.id.btnShow);
         lstLedger = findViewById(R.id.lstRecord);
         prgBar = findViewById(R.id.prgBar);
+        layHint = findViewById(R.id.layContentHint);
 
         if (getIntent().getExtras() != null) {
             actSubjectName.setText(getIntent().getExtras().getString(Constant.KEY_SUBJECT));
@@ -87,8 +89,8 @@ public class LedgerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //點擊按鈕後收起鍵盤
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(layLedgerContainer.getWindowToken(), 0);
+                //InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                //imm.hideSoftInputFromWindow(layLedgerContainer.getWindowToken(), 0);
 
                 if (isSubjectExist(actSubjectName.getText().toString())) {
                     showLedger();
@@ -338,6 +340,14 @@ public class LedgerActivity extends AppCompatActivity {
         for (int i = records.size() - 2; i >= 0; i--) {
             r = records.get(i);
             r.setBalance(records.get(i + 1).getBalance() + r.getCredit() - r.getDebit());
+        }
+
+        if (records.isEmpty()) {
+            TextView txtHint = findViewById(R.id.txtHint);
+            txtHint.setText("該月沒有紀錄");
+            layHint.setVisibility(View.VISIBLE);
+        } else {
+            layHint.setVisibility(View.GONE);
         }
 
         //顯示清單

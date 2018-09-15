@@ -13,8 +13,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -43,14 +44,14 @@ public class JournalActivity extends AppCompatActivity {
     private RecyclerView recyEntry;
     private FloatingActionButton fabCreateEntry;
     private ProgressBar prgBar;
+    private RelativeLayout layHint;
 
     private List<Entry> entries;
     private EntryCardAdapter adapter;
 
     private int selectedYear, selectedMonth;
 
-    private int queryFlag = -1;
-    private boolean canQuery = true;
+    private int queryFlag = -2;
     private ListenerRegistration lsrEntry;
 
     @Override
@@ -75,6 +76,7 @@ public class JournalActivity extends AppCompatActivity {
         recyEntry = findViewById(R.id.recyEntry);
         fabCreateEntry = findViewById(R.id.fabCreateEntry);
         prgBar = findViewById(R.id.prgBar);
+        layHint = findViewById(R.id.layContentHint);
 
         recyEntry.setHasFixedSize(true);
         recyEntry.setLayoutManager(new LinearLayoutManager(context));
@@ -90,7 +92,15 @@ public class JournalActivity extends AppCompatActivity {
             }
         });
 
+        entries = new ArrayList<>(128);
+
         setupSpinner();
+
+        adapter = new EntryCardAdapter(context, MyApp.thisMonthEntries);
+        recyEntry.setAdapter(adapter);
+
+        prgBar.setVisibility(View.GONE);
+        fabCreateEntry.setVisibility(View.VISIBLE);
     }
 
     private void setupSpinner() {
@@ -156,11 +166,6 @@ public class JournalActivity extends AppCompatActivity {
     }
 
     private void showEntry() {
-        if (!canQuery) {
-            return;
-        }
-
-        canQuery = false;
         prgBar.setVisibility(View.VISIBLE);
         recyEntry.setVisibility(View.INVISIBLE);
         fabCreateEntry.setVisibility(View.INVISIBLE);
@@ -180,7 +185,11 @@ public class JournalActivity extends AppCompatActivity {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        entries = new ArrayList<>(128);
+                        if (queryFlag < 1) {
+                            return;
+                        }
+
+                        entries.clear();
                         List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
                         Entry entry;
 
@@ -196,24 +205,28 @@ public class JournalActivity extends AppCompatActivity {
                             entries.add(entry);
                         }
 
-                        adapter = new EntryCardAdapter(context, entries);
-                        recyEntry.setAdapter(adapter);
-
                         if (entries.isEmpty()) {
-                            Toast.makeText(context, "該月沒有紀錄", Toast.LENGTH_SHORT).show();
+                            TextView txtHint = findViewById(R.id.txtHint);
+                            txtHint.setText("該月沒有紀錄，可點擊右下方按鈕進行記帳");
+                            layHint.setVisibility(View.VISIBLE);
+                        } else {
+                            layHint.setVisibility(View.GONE);
                         }
+
+                        adapter.setEntries(entries);
 
                         prgBar.setVisibility(View.GONE);
                         recyEntry.setVisibility(View.VISIBLE);
                         fabCreateEntry.setVisibility(View.VISIBLE);
-                        canQuery = true;
                     }
                 });
     }
 
     @Override
     public void onDestroy() {
-        lsrEntry.remove();
+        if (lsrEntry != null) {
+            lsrEntry.remove();
+        }
         super.onDestroy();
     }
 
