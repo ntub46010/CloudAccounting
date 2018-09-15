@@ -31,7 +31,6 @@ import com.vincent.acnt.adapter.BookGridAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Book;
-import com.vincent.acnt.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +47,6 @@ public class BookListActivity extends AppCompatActivity {
     private Dialog dialog;
 
     private List<Book> books;
-    private int cnt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +86,7 @@ public class BookListActivity extends AppCompatActivity {
 
         prepareDialog();
 
-        loadBooksData(true);
+        loadBooks(true);
     }
 
     private void prepareDialog() {
@@ -139,11 +137,13 @@ public class BookListActivity extends AppCompatActivity {
                 .create();
     }
 
-    private void loadBooksData(boolean showPrgBar) {
+    private void loadBooks(boolean showPrgBar) {
         if (MyApp.user.getBooks().isEmpty()) {
             prgBar.setVisibility(View.GONE);
             grdBook.setVisibility(View.INVISIBLE);
+
             Toast.makeText(context, "您目前沒有帳本", Toast.LENGTH_SHORT).show();
+
             return;
         }
 
@@ -159,45 +159,69 @@ public class BookListActivity extends AppCompatActivity {
             ref.whereEqualTo(Constant.PRO_ID, MyApp.user.getBooks().get(i));
         }
 
-        ref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-                    books.clear();
-                    Book book;
+        ref.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+                            books.clear();
+                            Book book;
 
-                    for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
-                        book = documentSnapshots.get(i).toObject(Book.class);
-                        book.defineDocumentId(documentSnapshots.get(i).getId());
-                        books.add(book);
+                            for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
+                                book = documentSnapshots.get(i).toObject(Book.class);
+                                book.defineDocumentId(documentSnapshots.get(i).getId());
+                                books.add(book);
+                            }
+
+                            if (books.isEmpty()) {
+                                TextView txtHint = findViewById(R.id.txtHint);
+                                txtHint.setText("您現在沒有帳本，點擊右下方按鈕加入帳本");
+                                layHint.setVisibility(View.VISIBLE);
+                            } else {
+                                layHint.setVisibility(View.GONE);
+                            }
+
+                            grdBook.setAdapter(new BookGridAdapter(context, books));
+                            prgBar.setVisibility(View.GONE);
+                            grdBook.setVisibility(View.VISIBLE);
+                            fabAddBook.setVisibility(View.VISIBLE);
+
+                            if (books.size() != MyApp.user.getBooks().size()) {
+                                removeMissingBook();
+                            }
+                        }
                     }
+                });
+    }
 
-                    if (books.isEmpty()) {
-                        TextView txtHint = findViewById(R.id.txtHint);
-                        txtHint.setText("您現在沒有帳本，點擊右下方按鈕加入帳本");
-                        layHint.setVisibility(View.VISIBLE);
-                    } else {
-                        layHint.setVisibility(View.GONE);
-                    }
+    private void removeMissingBook() {
+        List<String> expectBookIds = MyApp.user.getBooks();
+        List<String> actualBookIds = new ArrayList<>(16);
 
-                    grdBook.setAdapter(new BookGridAdapter(context, books));
-                    prgBar.setVisibility(View.GONE);
-                    grdBook.setVisibility(View.VISIBLE);
-                    fabAddBook.setVisibility(View.VISIBLE);
-                }
+        for (int i = 0, len = books.size(); i < len; i++) {
+            actualBookIds.add(books.get(i).getId());
+        }
+
+        for (int i = 0, len = expectBookIds.size(); i < len; i++) {
+            if (!actualBookIds.contains(expectBookIds.get(i))) {
+                expectBookIds.remove(i);
             }
-        });
+        }
+
+        MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
+                .update(Constant.PRO_BOOKS, expectBookIds);
     }
 
     private void createBook(String bookName) {
         prgBar.setVisibility(View.VISIBLE);
+        fabAddBook.setVisibility(View.INVISIBLE);
 
         final Book book = new Book();
         book.setId(Utility.convertTo62Notation(String.valueOf(System.currentTimeMillis())));
         book.setName(bookName);
         book.setCreator(MyApp.user.getId());
-        book.addAdminMember(getMySimpleUser());
+        book.addAdminMember(MyApp.user.getId());
 
         MyApp.db.collection(Constant.KEY_BOOKS)
                 .add(book)
@@ -223,6 +247,7 @@ public class BookListActivity extends AppCompatActivity {
         }
 
         prgBar.setVisibility(View.VISIBLE);
+        fabAddBook.setVisibility(View.INVISIBLE);
 
         MyApp.db.collection(Constant.KEY_BOOKS)
                 .whereEqualTo(Constant.PRO_ID, bookId)
@@ -259,7 +284,7 @@ public class BookListActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(context, "加入帳本成功", Toast.LENGTH_SHORT).show();
-                            loadBooksData(true);
+                            loadBooks(true);
 
                             if (mode == Constant.MODE_IMPORT) {
                                 addMemberToBook(book);
@@ -273,55 +298,37 @@ public class BookListActivity extends AppCompatActivity {
     }
 
     private void addMemberToBook(Book book) {
-        book.addWaitingMember(getMySimpleUser());
+        book.addWaitingMember(MyApp.user.getId());
 
         MyApp.db.collection(Constant.KEY_BOOKS)
                 .document(book.obtainDocumentId())
                 .set(book);
-    }
 
-    private User getMySimpleUser() {
-        User user = new User();
-        user.setId(MyApp.user.getId());
-        user.setName(MyApp.user.getName());
-        user.setEmail(MyApp.user.getEmail());
-
-        return user;
+        fabAddBook.setVisibility(View.VISIBLE);
     }
 
     private void requestToUseBook(Book book) {
-        // 自己在核准名單才可打開帳本
-        User testUser;
+        // 自己在合法成員名單才可打開帳本
+        if (book.isLegalUser(MyApp.user.getId())) {
+            Intent it = new Intent(context, BookHomeActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString(Constant.KEY_BOOK_NAME, book.getName());
+            bundle.putString(Constant.KEY_CREATOR, book.getCreator());
+            it.putExtras(bundle);
+            startActivityForResult(it, 0);
 
-        for (int i = 0, len = book.getApprovedMembers().size(); i < len; i++) {
-            testUser = book.getApprovedMembers().get(i);
+            MyApp.browsingBook = book;
 
-            if (testUser.getId().equals(MyApp.user.getId())) {
-                prepareOpenBook(testUser, book);
-                return;
-            }
+            return;
         }
 
-        for (int i = 0, len = book.getAdminMembers().size(); i < len; i++) {
-            testUser = book.getAdminMembers().get(i);
-
-            if (testUser.getId().equals(MyApp.user.getId())) {
-                prepareOpenBook(testUser, book);
-                return;
-            }
-        }
-
-        for (int i = 0, len = book.getWaitingMembers().size(); i < len; i++) {
-            testUser = book.getWaitingMembers().get(i);
-            if (testUser.getId().equals(MyApp.user.getId())) {
-                updateUserName(testUser, book);
-
-                Toast.makeText(context, "尚未被帳本成員批准加入", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        if (book.isWaitingUser(MyApp.user.getId())) {
+            Toast.makeText(context, "尚未被帳本成員批准加入", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         Toast.makeText(context, "您被拒絕使用該帳本，將從清單中移除", Toast.LENGTH_SHORT).show();
+
         MyApp.user.getBooks().remove(book.getId());
         MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
                 .update(Constant.PRO_BOOKS, MyApp.user.getBooks())
@@ -329,7 +336,7 @@ public class BookListActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            loadBooksData(true);
+                            loadBooks(true);
                         } else {
                             Toast.makeText(context, "移除帳本失敗", Toast.LENGTH_SHORT).show();
                         }
@@ -337,30 +344,9 @@ public class BookListActivity extends AppCompatActivity {
                 });
     }
 
-    private void prepareOpenBook(User user, Book book) {
-        updateUserName(user, book);
-
-        Intent it = new Intent(context, BookHomeActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constant.KEY_BOOK_NAME, book.getName());
-        bundle.putString(Constant.KEY_CREATOR, book.getCreator());
-        it.putExtras(bundle);
-        startActivityForResult(it, 0);
-
-        MyApp.browsingBook = book;
-    }
-
-    private void updateUserName(User origUser, Book book) {
-        if (!origUser.getName().equals(MyApp.user.getName())) {
-            origUser.setName(MyApp.user.getName());
-            MyApp.db.collection(Constant.KEY_BOOKS).document(book.obtainDocumentId())
-                    .set(book);
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        loadBooksData(resultCode == Constant.MODE_QUIT);
+        loadBooks(resultCode == Constant.MODE_QUIT);
         super.onActivityResult(requestCode, resultCode, data);
     }
 }

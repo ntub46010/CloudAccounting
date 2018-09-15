@@ -82,10 +82,9 @@ public class LoginActivity extends RegisterHelper {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(context, "Email登入成功", Toast.LENGTH_SHORT).show();
                             prepareLogin();
                         } else {
-                            Toast.makeText(context, "Email登入失敗", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "登入失敗", Toast.LENGTH_SHORT).show();
                             Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_LONG).show();
                             dlgWaiting.dismiss();
                         }
