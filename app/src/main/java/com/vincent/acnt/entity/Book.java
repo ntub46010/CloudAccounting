@@ -7,7 +7,10 @@ import java.util.List;
 public class Book implements Serializable {
     private String id;
     private String name, creator;
-    private List<User> approvedMembers = new ArrayList<>(), waitingMembers = new ArrayList<>(), adminMembers = new ArrayList<>();
+    private List<String> approvedMembers = new ArrayList<>(),
+            waitingMembers = new ArrayList<>(),
+            adminMembers = new ArrayList<>();
+    
     private String documentId;
 
     public Book() {
@@ -38,11 +41,11 @@ public class Book implements Serializable {
         this.creator = creator;
     }
 
-    public List<User> getApprovedMembers() {
+    public List<String> getApprovedMembers() {
         return approvedMembers;
     }
 
-    public void setApprovedMembers(List<User> approvedMembers) {
+    public void setApprovedMembers(List<String> approvedMembers) {
         if (approvedMembers == null) {
             approvedMembers = new ArrayList<>();
         }
@@ -50,40 +53,40 @@ public class Book implements Serializable {
         this.approvedMembers = approvedMembers;
     }
 
-    public List<User> getWaitingMembers() {
+    public List<String> getWaitingMembers() {
         return waitingMembers;
     }
 
-    public void setWaitingMembers(List<User> waitingMembers) {
+    public void setWaitingMembers(List<String> waitingMembers) {
         if (waitingMembers == null) {
             waitingMembers = new ArrayList<>();
         }
         this.waitingMembers = waitingMembers;
     }
 
-    public List<User> getAdminMembers() {
+    public List<String> getAdminMembers() {
         return adminMembers;
     }
 
-    public void setAdminMembers(List<User> adminMembers) {
+    public void setAdminMembers(List<String> adminMembers) {
         this.adminMembers = adminMembers;
     }
 
-    public void addApprovedMember(User member) {
+    public void addApprovedMember(String member) {
         if (approvedMembers == null) {
             approvedMembers = new ArrayList<>();
         }
         approvedMembers.add(member);
     }
 
-    public void addWaitingMember(User member) {
+    public void addWaitingMember(String member) {
         if (waitingMembers == null) {
             waitingMembers = new ArrayList<>();
         }
         waitingMembers.add(member);
     }
 
-    public void addAdminMember(User member) {
+    public void addAdminMember(String member) {
         if (adminMembers == null) {
             adminMembers = new ArrayList<>();
         }
@@ -91,30 +94,15 @@ public class Book implements Serializable {
     }
 
     public void removeApprovedMember(String userId) {
-        for (int i = 0, len = approvedMembers.size(); i < len; i++) {
-            if (approvedMembers.get(i).getId().equals(userId)) {
-                approvedMembers.remove(i);
-                return;
-            }
-        }
+        approvedMembers.remove(userId);
     }
 
     public void removeWaitingMember(String userId) {
-        for (int i = 0, len = waitingMembers.size(); i < len; i++) {
-            if (waitingMembers.get(i).getId().equals(userId)) {
-                waitingMembers.remove(i);
-                return;
-            }
-        }
+        waitingMembers.remove(userId);
     }
 
     public void removeAdminMember(String userId) {
-        for (int i = 0, len = adminMembers.size(); i < len; i++) {
-            if (adminMembers.get(i).getId().equals(userId)) {
-                adminMembers.remove(i);
-                return;
-            }
-        }
+        adminMembers.remove(userId);
     }
 
     public String obtainDocumentId() {
@@ -125,33 +113,20 @@ public class Book implements Serializable {
         this.documentId = documentId;
     }
 
-    public boolean isLegalUser(String userId) {
-        for (int i = 0, len = approvedMembers.size(); i < len; i++) {
-            if (approvedMembers.get(i).getId().equals(userId)) {
-                return true;
-            }
-        }
+    public boolean isAdminUser(String userId) {
+        return adminMembers.contains(userId);
+    }
 
-        return isAdminUser(userId);
+    public boolean isApprovedUser(String userId) {
+        return approvedMembers.contains(userId);
     }
 
     public boolean isWaitingUser(String userId) {
-        for (int i = 0, len = waitingMembers.size(); i < len; i++) {
-            if (waitingMembers.get(i).getId().equals(userId)) {
-                return true;
-            }
-        }
-
-        return false;
+        return waitingMembers.contains(userId);
     }
 
-    public boolean isAdminUser(String userId) {
-        for (int i = 0, len = adminMembers.size(); i < len; i++) {
-            if (adminMembers.get(i).getId().equals(userId)) {
-                return true;
-            }
-        }
-
-        return false;
+    public boolean isLegalUser(String userId) {
+        return isApprovedUser(userId) || isAdminUser(userId);
     }
+
 }

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +17,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.vincent.acnt.adapter.MemberListAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
@@ -28,7 +32,6 @@ public class BookMemberFragment extends Fragment {
     private Context context;
 
     private List<User> members;
-    private RelativeLayout layHint;
 
     private MemberListAdapter adapter;
     private int type;
@@ -40,7 +43,7 @@ public class BookMemberFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         context = getActivity();
         return inflater.inflate(R.layout.fragment_member, container, false);
     }
@@ -49,7 +52,7 @@ public class BookMemberFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        layHint = getView().findViewById(R.id.layContentHint);
+        RelativeLayout layHint = getView().findViewById(R.id.layContentHint);
 
         if (type == Constant.CODE_WAITING && members.isEmpty()) {
             TextView txtHint = getView().findViewById(R.id.txtHint);
@@ -60,7 +63,7 @@ public class BookMemberFragment extends Fragment {
         }
 
         ListView lstMember = getView().findViewById(R.id.lstMember);
-        adapter = new MemberListAdapter(getActivity(), type, members);
+        adapter = new MemberListAdapter(getActivity(), members);
 
         lstMember.setAdapter(adapter);
         lstMember.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -105,7 +108,7 @@ public class BookMemberFragment extends Fragment {
         btnPositive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapter.approveUser(members.get(index));
+                approveUser(members.get(index));
                 dialog.dismiss();
             }
         });
@@ -115,7 +118,7 @@ public class BookMemberFragment extends Fragment {
         btnNegative.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapter.rejectUser(members.get(index));
+                rejectUser(members.get(index));
                 dialog.dismiss();
             }
         });
@@ -156,7 +159,7 @@ public class BookMemberFragment extends Fragment {
                             .setPositiveButton("是", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    adapter.degradeUser(members.get(index));
+                                    degradeUser(members.get(index));
                                 }
                             })
                             .setNegativeButton("否", null)
@@ -175,7 +178,7 @@ public class BookMemberFragment extends Fragment {
                             .setPositiveButton("是", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    adapter.upgradeUser(members.get(index));
+                                    upgradeUser(members.get(index));
                                 }
                             })
                             .setNegativeButton("否", null)
@@ -195,7 +198,7 @@ public class BookMemberFragment extends Fragment {
                     .setPositiveButton("是", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            adapter.removeUser(members.get(index));
+                            removeUser(members.get(index));
                         }
                     })
                     .setNegativeButton("否", null)
@@ -209,4 +212,74 @@ public class BookMemberFragment extends Fragment {
                 .setView(layout)
                 .setCancelable(true);
     }
+
+    public void approveUser(final User user) {
+        MyApp.browsingBook.removeWaitingMember(user.getId());
+        MyApp.browsingBook.getApprovedMembers().add(user.getId());
+
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .set(MyApp.browsingBook)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(context, "已加入" + user.getName(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public void rejectUser(final User user) {
+        MyApp.browsingBook.removeWaitingMember(user.getId());
+
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .set(MyApp.browsingBook)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(context, "已拒絕" + user.getName(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public void upgradeUser(final User user) {
+        MyApp.browsingBook.removeApprovedMember(user.getId());
+        MyApp.browsingBook.addAdminMember(user.getId());
+
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .set(MyApp.browsingBook)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(context, "已給予" + user.getName() + "管理員身份", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public void degradeUser(final User user) {
+        MyApp.browsingBook.removeAdminMember(user.getId());
+        MyApp.browsingBook.addApprovedMember(user.getId());
+
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .set(MyApp.browsingBook)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(context, "已移除"  + user.getName() + "的管理員身份", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public void removeUser(final User user) {
+        MyApp.browsingBook.removeApprovedMember(user.getId());
+        MyApp.browsingBook.removeAdminMember(user.getId());
+
+        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .set(MyApp.browsingBook)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(context, "已移除" + user.getName(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.vincent.acnt.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,10 +56,13 @@ public class BookGridAdapter extends BaseAdapter {
 
         if (book.isLegalUser(MyApp.user.getId())) {
             imgBook.setImageResource(R.drawable.img_book_legal);
+            txtBookName.setTextColor(Color.parseColor("#000000"));
         } else if (book.isWaitingUser(MyApp.user.getId())) {
             imgBook.setImageResource(R.drawable.img_book_waiting);
+            txtBookName.setTextColor(Color.parseColor("#808080"));
         } else {
             imgBook.setImageResource(R.drawable.img_book_reject);
+            txtBookName.setTextColor(Color.parseColor("#808080"));
         }
 
         return view;
