@@ -98,9 +98,11 @@ public class SubjectAccessor {
 
     public interface RetrieveSubjectListener {
         void onRetrieve(Subject subject);
+        void onFailure(Exception e);
     }
 
     public interface RetrieveSubjectsListener {
         void onRetrieve(List<Subject> subjects);
+        void onFailure(Exception e);
     }
 }

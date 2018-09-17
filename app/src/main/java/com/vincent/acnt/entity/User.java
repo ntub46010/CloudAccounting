@@ -1,9 +1,10 @@
 package com.vincent.acnt.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
     private String id;
     private String name, email;
     private List<String> books;

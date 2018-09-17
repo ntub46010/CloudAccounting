@@ -108,9 +108,11 @@ public class UserAccessor {
 
     public interface RetrieveUserListener {
         void onRetrieve(User user);
+        void onFailure(Exception e);
     }
 
     public interface RetrieveUsersListener {
         void onRetrieve(List<User> users);
+        void onFailure(Exception e);
     }
 }

@@ -40,10 +40,9 @@ public class EntryAccessor {
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
                             entry.defineDocumentId(task.getResult().getId());
-
                             listener.onRetrieve(entry);
                         } else {
-                            listener.onRetrieve(null);
+                            listener.onFailure(task.getException());
                         }
                     }
                 });
@@ -59,7 +58,7 @@ public class EntryAccessor {
                         if (task.isSuccessful()) {
                             listener.onFinish();
                         } else {
-
+                            listener.onFailure(task.getException());
                         }
                     }
                 });
@@ -98,26 +97,31 @@ public class EntryAccessor {
 
                             listener.onRetrieve(entries);
                         } else {
-                            listener.onRetrieve(null);
+                            listener.onFailure(task.getException());
                         }
                     }
                 });
     }
 
-    public ListenerRegistration observeTodayStatement() {
+    public ListenerRegistration observeTodayStatement(final RetrieveTodayStatementListener listener) {
         final int today = Integer.parseInt(new SimpleDateFormat("yyyyMMdd").format(new Date()));
-        int startDate = (today / 100) * 100 + 1;
-        int endDate = startDate + 30;
+
+        final int thisMonthStartDate = (today / 100) * 100 + 1;
+        int thisMonthEndDate = thisMonthStartDate + 30;
+        int lastMonthStartDate = thisMonthStartDate % 10000 == 101 ?
+                ((thisMonthStartDate - 10000) / 10000) * 10000 + 1201 :
+                thisMonthStartDate - 100;
 
         return collection
-                .whereGreaterThanOrEqualTo(Constant.PRO_DATE, startDate)
-                .whereLessThanOrEqualTo(Constant.PRO_DATE, endDate)
+                .whereGreaterThanOrEqualTo(Constant.PRO_DATE, lastMonthStartDate)
+                .whereLessThanOrEqualTo(Constant.PRO_DATE, thisMonthEndDate)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
-                        List<Entry> entries = new ArrayList<>();
-                        List<Subject> subjects = new ArrayList<>();
+                        List<Entry> monthEntries = new ArrayList<>();
+                        List<Entry> todayEntries = new ArrayList<>();
+                        List<Subject> subjects;
                         Entry entry;
                         Subject subject;
 
@@ -136,20 +140,34 @@ public class EntryAccessor {
                                 subject = subjects.get(j);
                                 subject.setName(MyApp.mapSubjectById.get(subject.getId()).getName());
 
+                                //累計本月支出
                                 if (subject.getNo().substring(0, 1).equals(Constant.CODE_TYPE[4])) {
-                                    thisMonthExpanseCredit += subject.getCredit();
-                                    thisMonthExpanseDebit += subject.getDebit();
+                                    if (entry.getDate() >= thisMonthStartDate) {
+                                        thisMonthExpanseCredit += subject.getCredit();
+                                        thisMonthExpanseDebit += subject.getDebit();
+
+                                        //若為今日的分錄，則保存起來
+                                        if (entry.getDate() == today) {
+                                            entry.defineDocumentId(documentSnapshots.get(i).getId());
+                                            todayEntries.add(entry);
+                                        }
+                                    } else {
+                                        lastMonthExpanseCredit += subject.getCredit();
+                                        lastMonthExpanseDebit += subject.getDebit();
+                                    }
                                 }
                             }
 
-                            //若為今日的分錄，則保存起來
-                            if (entry.getDate() == today) {
-                                entry.defineDocumentId(documentSnapshots.get(i).getId());
-                                entries.add(entry);
-                            }
-
-                            entries.add(entry);
+                            //保存本月的分錄
+                            monthEntries.add(entry);
                         }
+
+                        listener.onRetrieve(
+                                lastMonthExpanseCredit - lastMonthExpanseDebit,
+                                thisMonthExpanseCredit - thisMonthExpanseDebit,
+                                monthEntries,
+                                todayEntries
+                        );
                     }
                 });
     }
@@ -164,7 +182,7 @@ public class EntryAccessor {
                         if (task.isSuccessful()) {
                             listener.onFinish();
                         } else {
-
+                            listener.onFailure(task.getException());
                         }
                     }
                 });
@@ -172,9 +190,15 @@ public class EntryAccessor {
 
     public interface RetrieveEntryListener {
         void onRetrieve(Entry entry);
+        void onFailure(Exception e);
     }
 
     public interface RetrieveEntriesListener {
         void onRetrieve(List<Entry> entries);
+        void onFailure(Exception e);
+    }
+
+    public interface RetrieveTodayStatementListener {
+        void onRetrieve(int lastMonthExpanse, int thisMonthExpanse, List<Entry> thisMonthEntries, List<Entry> todayEntries);
     }
 }

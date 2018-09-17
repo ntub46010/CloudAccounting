@@ -16,8 +16,10 @@ import com.vincent.acnt.MyApp;
 import com.vincent.acnt.TaskFinishListener;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.entity.Book;
+import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +43,7 @@ public class BookAccessor {
                             book.defineDocumentId(task.getResult().getId());
                             listener.onRetrieve(book);
                         } else {
-                            listener.onRetrieve(null);
+                            listener.onFailure(task.getException());
                         }
                     }
                 });
@@ -70,7 +72,7 @@ public class BookAccessor {
 
                             listener.onRetrieve(books);
                         } else {
-
+                            listener.onFailure(task.getException());
                         }
                     }
                 });
@@ -86,7 +88,7 @@ public class BookAccessor {
                         if (task.isSuccessful()) {
                             listener.onFinish();
                         } else {
-
+                            listener.onFailure(task.getException());
                         }
                     }
                 });
@@ -108,7 +110,7 @@ public class BookAccessor {
                         if (task.isSuccessful()) {
                             listener.onFinish();
                         } else {
-
+                            listener.onFailure(task.getException());
                         }
                     }
                 });
@@ -124,7 +126,7 @@ public class BookAccessor {
                         if (task.isSuccessful()) {
                             listener.onFinish();
                         } else {
-
+                            listener.onFailure(task.getException());
                         }
                     }
                 });
@@ -152,6 +154,11 @@ public class BookAccessor {
                                     public void onRetrieve(List<User> users) {
                                         listener.onRetrieve(users);
                                     }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        listener.onFailure(e);
+                                    }
                                 }
                         );
 
@@ -161,13 +168,16 @@ public class BookAccessor {
 
     public interface RetrieveBookListener {
         void onRetrieve(Book book);
+        void onFailure(Exception e);
     }
 
     public interface RetrieveBooksListener {
         void onRetrieve(List<Book> books);
+        void onFailure(Exception e);
     }
 
     public interface RetrieveBookMembersListener {
         void onRetrieve(List<User> members);
+        void onFailure(Exception e);
     }
 }
