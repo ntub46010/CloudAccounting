@@ -5,51 +5,30 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.WriteBatch;
 import com.vincent.acnt.MyApp;
-import com.vincent.acnt.TaskFinishListener;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.entity.Book;
-import com.vincent.acnt.entity.Entry;
+import com.vincent.acnt.entity.Entity;
 import com.vincent.acnt.entity.User;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
-public class BookAccessor {
+public class BookAccessor extends BaseAccessor {
     private CollectionReference collection;
 
     public BookAccessor(CollectionReference collection) {
-        this.collection = collection;
+        super.collection = collection;
     }
 
-    public void createBook(final Book book, final RetrieveBookListener listener) {
-        collection
-                .add(book)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if (task.isSuccessful()) {
-                            book.defineDocumentId(task.getResult().getId());
-                            listener.onRetrieve(book);
-                        } else {
-                            listener.onFailure(task.getException());
-                        }
-                    }
-                });
-    }
-
-    public void loadBooksByList(List<String> ids, final RetrieveBooksListener listener) {
+    public void loadBooksByList(List<String> ids, final RetrieveEntitiesListener listener) {
         for (int i = 0, len = ids.size(); i < len; i++) {
             collection.whereEqualTo(Constant.PRO_ID, ids.get(i));
         }
@@ -78,60 +57,6 @@ public class BookAccessor {
                 });
     }
 
-    public void patchBook(String documentId, String field, Object value, final TaskFinishListener listener) {
-        collection
-                .document(documentId)
-                .update(field, value)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            listener.onFinish();
-                        } else {
-                            listener.onFailure(task.getException());
-                        }
-                    }
-                });
-    }
-
-    public void patchBook(String documentId, Map<String, Object> properties, final TaskFinishListener listener) {
-        DocumentReference documentReference = collection.document(documentId);
-        WriteBatch writeBatch = MyApp.db.batch();
-
-        for (String field : properties.keySet()) {
-            writeBatch.update(documentReference, field, properties.get(field));
-        }
-
-        writeBatch
-                .commit()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            listener.onFinish();
-                        } else {
-                            listener.onFailure(task.getException());
-                        }
-                    }
-                });
-    }
-
-    public void deleteBook(String documentId, final TaskFinishListener listener) {
-        collection
-                .document(documentId)
-                .delete()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            listener.onFinish();
-                        } else {
-                            listener.onFailure(task.getException());
-                        }
-                    }
-                });
-    }
-
     public ListenerRegistration observeBookMembersById(String documentId, final RetrieveBookMembersListener listener) {
         return collection
                 .document(documentId)
@@ -149,10 +74,10 @@ public class BookAccessor {
                         UserAccessor accessor = new UserAccessor(MyApp.db.collection(Constant.KEY_USERS));
                         accessor.loadUsersByList(
                                 memberIds,
-                                new UserAccessor.RetrieveUsersListener() {
+                                new RetrieveEntitiesListener() {
                                     @Override
-                                    public void onRetrieve(List<User> users) {
-                                        listener.onRetrieve(users);
+                                    public void onRetrieve(List<? extends Entity> users) {
+                                        listener.onRetrieve((List<User>) users);
                                     }
 
                                     @Override
@@ -164,16 +89,6 @@ public class BookAccessor {
 
                     }
                 });
-    }
-
-    public interface RetrieveBookListener {
-        void onRetrieve(Book book);
-        void onFailure(Exception e);
-    }
-
-    public interface RetrieveBooksListener {
-        void onRetrieve(List<Book> books);
-        void onFailure(Exception e);
     }
 
     public interface RetrieveBookMembersListener {

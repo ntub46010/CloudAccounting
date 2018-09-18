@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -13,41 +12,20 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.entity.User;
-import com.vincent.acnt.TaskFinishListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-public class UserAccessor {
+public class UserAccessor extends BaseAccessor {
     private CollectionReference collection;
 
     public UserAccessor(CollectionReference collection) {
-        this.collection = collection;
+        super.collection = collection;
     }
 
-    public void createUser(final User user, final RetrieveUserListener listener) {
-        user.setBooks(new ArrayList<String>());
-
-        collection
-                .add(user)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if (task.isSuccessful()) {
-                            DocumentReference documentReference = task.getResult();
-                            user.defineDocumentId(documentReference.getId());
-
-                            listener.onRetrieve(user);
-                        } else {
-                            listener.onRetrieve(null);
-                        }
-                    }
-                });
-    }
-
-    public ListenerRegistration observeUserById(String documentId, final RetrieveUserListener listener) {
+    public ListenerRegistration observeUserById(String documentId, final RetrieveEntityListener listener) {
         return collection
                 .document(documentId)
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -61,7 +39,7 @@ public class UserAccessor {
                 });
     }
 
-    public void loadUsersByList(List<String> ids, final RetrieveUsersListener listener) {
+    public void loadUsersByList(List<String> ids, final RetrieveEntitiesListener listener) {
         for (int i = 0, len = ids.size(); i < len; i++) {
             collection.whereEqualTo(Constant.PRO_ID, ids.get(i));
         }
@@ -84,35 +62,10 @@ public class UserAccessor {
 
                             listener.onRetrieve(users);
                         } else {
-
+                            listener.onFailure(task.getException());
                         }
                     }
                 });
     }
 
-    public void patchUser(String documentId, String field, Object value, final TaskFinishListener listener) {
-        collection
-                .document(documentId)
-                .update(field, value)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            listener.onFinish();
-                        } else {
-
-                        }
-                    }
-                });
-    }
-
-    public interface RetrieveUserListener {
-        void onRetrieve(User user);
-        void onFailure(Exception e);
-    }
-
-    public interface RetrieveUsersListener {
-        void onRetrieve(List<User> users);
-        void onFailure(Exception e);
-    }
 }

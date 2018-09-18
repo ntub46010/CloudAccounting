@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User implements Serializable {
+public class User implements Entity, Serializable {
     private String id;
     private String name, email;
     private List<String> books;
@@ -54,10 +54,12 @@ public class User implements Serializable {
         this.books = books;
     }
 
+    @Override
     public String obtainDocumentId() {
         return documentId;
     }
 
+    @Override
     public void defineDocumentId(String documentId) {
         this.documentId = documentId;
     }

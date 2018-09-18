@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -13,7 +12,6 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.vincent.acnt.MyApp;
-import com.vincent.acnt.TaskFinishListener;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.Subject;
@@ -25,46 +23,14 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-public class EntryAccessor {
+public class EntryAccessor extends BaseAccessor {
     private CollectionReference collection;
 
     public EntryAccessor(CollectionReference collection) {
-        this.collection = collection;
+        super.collection = collection;
     }
 
-    public void createEntry(final Entry entry, final RetrieveEntryListener listener) {
-        collection
-                .add(entry)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if (task.isSuccessful()) {
-                            entry.defineDocumentId(task.getResult().getId());
-                            listener.onRetrieve(entry);
-                        } else {
-                            listener.onFailure(task.getException());
-                        }
-                    }
-                });
-    }
-
-    public void updateEntry(final Entry entry, final TaskFinishListener listener) {
-        collection
-                .document(entry.obtainDocumentId())
-                .set(entry)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            listener.onFinish();
-                        } else {
-                            listener.onFailure(task.getException());
-                        }
-                    }
-                });
-    }
-
-    public void loadEntriesByDate(int startDate, int endDate, final RetrieveEntriesListener listener) {
+    public void loadEntriesByDate(int startDate, int endDate, final RetrieveEntitiesListener listener) {
         collection
                 .orderBy(Constant.PRO_DATE, Query.Direction.DESCENDING)
                 .orderBy(Constant.PRO_MEMO, Query.Direction.ASCENDING)
@@ -170,32 +136,6 @@ public class EntryAccessor {
                         );
                     }
                 });
-    }
-
-    public void deleteEntry(String documentId, final TaskFinishListener listener) {
-        collection
-                .document(documentId)
-                .delete()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            listener.onFinish();
-                        } else {
-                            listener.onFailure(task.getException());
-                        }
-                    }
-                });
-    }
-
-    public interface RetrieveEntryListener {
-        void onRetrieve(Entry entry);
-        void onFailure(Exception e);
-    }
-
-    public interface RetrieveEntriesListener {
-        void onRetrieve(List<Entry> entries);
-        void onFailure(Exception e);
     }
 
     public interface RetrieveTodayStatementListener {
