@@ -6,27 +6,27 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.vincent.acnt.accessor.RetrieveEntityListener;
+import com.vincent.acnt.accessor.UserAccessor;
 import com.vincent.acnt.data.Constant;
+import com.vincent.acnt.entity.Entity;
 import com.vincent.acnt.entity.User;
-
-import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity {
     private Context context;
 
-    private ListenerRegistration lsrUser;
+    private UserAccessor accessor;
+
+    private ListenerRegistration regUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
+        accessor = new UserAccessor(MyApp.db.collection(Constant.KEY_USERS));
 
         ImageButton btnBook = findViewById(R.id.btnBook);
         btnBook.setOnClickListener(new View.OnClickListener() {
@@ -46,20 +46,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        lsrUser = MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        User user = documentSnapshot.toObject(User.class);
-                        user.defineDocumentId(documentSnapshot.getId());
-                        MyApp.user = user;
-                    }
-                });
+        loadMyUser();
+    }
+
+    private void loadMyUser() {
+        regUser = accessor.observeUserById(MyApp.user.obtainDocumentId(), new RetrieveEntityListener() {
+            @Override
+            public void onRetrieve(Entity entity) {
+                MyApp.user = (User) entity;
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
     }
 
     @Override
     public void onDestroy() {
-        lsrUser.remove();
+        regUser.remove();
         super.onDestroy();
     }
 

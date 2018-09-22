@@ -14,19 +14,18 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 public class SubjectAccessor extends BaseAccessor {
-    private CollectionReference collection;
 
     public SubjectAccessor(CollectionReference collection) {
         super.collection = collection;
     }
 
     public ListenerRegistration observeSubjects(final RetrieveEntitiesListener listener) {
-        return collection
+        return super.collection
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
-                        List<Subject> subjects = new ArrayList<>();
+                        List<Subject> subjects = new ArrayList<>(32);
                         Subject subject;
 
                         for (int i = 0, len = documentSnapshots.size(); i < len; i++) {

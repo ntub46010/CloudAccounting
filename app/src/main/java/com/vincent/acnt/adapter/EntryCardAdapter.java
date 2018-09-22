@@ -156,6 +156,7 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
     }
 
     public void setEntries(List<Entry> entries) {
+        this.entries.clear();
         this.entries = entries;
         notifyDataSetChanged();
     }

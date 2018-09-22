@@ -1,6 +1,6 @@
 package com.vincent.acnt.accessor;
 
 public interface TaskFinishListener {
-    void onFinish();
+    void onSuccess();
     void onFailure(Exception e);
 }

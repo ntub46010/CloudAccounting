@@ -3,7 +3,6 @@ package com.vincent.acnt;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -20,13 +19,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
+import com.vincent.acnt.accessor.EntryAccessor;
+import com.vincent.acnt.accessor.RetrieveEntityListener;
+import com.vincent.acnt.accessor.TaskFinishListener;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.EntryElementView;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.data.Verifier;
+import com.vincent.acnt.entity.Entity;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.Subject;
 
@@ -52,12 +52,16 @@ public class EntryEditActivity extends AppCompatActivity {
 
     private Dialog dlgWaiting;
 
+    private EntryAccessor accessor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry_edit);
         context = this;
         bundle = getIntent().getExtras();
+        accessor = new EntryAccessor(MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .collection(Constant.KEY_ENTRIES));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         TextView txtBarTitle = toolbar.findViewById(R.id.txtToolbarTitle);
@@ -286,41 +290,37 @@ public class EntryEditActivity extends AppCompatActivity {
     private void createEntry(Entry entry) {
         entry.setCreator(MyApp.user.getId());
 
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
-                .add(entry)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        dlgWaiting.dismiss();
+        accessor.create(entry, new RetrieveEntityListener() {
+            @Override
+            public void onRetrieve(Entity entity) {
+                dlgWaiting.dismiss();
+                Toast.makeText(context, "新增分錄成功", Toast.LENGTH_SHORT).show();
+                clearContent();
+                addElementView(null);
+                addElementView(null);
+            }
 
-                        if (task.isSuccessful()) {
-                            Toast.makeText(context, "新增分錄成功", Toast.LENGTH_SHORT).show();
-                            clearContent();
-                            addElementView(null);
-                            addElementView(null);
-                            return;
-                        }
-
-                        Toast.makeText(context, "新增分錄失敗", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            @Override
+            public void onFailure(Exception e) {
+                dlgWaiting.dismiss();
+                Toast.makeText(context, "新增分錄失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void updateEntry(Entry entry) {
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES).document(documentId)
-                .set(entry)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(context, "修改分錄成功", Toast.LENGTH_SHORT).show();
-                            finish();
-                            return;
-                        }
+        accessor.update(entry, new TaskFinishListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(context, "修改分錄成功", Toast.LENGTH_SHORT).show();
+                finish();
+            }
 
-                        Toast.makeText(context, "修改分錄失敗", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "修改分錄失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void clearContent() {

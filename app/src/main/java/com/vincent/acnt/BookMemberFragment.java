@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,24 +20,27 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.vincent.acnt.accessor.BookAccessor;
+import com.vincent.acnt.accessor.TaskFinishListener;
 import com.vincent.acnt.adapter.MemberListAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.User;
 
 import java.util.List;
+import java.util.Map;
 
 public class BookMemberFragment extends Fragment {
     private Context context;
 
     private List<User> members;
+    List<String> adminMembers, approvedMembers, waitingMembers;
 
     private MemberListAdapter adapter;
     private int type;
 
     private Dialog dialog;
+    private BookAccessor accessor;
 
     public BookMemberFragment() {
 
@@ -51,6 +55,11 @@ public class BookMemberFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        accessor = new BookAccessor(MyApp.db.collection(Constant.KEY_BOOKS));
+
+        adminMembers = MyApp.browsingBook.getAdminMembers();
+        approvedMembers = MyApp.browsingBook.getApprovedMembers();
+        waitingMembers = MyApp.browsingBook.getWaitingMembers();
 
         RelativeLayout layHint = getView().findViewById(R.id.layContentHint);
 
@@ -82,15 +91,12 @@ public class BookMemberFragment extends Fragment {
         if (adapter != null) {
             adapter.setMembers(members);
         }
+
         this.members = members;
     }
 
     public void setType(int type) {
         this.type = type;
-    }
-
-    public MemberListAdapter getAdapter() {
-        return adapter;
     }
 
     private AlertDialog.Builder prepareAdmissionDialog(final int index) {
@@ -214,72 +220,77 @@ public class BookMemberFragment extends Fragment {
     }
 
     public void approveUser(final User user) {
-        MyApp.browsingBook.removeWaitingMember(user.getId());
-        MyApp.browsingBook.getApprovedMembers().add(user.getId());
+        waitingMembers.remove(user.getId());
+        approvedMembers.add(user.getId());
 
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
-                .set(MyApp.browsingBook)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(context, "已加入" + user.getName(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+        Map<String, Object> properties = new ArrayMap<>();
+        properties.put(Constant.PRO_WAITING_MEMBERS, waitingMembers);
+        properties.put(Constant.PRO_APPROVED_MEMBERS, approvedMembers);
+
+        patchBook(properties, "已加入" + user.getName());
     }
 
     public void rejectUser(final User user) {
-        MyApp.browsingBook.removeWaitingMember(user.getId());
+        waitingMembers.remove(user.getId());
 
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
-                .set(MyApp.browsingBook)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(context, "已拒絕" + user.getName(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+        accessor.patch(MyApp.browsingBook.obtainDocumentId(), Constant.PRO_WAITING_MEMBERS, waitingMembers, new TaskFinishListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(context, "已拒絕" + user.getName(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "操作失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void upgradeUser(final User user) {
-        MyApp.browsingBook.removeApprovedMember(user.getId());
-        MyApp.browsingBook.addAdminMember(user.getId());
+        adminMembers.add(user.getId());
+        approvedMembers.remove(user.getId());
 
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
-                .set(MyApp.browsingBook)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(context, "已給予" + user.getName() + "管理員身份", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        Map<String, Object> properties = new ArrayMap<>();
+        properties.put(Constant.PRO_ADMIN_MEMBERS, adminMembers);
+        properties.put(Constant.PRO_APPROVED_MEMBERS, approvedMembers);
+
+        patchBook(properties, "已給予" + user.getName() + "管理員身份");
     }
 
     public void degradeUser(final User user) {
-        MyApp.browsingBook.removeAdminMember(user.getId());
-        MyApp.browsingBook.addApprovedMember(user.getId());
+        adminMembers.remove(user.getId());
+        approvedMembers.add(user.getId());
 
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
-                .set(MyApp.browsingBook)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(context, "已移除"  + user.getName() + "的管理員身份", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        Map<String, Object> properties = new ArrayMap<>();
+        properties.put(Constant.PRO_ADMIN_MEMBERS, adminMembers);
+        properties.put(Constant.PRO_APPROVED_MEMBERS, approvedMembers);
+
+        patchBook(properties, "已移除" + user.getName() + "的管理員身份");
     }
 
     public void removeUser(final User user) {
-        MyApp.browsingBook.removeApprovedMember(user.getId());
-        MyApp.browsingBook.removeAdminMember(user.getId());
+        adminMembers.remove(user.getId());
+        approvedMembers.remove(user.getId());
 
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
-                .set(MyApp.browsingBook)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(context, "已移除" + user.getName(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+        Map<String, Object> properties = new ArrayMap<>();
+        properties.put(Constant.PRO_ADMIN_MEMBERS, adminMembers);
+        properties.put(Constant.PRO_APPROVED_MEMBERS, approvedMembers);
+
+        patchBook(properties, "已移除" + user.getName());
+    }
+
+    private void patchBook(Map<String, Object> properties, final String successMessage) {
+        accessor.patch(MyApp.browsingBook.obtainDocumentId(), properties, new TaskFinishListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(context, successMessage, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "操作失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

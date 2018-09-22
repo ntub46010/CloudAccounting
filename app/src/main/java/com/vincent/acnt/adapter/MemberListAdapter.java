@@ -64,6 +64,7 @@ public class MemberListAdapter extends BaseAdapter {
 
     public void setMembers(List<User> members) {
         this.members = members;
+        notifyDataSetChanged();
     }
 
 }

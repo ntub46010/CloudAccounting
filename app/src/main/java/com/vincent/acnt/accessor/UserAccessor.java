@@ -19,14 +19,39 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 public class UserAccessor extends BaseAccessor {
-    private CollectionReference collection;
 
     public UserAccessor(CollectionReference collection) {
         super.collection = collection;
     }
 
+    public void loadUserById(String id, final RetrieveEntityListener listener) {
+        collection
+                .whereEqualTo(Constant.PRO_ID, id)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+
+                            //檢查資料庫有無該使用者
+                            if (documentSnapshots.isEmpty()) {
+                                listener.onRetrieve(null);
+                            } else {
+                                User user = documentSnapshots.get(0).toObject(User.class);
+                                user.defineDocumentId(documentSnapshots.get(0).getId());
+
+                                listener.onRetrieve(user);
+                            }
+                        } else {
+                            listener.onFailure(task.getException());
+                        }
+                    }
+                });
+    }
+
     public ListenerRegistration observeUserById(String documentId, final RetrieveEntityListener listener) {
-        return collection
+        return super.collection
                 .document(documentId)
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
@@ -41,10 +66,10 @@ public class UserAccessor extends BaseAccessor {
 
     public void loadUsersByList(List<String> ids, final RetrieveEntitiesListener listener) {
         for (int i = 0, len = ids.size(); i < len; i++) {
-            collection.whereEqualTo(Constant.PRO_ID, ids.get(i));
+            super.collection.whereEqualTo(Constant.PRO_ID, ids.get(i));
         }
 
-        collection
+        super.collection
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

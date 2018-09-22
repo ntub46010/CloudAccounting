@@ -16,25 +16,20 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.vincent.acnt.accessor.EntryAccessor;
+import com.vincent.acnt.accessor.RetrieveEntitiesListener;
 import com.vincent.acnt.adapter.EntryCardAdapter;
 import com.vincent.acnt.data.Constant;
-import com.vincent.acnt.data.Utility;
+import com.vincent.acnt.entity.Entity;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.data.EntryContextMenuHandler;
-import com.vincent.acnt.entity.Subject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 public class JournalActivity extends AppCompatActivity {
     private Context context;
@@ -46,19 +41,22 @@ public class JournalActivity extends AppCompatActivity {
     private ProgressBar prgBar;
     private RelativeLayout layHint;
 
-    private List<Entry> entries;
     private EntryCardAdapter adapter;
 
     private int selectedYear, selectedMonth;
 
     private int queryFlag = -2;
-    private ListenerRegistration lsrEntry;
+
+    private ListenerRegistration regEntry;
+    private EntryAccessor accessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_journal);
         context = this;
+        accessor = new EntryAccessor(MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .collection(Constant.KEY_ENTRIES));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -91,8 +89,6 @@ public class JournalActivity extends AppCompatActivity {
                 startActivity(it);
             }
         });
-
-        entries = new ArrayList<>(128);
 
         setupSpinner();
 
@@ -128,7 +124,7 @@ public class JournalActivity extends AppCompatActivity {
 
                 queryFlag++;
                 if (queryFlag > 0) {
-                    showEntry();
+                    loadEntries();
                 }
             }
 
@@ -145,7 +141,7 @@ public class JournalActivity extends AppCompatActivity {
 
                 queryFlag++;
                 if (queryFlag > 0) {
-                    showEntry();
+                    loadEntries();
                 }
             }
 
@@ -165,67 +161,46 @@ public class JournalActivity extends AppCompatActivity {
         spnMonth.setSelection(month);
     }
 
-    private void showEntry() {
+    private void loadEntries() {
         prgBar.setVisibility(View.VISIBLE);
         recyEntry.setVisibility(View.INVISIBLE);
         fabCreateEntry.setVisibility(View.INVISIBLE);
 
-        int endYear = selectedYear;
-        int endMonth = selectedMonth + 1;
-        if (endMonth > 12) {
-            endYear++;
-            endMonth = 1;
-        }
+        regEntry = accessor.observeEntriesByMonth(selectedYear, selectedMonth, new RetrieveEntitiesListener() {
+            @Override
+            public void onRetrieve(List<? extends Entity> entities) {
+                if (queryFlag < 1) {
+                    return;
+                }
 
-        lsrEntry = MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
-                .orderBy(Constant.PRO_DATE, Query.Direction.DESCENDING)
-                .orderBy(Constant.PRO_MEMO, Query.Direction.ASCENDING)
-                .whereGreaterThanOrEqualTo(Constant.PRO_DATE, Utility.getDateNumber(selectedYear, selectedMonth, 1))
-                .whereLessThan(Constant.PRO_DATE, Utility.getDateNumber(endYear, endMonth, 1))
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (queryFlag < 1) {
-                            return;
-                        }
+                List<Entry> entries = (List<Entry>) entities;
 
-                        entries.clear();
-                        List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
-                        Entry entry;
+                if (entries.isEmpty()) {
+                    TextView txtHint = findViewById(R.id.txtHint);
+                    txtHint.setText("該月沒有紀錄，可點擊右下方按鈕進行記帳");
+                    layHint.setVisibility(View.VISIBLE);
+                } else {
+                    layHint.setVisibility(View.GONE);
+                }
 
-                        for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
-                            entry = documentSnapshots.get(i).toObject(Entry.class);
-                            entry.defineDocumentId(documentSnapshots.get(i).getId());
+                adapter.setEntries(entries);
 
-                            //將分錄中的科目補上名稱
-                            for (Subject subject : entry.getSubjects()) {
-                                subject.setName(MyApp.mapSubjectById.get(subject.getId()).getName());
-                            }
+                prgBar.setVisibility(View.GONE);
+                recyEntry.setVisibility(View.VISIBLE);
+                fabCreateEntry.setVisibility(View.VISIBLE);
+            }
 
-                            entries.add(entry);
-                        }
+            @Override
+            public void onFailure(Exception e) {
 
-                        if (entries.isEmpty()) {
-                            TextView txtHint = findViewById(R.id.txtHint);
-                            txtHint.setText("該月沒有紀錄，可點擊右下方按鈕進行記帳");
-                            layHint.setVisibility(View.VISIBLE);
-                        } else {
-                            layHint.setVisibility(View.GONE);
-                        }
-
-                        adapter.setEntries(entries);
-
-                        prgBar.setVisibility(View.GONE);
-                        recyEntry.setVisibility(View.VISIBLE);
-                        fabCreateEntry.setVisibility(View.VISIBLE);
-                    }
-                });
+            }
+        });
     }
 
     @Override
     public void onDestroy() {
-        if (lsrEntry != null) {
-            lsrEntry.remove();
+        if (regEntry != null) {
+            regEntry.remove();
         }
         super.onDestroy();
     }

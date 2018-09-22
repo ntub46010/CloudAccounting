@@ -3,6 +3,7 @@ package com.vincent.acnt;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,17 +24,18 @@ public class ReportFragment extends Fragment {
     protected Context context;
 
     private TextView txtBalance;
-    private ListView lstReport;
 
     private String type;
     private List<ReportItem> reportItems;
+
+    private ReportListAdapter adapter;
 
     public ReportFragment() {
 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         context = getActivity();
         return inflater.inflate(R.layout.fragment_report, container, false);
     }
@@ -43,7 +45,7 @@ public class ReportFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         txtBalance = getView().findViewById(R.id.txtBalance);
-        lstReport = getView().findViewById(R.id.lstReport);
+        ListView lstReport = getView().findViewById(R.id.lstReport);
 
         lstReport.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -55,19 +57,21 @@ public class ReportFragment extends Fragment {
                 context.startActivity(it);
             }
         });
+
+        adapter = new ReportListAdapter(context, reportItems);
+        lstReport.setAdapter(adapter);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        lstReport.setAdapter(new ReportListAdapter(context, reportItems));
         showBalance();
     }
 
     private void showBalance() {
         int balance = 0;
-        for (ReportItem item : reportItems) {
-            balance += item.getBalance();
+        for (int i = 0, len = reportItems.size(); i < len; i++) {
+            balance += reportItems.get(i).getBalance();
         }
 
         String text = "";
@@ -97,6 +101,10 @@ public class ReportFragment extends Fragment {
     }
 
     public void setReportItems(List<ReportItem> reportItems) {
+        if (adapter != null) {
+            adapter.setItems(reportItems);
+        }
+
         this.reportItems = reportItems;
     }
 

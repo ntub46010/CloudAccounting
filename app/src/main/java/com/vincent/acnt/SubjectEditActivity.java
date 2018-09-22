@@ -2,7 +2,6 @@ package com.vincent.acnt;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -13,12 +12,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
+import com.vincent.acnt.accessor.RetrieveEntityListener;
+import com.vincent.acnt.accessor.SubjectAccessor;
+import com.vincent.acnt.accessor.TaskFinishListener;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.data.Verifier;
+import com.vincent.acnt.entity.Entity;
 import com.vincent.acnt.entity.Subject;
 
 public class SubjectEditActivity extends AppCompatActivity {
@@ -29,9 +29,11 @@ public class SubjectEditActivity extends AppCompatActivity {
     private Spinner spnType;
     private EditText edtNo, edtName, edtCredit, edtDebit;
 
-    private String documentId;
-
     private Dialog dlgWaiting;
+
+    private long id;
+    private String documentId;
+    private SubjectAccessor accessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,8 @@ public class SubjectEditActivity extends AppCompatActivity {
         setContentView(R.layout.activity_subject_edit);
         context = this;
         bundle = getIntent().getExtras();
+        accessor = new SubjectAccessor(MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .collection(Constant.KEY_SUBJECTS));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         TextView txtBarTitle = toolbar.findViewById(R.id.txtToolbarTitle);
@@ -66,7 +70,6 @@ public class SubjectEditActivity extends AppCompatActivity {
                 String debit = edtDebit.getText().toString();
 
                 Subject subject = new Subject();
-                subject.setId(System.currentTimeMillis());
                 subject.setNo(String.valueOf(spnType.getSelectedItemPosition()) + edtNo.getText().toString());
                 subject.setName(edtName.getText().toString());
                 subject.setCredit(credit.equals("") ? 0 : Integer.parseInt(credit));
@@ -79,8 +82,10 @@ public class SubjectEditActivity extends AppCompatActivity {
                 dlgWaiting.show();
 
                 if (bundle.getInt(Constant.KEY_MODE) == Constant.MODE_CREATE) {
+                    subject.setId(System.currentTimeMillis());
                     createSubject(subject);
                 } else {
+                    subject.setId(id);
                     subject.defineDocumentId(documentId);
                     updateSubject(subject);
                 }
@@ -89,6 +94,7 @@ public class SubjectEditActivity extends AppCompatActivity {
 
         if (bundle.getInt(Constant.KEY_MODE) == Constant.MODE_UPDATE) {
             Subject subject = (Subject) bundle.getSerializable(Constant.KEY_SUBJECT);
+            id = subject.getId();
             documentId = subject.obtainDocumentId();
             spnType.setSelection(Integer.parseInt(subject.getNo().substring(0, 1)));
             edtNo.setText(subject.getNo().substring(1, 3));
@@ -101,48 +107,42 @@ public class SubjectEditActivity extends AppCompatActivity {
     }
 
     private void createSubject(Subject subject) {
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS)
-                .add(subject)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        dlgWaiting.dismiss();
+        accessor.create(subject, new RetrieveEntityListener() {
+            @Override
+            public void onRetrieve(Entity entity) {
+                dlgWaiting.dismiss();
+                Toast.makeText(context, "科目新增成功", Toast.LENGTH_SHORT).show();
 
-                        if (task.isSuccessful()) {
-                            Toast.makeText(context, "科目新增成功", Toast.LENGTH_SHORT).show();
+                spnType.setSelection(0);
+                edtNo.setText(null);
+                edtName.setText(null);
+                edtCredit.setText(null);
+                edtDebit.setText(null);
+            }
 
-                            spnType.setSelection(0);
-                            edtNo.setText(null);
-                            edtName.setText(null);
-                            edtCredit.setText(null);
-                            edtDebit.setText(null);
-                            return;
-                        }
-
-                        Toast.makeText(context, "科目新增失敗", Toast.LENGTH_SHORT).show();
-                        Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
+            @Override
+            public void onFailure(Exception e) {
+                dlgWaiting.dismiss();
+                Toast.makeText(context, "科目新增失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void updateSubject(Subject subject) {
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS).document(subject.obtainDocumentId())
-                .set(subject)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        dlgWaiting.dismiss();
+        accessor.update(subject, new TaskFinishListener() {
+            @Override
+            public void onSuccess() {
+                dlgWaiting.dismiss();
+                Toast.makeText(context, "科目更新成功", Toast.LENGTH_SHORT).show();
+                finish();
+            }
 
-                        if (task.isSuccessful()) {
-                            Toast.makeText(context, "科目編輯成功", Toast.LENGTH_SHORT).show();
-                            finish();
-                            return;
-                        }
-
-                        Toast.makeText(context, "科目編輯失敗", Toast.LENGTH_SHORT).show();
-                        Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
+            @Override
+            public void onFailure(Exception e) {
+                dlgWaiting.dismiss();
+                Toast.makeText(context, "科目更新失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private boolean isNotValid(Subject subject) {

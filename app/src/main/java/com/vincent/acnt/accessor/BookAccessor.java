@@ -22,10 +22,36 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 public class BookAccessor extends BaseAccessor {
-    private CollectionReference collection;
 
     public BookAccessor(CollectionReference collection) {
         super.collection = collection;
+    }
+
+    public void loadBookById(String id, final RetrieveEntityListener listener) {
+        super.collection
+                .whereEqualTo(Constant.PRO_ID, id)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+
+                            if (documentSnapshots.isEmpty()) {
+                                listener.onRetrieve(null);
+                                return;
+                            }
+
+                            Book book;
+                            book = documentSnapshots.get(0).toObject(Book.class);
+                            book.defineDocumentId(documentSnapshots.get(0).getId());
+
+                            listener.onRetrieve(book);
+                        } else {
+                            listener.onFailure(task.getException());
+                        }
+                    }
+                });
     }
 
     public void loadBooksByList(List<String> ids, final RetrieveEntitiesListener listener) {
@@ -40,7 +66,7 @@ public class BookAccessor extends BaseAccessor {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-                            List<Book> books = new ArrayList<>();
+                            List<Book> books = new ArrayList<>(16);
                             Book book;
 
                             for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
@@ -64,9 +90,8 @@ public class BookAccessor extends BaseAccessor {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                         Book book = documentSnapshot.toObject(Book.class);
-                        book.defineDocumentId(documentSnapshot.getId());
 
-                        List<String> memberIds = new ArrayList<>();
+                        List<String> memberIds = new ArrayList<>(32);
                         memberIds.addAll(book.getAdminMembers());
                         memberIds.addAll(book.getApprovedMembers());
                         memberIds.addAll(book.getWaitingMembers());
@@ -76,8 +101,8 @@ public class BookAccessor extends BaseAccessor {
                                 memberIds,
                                 new RetrieveEntitiesListener() {
                                     @Override
-                                    public void onRetrieve(List<? extends Entity> users) {
-                                        listener.onRetrieve((List<User>) users);
+                                    public void onRetrieve(List<? extends Entity> entities) {
+                                        listener.onRetrieve((List<User>) entities);
                                     }
 
                                     @Override

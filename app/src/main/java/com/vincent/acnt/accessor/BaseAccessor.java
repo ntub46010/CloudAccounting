@@ -21,6 +21,10 @@ public class BaseAccessor {
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if (listener == null) {
+                            return;
+                        }
+
                         if (task.isSuccessful()) {
                             entity.defineDocumentId(task.getResult().getId());
                             listener.onRetrieve(entity);
@@ -31,15 +35,19 @@ public class BaseAccessor {
                 });
     }
 
-    public void update(String documentId, Entity entity, final TaskFinishListener listener) {
+    public void update(Entity entity, final TaskFinishListener listener) {
         collection
-                .document(documentId)
+                .document(entity.obtainDocumentId())
                 .set(entity)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        if (listener == null) {
+                            return;
+                        }
+
                         if (task.isSuccessful()) {
-                            listener.onFinish();
+                            listener.onSuccess();
                         } else {
                             listener.onFailure(task.getException());
                         }
@@ -54,8 +62,12 @@ public class BaseAccessor {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        if (listener == null) {
+                            return;
+                        }
+
                         if (task.isSuccessful()) {
-                            listener.onFinish();
+                            listener.onSuccess();
                         } else {
                             listener.onFailure(task.getException());
                         }
@@ -76,8 +88,12 @@ public class BaseAccessor {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        if (listener == null) {
+                            return;
+                        }
+
                         if (task.isSuccessful()) {
-                            listener.onFinish();
+                            listener.onSuccess();
                         } else {
                             listener.onFailure(task.getException());
                         }
@@ -92,8 +108,12 @@ public class BaseAccessor {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        if (listener == null) {
+                            return;
+                        }
+
                         if (task.isSuccessful()) {
-                            listener.onFinish();
+                            listener.onSuccess();
                         } else {
                             listener.onFailure(task.getException());
                         }

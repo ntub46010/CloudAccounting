@@ -3,10 +3,10 @@ package com.vincent.acnt;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.ArrayMap;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -14,12 +14,16 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.vincent.acnt.accessor.BookAccessor;
+import com.vincent.acnt.accessor.TaskFinishListener;
+import com.vincent.acnt.accessor.UserAccessor;
 import com.vincent.acnt.adapter.BookOptionListAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.User;
+
+import java.util.List;
+import java.util.Map;
 
 public class BookOptionActivity extends AppCompatActivity {
     private Context context;
@@ -27,13 +31,18 @@ public class BookOptionActivity extends AppCompatActivity {
 
     private Dialog dialog;
 
-    private interface TaskListener { void onFinish(User user); }
+    private BookAccessor asrBook;
+    private UserAccessor asrUser;
+
+    private interface TaskListener { void onFinish(); }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_option);
         context = this;
+        asrBook = new BookAccessor(MyApp.db.collection(Constant.KEY_BOOKS));
+        asrUser = new UserAccessor(MyApp.db.collection(Constant.KEY_USERS));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -102,7 +111,7 @@ public class BookOptionActivity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int which) {
                                     leaveBook(new TaskListener() {
                                         @Override
-                                        public void onFinish(User user) {
+                                        public void onFinish() {
                                             deleteBook();
                                         }
                                     });
@@ -117,7 +126,7 @@ public class BookOptionActivity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int which) {
                                     leaveBook(new TaskListener() {
                                         @Override
-                                        public void onFinish(User user) {
+                                        public void onFinish() {
                                             removeMember(MyApp.user);
                                         }
                                     });
@@ -134,7 +143,7 @@ public class BookOptionActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 leaveBook(new TaskListener() {
                                     @Override
-                                    public void onFinish(User user) {
+                                    public void onFinish() {
                                         deleteBook();
                                     }
                                 });
@@ -147,66 +156,74 @@ public class BookOptionActivity extends AppCompatActivity {
     }
 
     private void updateBookName(String bookName) {
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
-                .update(Constant.PRO_NAME, bookName)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(context, "修改名稱成功", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(context, "修改名稱失敗", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        asrBook.patch(MyApp.browsingBook.obtainDocumentId(), Constant.PRO_NAME, bookName, new TaskFinishListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(context, "修改名稱成功", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "修改名稱失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void leaveBook(final TaskListener taskListener) {
         MyApp.user.getBooks().remove(MyApp.browsingBook.getId());
 
-        MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
-                .update(Constant.PRO_BOOKS, MyApp.user.getBooks())
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        taskListener.onFinish(MyApp.user);
-                    }
-                });
+        asrUser.patch(MyApp.user.obtainDocumentId(), Constant.PRO_BOOKS, MyApp.user.getBooks(), new TaskFinishListener() {
+            @Override
+            public void onSuccess() {
+                taskListener.onFinish();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "離開帳本失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void removeMember(User member) {
-        MyApp.browsingBook.getApprovedMembers().remove(member.getId());
+        List<String> adminMembers = MyApp.browsingBook.getAdminMembers();
+        List<String> approvedMembers = MyApp.browsingBook.getApprovedMembers();
 
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
-                .set(MyApp.browsingBook)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(context, "已退出帳本", Toast.LENGTH_SHORT).show();
-                            setResult(Constant.MODE_QUIT);
-                            finish();
-                        } else {
-                            Toast.makeText(context, "退出失敗", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        adminMembers.remove(member.getId());
+        approvedMembers.remove(member.getId());
+
+        Map<String, Object> properties = new ArrayMap<>();
+        properties.put(Constant.PRO_ADMIN_MEMBERS, adminMembers);
+        properties.put(Constant.PRO_APPROVED_MEMBERS, approvedMembers);
+
+        asrBook.patch(MyApp.browsingBook.obtainDocumentId(), properties, new TaskFinishListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(context, "已退出帳本", Toast.LENGTH_SHORT).show();
+                setResult(Constant.MODE_QUIT);
+                finish();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "退出失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void deleteBook() {
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
-                .delete()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(context, "刪除成功", Toast.LENGTH_SHORT).show();
-                            setResult(Constant.MODE_QUIT);
-                            finish();
-                        } else {
-                            Toast.makeText(context, "刪除失敗", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        asrBook.delete(MyApp.browsingBook.obtainDocumentId(), new TaskFinishListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(context, "刪除成功", Toast.LENGTH_SHORT).show();
+                setResult(Constant.MODE_QUIT);
+                finish();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "刪除失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

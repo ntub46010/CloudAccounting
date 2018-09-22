@@ -62,4 +62,10 @@ public class ReportListAdapter extends BaseAdapter {
 
         return view;
     }
+
+    public void setItems(List<ReportItem> items) {
+        this.items.clear();
+        this.items = items;
+        notifyDataSetChanged();
+    }
 }

@@ -5,6 +5,6 @@ import com.vincent.acnt.entity.Entity;
 import java.util.List;
 
 public interface RetrieveEntitiesListener {
-    void onRetrieve(List<? extends Entity> entity);
+    void onRetrieve(List<? extends Entity> entities);
     void onFailure(Exception e);
 }

@@ -67,4 +67,9 @@ public class BookGridAdapter extends BaseAdapter {
 
         return view;
     }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+        notifyDataSetChanged();
+    }
 }
