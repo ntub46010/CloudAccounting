@@ -4,27 +4,27 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.view.Menu;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.vincent.acnt.EntryEditActivity;
 import com.vincent.acnt.MyApp;
+import com.vincent.acnt.accessor.EntryAccessor;
+import com.vincent.acnt.accessor.TaskFinishListener;
 import com.vincent.acnt.entity.Entry;
 
 public class EntryContextMenuHandler {
     private Context context;
     private Entry entry;
+    private EntryAccessor accessor;
 
     public EntryContextMenuHandler(Context context, Entry entry) {
         this.context = context;
         this.entry = entry;
+        this.accessor = new EntryAccessor(MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .collection(Constant.KEY_ENTRIES));
     }
 
     public void updateEntry() {
@@ -52,22 +52,21 @@ public class EntryContextMenuHandler {
                         prgBar.setVisibility(View.VISIBLE);
                         recyEntry.setVisibility(View.INVISIBLE);
 
-                        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
-                                .collection(Constant.KEY_ENTRIES).document(entry.obtainDocumentId())
-                                .delete()
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Toast.makeText(context, "分錄刪除成功", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            Toast.makeText(context, "分錄刪除失敗", Toast.LENGTH_SHORT).show();
-                                        }
+                        accessor.delete(entry.obtainDocumentId(), new TaskFinishListener() {
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(context, "分錄刪除成功", Toast.LENGTH_SHORT).show();
+                                prgBar.setVisibility(View.GONE);
+                                recyEntry.setVisibility(View.VISIBLE);
+                            }
 
-                                        prgBar.setVisibility(View.GONE);
-                                        recyEntry.setVisibility(View.VISIBLE);
-                                    }
-                                });
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(context, "分錄刪除失敗", Toast.LENGTH_SHORT).show();
+                                prgBar.setVisibility(View.GONE);
+                                recyEntry.setVisibility(View.VISIBLE);
+                            }
+                        });
                     }
                 })
                 .setNegativeButton("否", null)

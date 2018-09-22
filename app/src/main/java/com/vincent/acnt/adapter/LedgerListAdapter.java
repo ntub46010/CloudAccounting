@@ -64,4 +64,10 @@ public class LedgerListAdapter extends BaseAdapter {
 
         return view;
     }
+
+    public void setRecords(List<LedgerRecord> records) {
+        this.records.clear();
+        this.records = records;
+        notifyDataSetChanged();
+    }
 }

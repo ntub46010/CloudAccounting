@@ -2,7 +2,7 @@ package com.vincent.acnt.entity;
 
 import java.io.Serializable;
 
-public class ReportItem implements Serializable {
+public class ReportItem {
     private String id, name;
     private int totalCredit, totalDebit, balance;
 

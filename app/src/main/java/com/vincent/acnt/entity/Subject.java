@@ -2,7 +2,7 @@ package com.vincent.acnt.entity;
 
 import java.io.Serializable;
 
-public class Subject implements Serializable {
+public class Subject implements Entity, Serializable {
     private long id;
     private int credit, debit;
     private String no, name;
@@ -32,6 +32,7 @@ public class Subject implements Serializable {
         return debit;
     }
 
+    @Override
     public String obtainDocumentId() {
         return documentId;
     }
@@ -56,6 +57,7 @@ public class Subject implements Serializable {
         this.debit = debit;
     }
 
+    @Override
     public void defineDocumentId(String documentId) {
         this.documentId = documentId;
     }

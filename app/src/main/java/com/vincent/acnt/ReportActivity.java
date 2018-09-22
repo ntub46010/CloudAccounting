@@ -3,7 +3,6 @@ package com.vincent.acnt;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -14,15 +13,10 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.vincent.acnt.accessor.EntryAccessor;
 import com.vincent.acnt.adapter.ReportPagerAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
-import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.ReportItem;
 import com.vincent.acnt.entity.Subject;
 
@@ -42,11 +36,11 @@ public class ReportActivity extends AppCompatActivity {
     private ViewPager vpgReport;
     private FloatingActionButton fabDate;
 
-    private List<Entry> entries;
     private Map<String, ReportItem> mapReportItem = new TreeMap<>();
     private ReportFragment[] reportFragments = new ReportFragment[5];
 
     private Dialog dlgWaiting;
+    private EntryAccessor accessor;
 
     private interface TaskListener { void onFinish();}
 
@@ -55,6 +49,8 @@ public class ReportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
         context = this;
+        accessor = new EntryAccessor(MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .collection(Constant.KEY_ENTRIES));
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
         toolbar = findViewById(R.id.toolbar);
@@ -105,16 +101,17 @@ public class ReportActivity extends AppCompatActivity {
 
         dlgWaiting = Utility.getWaitingDialog(context);
 
-        collectReportItems(Integer.parseInt(date), null);
+        //collectReportItems(Integer.parseInt(date), null);
+        loadReportItems(Integer.parseInt(date), null);
     }
 
-    private void collectReportItems(final int endDate, final TaskListener listener) {
+    private void loadReportItems(final int endDate, final TaskListener listener) {
         dlgWaiting.show();
         fabDate.setVisibility(View.INVISIBLE);
 
         //儲存各個科目的初始餘額
-        Subject subject;
         mapReportItem.clear();
+        Subject subject;
         ReportItem item;
 
         for (int i = 0, len = MyApp.mapSubjectById.size(); i < len; i++) {
@@ -129,77 +126,31 @@ public class ReportActivity extends AppCompatActivity {
             mapReportItem.put(subject.getNo(), item);
         }
 
-        searchInEntry(endDate, listener);
-    }
+        accessor.loadReportItems(endDate, mapReportItem, new EntryAccessor.RetrieveReportItemsListener() {
+            @Override
+            public void onRetrieve(Map<String, ReportItem> mapReportItem) {
+                if (listener == null) {
+                    setupFragment(); //加入頁面
+                } else {
+                    listener.onFinish();
+                }
 
-    private void searchInEntry(final int endDate, final TaskListener listener) {
-        entries = new ArrayList<>(256);
+                String date = String.valueOf(endDate);
+                toolbar.setTitle(String.format("財務報告  %s/%s/%s",
+                        date.substring(0, 4),
+                        date.substring(4, 6),
+                        date.substring(6, 8)
+                ));
 
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
-                .orderBy(Constant.PRO_DATE, Query.Direction.DESCENDING)
-                .orderBy(Constant.PRO_MEMO, Query.Direction.ASCENDING)
-                .whereLessThanOrEqualTo(Constant.PRO_DATE, endDate)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
-                            List<DocumentSnapshot> documentSnapshots = querySnapshot.getDocuments();
+                fabDate.setVisibility(View.VISIBLE);
+                dlgWaiting.dismiss();
+            }
 
-                            //儲存分錄
-                            for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
-                                entries.add(documentSnapshots.get(i).toObject(Entry.class));
-                            }
-
-                            //從各個分錄中將科目金額逐一儲存
-                            ReportItem item;
-                            for (int i = 0, len = entries.size(); i < len; i++) {
-                                List<Subject> subjects = entries.get(i).getSubjects();
-
-                                for (int j = 0, len2 = subjects.size(); j < len2; j++) {
-                                    Subject subject = subjects.get(j);
-                                    Subject s = MyApp.mapSubjectById.get(subject.getId());
-
-                                    if (mapReportItem.containsKey(s.getNo())) {
-                                        //科目已存在，取出累積金額，再放置回去
-                                        item = mapReportItem.get(s.getNo());
-
-                                        item.addCredit(subject.getCredit());
-                                        item.addDebit(subject.getDebit());
-                                    } else {
-                                        item = new ReportItem();
-
-                                        item.setId(s.getNo());
-                                        item.setName(s.getName());
-                                        item.addCredit(subject.getCredit());
-                                        item.addDebit(subject.getDebit());
-                                    }
-
-                                    mapReportItem.put(s.getNo(), item);
-                                }
-                            } //各個科目金額計算完畢
-
-                            if (listener == null) {
-                                setupFragment(); //加入頁面
-                            } else {
-                                listener.onFinish();
-                            }
-
-                            String date = String.valueOf(endDate);
-                            toolbar.setTitle(String.format("財務報告  %s/%s/%s",
-                                    date.substring(0, 4),
-                                    date.substring(4, 6),
-                                    date.substring(6, 8)
-                            ));
-
-                            fabDate.setVisibility(View.VISIBLE);
-                            dlgWaiting.dismiss();
-                        } else {
-                            Toast.makeText(context, "查詢分錄失敗", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "查詢分錄失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupFragment() {
@@ -207,8 +158,8 @@ public class ReportActivity extends AppCompatActivity {
 
         for (int i = 0; i < 5; i++) {
             reportFragments[i] = new ReportFragment();
-            reportFragments[i].setReportItems(getReportItemsByType(Constant.CODE_TYPE[i]));
             reportFragments[i].setType(Constant.CODE_TYPE[i]);
+            reportFragments[i].setReportItems(getReportItemsByType(Constant.CODE_TYPE[i]));
         }
 
         adapter.addFragment(reportFragments[0], "資產");
@@ -245,11 +196,12 @@ public class ReportActivity extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         month++;
-                        collectReportItems(Utility.getDateNumber(year, month, dayOfMonth), new TaskListener() {
+                        loadReportItems(Utility.getDateNumber(year, month, dayOfMonth), new TaskListener() {
                             @Override
                             public void onFinish() {
                                 for (int i = 0; i < 5; i++) {
                                     reportFragments[i].setType(Constant.CODE_TYPE[i]);
+                                    reportFragments[i].setReportItems(getReportItemsByType(Constant.CODE_TYPE[i]));
                                     reportFragments[i].onResume();
                                 }
                             }

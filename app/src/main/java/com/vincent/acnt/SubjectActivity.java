@@ -3,7 +3,6 @@ package com.vincent.acnt;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,8 +17,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.vincent.acnt.accessor.SubjectAccessor;
+import com.vincent.acnt.accessor.TaskFinishListener;
 import com.vincent.acnt.adapter.SubjectListAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
@@ -40,12 +39,15 @@ public class SubjectActivity extends AppCompatActivity {
     private int longClickPosition;
 
     private Subject subject;
+    private SubjectAccessor accessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subject);
         context = this;
+        accessor = new SubjectAccessor(MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .collection(Constant.KEY_SUBJECTS));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -114,19 +116,18 @@ public class SubjectActivity extends AppCompatActivity {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_SUBJECTS).document(subject.obtainDocumentId())
-                                .delete()
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Toast.makeText(context, "科目刪除成功", Toast.LENGTH_SHORT).show();
-                                            loadSubjects();
-                                        } else {
-                                            Toast.makeText(context, "科目刪除失敗", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                });
+                        accessor.delete(subject.obtainDocumentId(), new TaskFinishListener() {
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(context, "科目刪除成功", Toast.LENGTH_SHORT).show();
+                                loadSubjects();
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(context, "科目刪除失敗", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 })
                 .setNegativeButton("否", null)

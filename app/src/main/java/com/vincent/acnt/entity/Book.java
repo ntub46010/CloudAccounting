@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Book implements Serializable {
+public class Book implements Entity, Serializable {
     private String id;
     private String name, creator;
     private List<String> approvedMembers = new ArrayList<>(),
@@ -105,10 +105,12 @@ public class Book implements Serializable {
         adminMembers.remove(userId);
     }
 
+    @Override
     public String obtainDocumentId() {
         return documentId;
     }
 
+    @Override
     public void defineDocumentId(String documentId) {
         this.documentId = documentId;
     }

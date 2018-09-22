@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,16 +20,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.vincent.acnt.accessor.BookAccessor;
+import com.vincent.acnt.accessor.RetrieveEntitiesListener;
+import com.vincent.acnt.accessor.RetrieveEntityListener;
+import com.vincent.acnt.accessor.TaskFinishListener;
+import com.vincent.acnt.accessor.UserAccessor;
 import com.vincent.acnt.adapter.BookGridAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Book;
+import com.vincent.acnt.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,15 +43,20 @@ public class BookListActivity extends AppCompatActivity {
     private ProgressBar prgBar;
     private RelativeLayout layHint;
 
-    private Dialog dialog;
+    private List<Book> mBooks;
+    private BookGridAdapter adapter;
 
-    private List<Book> books;
+    private Dialog dialog;
+    private BookAccessor asrBook;
+    private UserAccessor asrUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
         context = this;
+        asrBook = new BookAccessor(MyApp.db.collection(Constant.KEY_BOOKS));
+        asrUser = new UserAccessor(MyApp.db.collection(Constant.KEY_USERS));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -80,7 +84,7 @@ public class BookListActivity extends AppCompatActivity {
         grdBook.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                requestToUseBook(books.get(position));
+                requestToUseBook(mBooks.get(position));
             }
         });
 
@@ -143,7 +147,6 @@ public class BookListActivity extends AppCompatActivity {
             grdBook.setVisibility(View.INVISIBLE);
 
             Toast.makeText(context, "您目前沒有帳本", Toast.LENGTH_SHORT).show();
-
             return;
         }
 
@@ -151,66 +154,54 @@ public class BookListActivity extends AppCompatActivity {
         grdBook.setVisibility(showPrgBar ? View.INVISIBLE : View.VISIBLE);
         fabAddBook.setVisibility(showPrgBar ? View.INVISIBLE : View.VISIBLE);
 
-        books = new ArrayList<>(16);
+        mBooks = new ArrayList<>(16);
 
-        CollectionReference ref = MyApp.db.collection(Constant.KEY_BOOKS);
+        asrBook.loadBooksByList(MyApp.user.getBooks(), new RetrieveEntitiesListener() {
+            @Override
+            public void onRetrieve(List<? extends Entity> entities) {
+                List<Book> books = (List<Book>) entities;
+                mBooks.clear();
+                mBooks.addAll(books);
 
-        for (int i = 0, len = MyApp.user.getBooks().size(); i < len; i++) {
-            ref.whereEqualTo(Constant.PRO_ID, MyApp.user.getBooks().get(i));
-        }
+                if (mBooks.isEmpty()) {
+                    TextView txtHint = findViewById(R.id.txtHint);
+                    txtHint.setText("您現在沒有帳本，點擊右下方按鈕加入帳本");
+                    layHint.setVisibility(View.VISIBLE);
+                } else {
+                    layHint.setVisibility(View.GONE);
+                }
 
-        ref.get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-                            books.clear();
-                            Book book;
+                if (adapter == null) {
+                    adapter = new BookGridAdapter(context, mBooks);
+                    grdBook.setAdapter(adapter);
+                } else {
+                    adapter.setBooks(mBooks);
+                }
 
-                            for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
-                                book = documentSnapshots.get(i).toObject(Book.class);
-                                book.defineDocumentId(documentSnapshots.get(i).getId());
-                                books.add(book);
-                            }
+                prgBar.setVisibility(View.GONE);
+                grdBook.setVisibility(View.VISIBLE);
+                fabAddBook.setVisibility(View.VISIBLE);
 
-                            if (books.isEmpty()) {
-                                TextView txtHint = findViewById(R.id.txtHint);
-                                txtHint.setText("您現在沒有帳本，點擊右下方按鈕加入帳本");
-                                layHint.setVisibility(View.VISIBLE);
-                            } else {
-                                layHint.setVisibility(View.GONE);
-                            }
+                if (mBooks.size() != MyApp.user.getBooks().size()) {
+                    removeMissingBook();
+                }
+            }
 
-                            grdBook.setAdapter(new BookGridAdapter(context, books));
-                            prgBar.setVisibility(View.GONE);
-                            grdBook.setVisibility(View.VISIBLE);
-                            fabAddBook.setVisibility(View.VISIBLE);
-
-                            if (books.size() != MyApp.user.getBooks().size()) {
-                                removeMissingBook();
-                            }
-                        }
-                    }
-                });
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context,"取得帳本失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void removeMissingBook() {
-        List<String> expectBookIds = MyApp.user.getBooks();
         List<String> actualBookIds = new ArrayList<>(16);
 
-        for (int i = 0, len = books.size(); i < len; i++) {
-            actualBookIds.add(books.get(i).getId());
+        for (int i = 0, len = mBooks.size(); i < len; i++) {
+            actualBookIds.add(mBooks.get(i).getId());
         }
 
-        for (int i = 0, len = expectBookIds.size(); i < len; i++) {
-            if (!actualBookIds.contains(expectBookIds.get(i))) {
-                expectBookIds.remove(i);
-            }
-        }
-
-        MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
-                .update(Constant.PRO_BOOKS, expectBookIds);
+        asrUser.patch(MyApp.user.obtainDocumentId(), Constant.PRO_BOOKS, actualBookIds, null);
     }
 
     private void createBook(String bookName) {
@@ -223,21 +214,18 @@ public class BookListActivity extends AppCompatActivity {
         book.setCreator(MyApp.user.getId());
         book.addAdminMember(MyApp.user.getId());
 
-        MyApp.db.collection(Constant.KEY_BOOKS)
-                .add(book)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if (task.isSuccessful()) {
-                            Book fakeBook = new Book();
-                            fakeBook.defineDocumentId(task.getResult().getId());
-                            addToMyBookList(book.getId(), fakeBook, Constant.MODE_CREATE);
-                        } else {
-                            Toast.makeText(context, "新增帳本失敗", Toast.LENGTH_SHORT).show();
-                            prgBar.setVisibility(View.GONE);
-                        }
-                    }
-                });
+        asrBook.create(book, new RetrieveEntityListener() {
+            @Override
+            public void onRetrieve(Entity entity) {
+                addToMyBookList(book.getId(), (Book) entity, Constant.MODE_CREATE);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "新增帳本失敗", Toast.LENGTH_SHORT).show();
+                prgBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void importBook(final String bookId) {
@@ -249,60 +237,51 @@ public class BookListActivity extends AppCompatActivity {
         prgBar.setVisibility(View.VISIBLE);
         fabAddBook.setVisibility(View.INVISIBLE);
 
-        MyApp.db.collection(Constant.KEY_BOOKS)
-                .whereEqualTo(Constant.PRO_ID, bookId)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            List<DocumentSnapshot> documentSnapshot = task.getResult().getDocuments();
-                            if (documentSnapshot.isEmpty()) {
-                                Toast.makeText(context, "該帳本不存在，請確認帳本ID", Toast.LENGTH_SHORT).show();
-                                prgBar.setVisibility(View.GONE);
-                            } else {
-                                DocumentSnapshot bookDocument = task.getResult().getDocuments().get(0);
-                                Book book = bookDocument.toObject(Book.class);
-                                book.defineDocumentId(bookDocument.getId());
-                                addToMyBookList(bookId, book, Constant.MODE_IMPORT);
-                            }
-                        } else {
-                            Toast.makeText(context, "帳本確認失敗", Toast.LENGTH_SHORT).show();
-                            prgBar.setVisibility(View.GONE);
-                        }
-                    }
-                });
+        asrBook.loadBookById(bookId, new RetrieveEntityListener() {
+            @Override
+            public void onRetrieve(Entity entity) {
+                if (entity == null) {
+                    Toast.makeText(context, "該帳本不存在，請確認帳本ID", Toast.LENGTH_SHORT).show();
+                    prgBar.setVisibility(View.GONE);
+                    return;
+                }
+
+                addToMyBookList(bookId, (Book) entity, Constant.MODE_IMPORT);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "帳本確認失敗", Toast.LENGTH_SHORT).show();
+                prgBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void addToMyBookList(final String bookId, final Book book, final int mode) {
         MyApp.user.addBooks(bookId);
 
-        MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
-                .update(Constant.PRO_BOOKS, MyApp.user.getBooks())
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(context, "加入帳本成功", Toast.LENGTH_SHORT).show();
-                            loadBooks(true);
+        asrUser.patch(MyApp.user.obtainDocumentId(), Constant.PRO_BOOKS, MyApp.user.getBooks(), new TaskFinishListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(context, "加入帳本成功", Toast.LENGTH_SHORT).show();
+                loadBooks(true);
 
-                            if (mode == Constant.MODE_IMPORT) {
-                                addMemberToBook(book);
-                            }
-                        } else {
-                            Toast.makeText(context, "加入帳本失敗", Toast.LENGTH_SHORT).show();
-                            prgBar.setVisibility(View.GONE);
-                        }
-                    }
-                });
+                if (mode == Constant.MODE_IMPORT) {
+                    addMemberToBook(book);
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "加入帳本失敗", Toast.LENGTH_SHORT).show();
+                prgBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void addMemberToBook(Book book) {
         book.addWaitingMember(MyApp.user.getId());
-
-        MyApp.db.collection(Constant.KEY_BOOKS)
-                .document(book.obtainDocumentId())
-                .set(book);
+        asrBook.patch(book.obtainDocumentId(), Constant.PRO_WAITING_MEMBERS, book.getWaitingMembers(), null);
 
         fabAddBook.setVisibility(View.VISIBLE);
     }
@@ -318,7 +297,6 @@ public class BookListActivity extends AppCompatActivity {
             startActivityForResult(it, 0);
 
             MyApp.browsingBook = book;
-
             return;
         }
 
@@ -330,18 +308,17 @@ public class BookListActivity extends AppCompatActivity {
         Toast.makeText(context, "您被拒絕使用該帳本，將從清單中移除", Toast.LENGTH_SHORT).show();
 
         MyApp.user.getBooks().remove(book.getId());
-        MyApp.db.collection(Constant.KEY_USERS).document(MyApp.user.obtainDocumentId())
-                .update(Constant.PRO_BOOKS, MyApp.user.getBooks())
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            loadBooks(true);
-                        } else {
-                            Toast.makeText(context, "移除帳本失敗", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        asrUser.patch(MyApp.user.obtainDocumentId(), Constant.PRO_BOOKS, MyApp.user.getBooks(), new TaskFinishListener() {
+            @Override
+            public void onSuccess() {
+                loadBooks(true);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "移除帳本失敗", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

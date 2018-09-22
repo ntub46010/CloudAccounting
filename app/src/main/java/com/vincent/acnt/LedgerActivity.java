@@ -2,17 +2,14 @@ package com.vincent.acnt;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -20,17 +17,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.vincent.acnt.accessor.EntryAccessor;
 import com.vincent.acnt.adapter.LedgerListAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.LedgerRecord;
-import com.vincent.acnt.entity.Subject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,14 +42,18 @@ public class LedgerActivity extends AppCompatActivity {
     private int queryFlag = -2;
     private boolean canQuery = true;
 
-    private List<Entry> entries;
-    private List<LedgerRecord> records;
+    private List<Entry> mEntries;
+    private LedgerListAdapter adapter;
+
+    private EntryAccessor accessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ledger);
         context = this;
+        accessor = new EntryAccessor(MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
+                .collection(Constant.KEY_ENTRIES));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -101,7 +97,7 @@ public class LedgerActivity extends AppCompatActivity {
         lstLedger.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Entry entry = entries.get(position);
+                Entry entry = mEntries.get(position);
                 if (entry != null) {
                     Intent it = new Intent(context, EntryDetailActivity.class);
                     Bundle bundle = new Bundle();
@@ -207,154 +203,38 @@ public class LedgerActivity extends AppCompatActivity {
         prgBar.setVisibility(View.VISIBLE);
         lstLedger.setVisibility(View.INVISIBLE);
 
-        int endYear = selectedYear;
-        int endMonth = selectedMonth + 1;
-        if (endMonth > 12) {
-            endYear++;
-            endMonth = 1;
-        }
-
-        entries = new ArrayList<>(256);
-        records = new ArrayList<>(64);
-        queryMonthlyRecord(
-                MyApp.mapSubjectByName.get(subjectName).getId(),
-                Utility.getDateNumber(selectedYear, selectedMonth, 1),
-                Utility.getDateNumber(endYear, endMonth, 1)
-        );
-    }
-
-    private void queryMonthlyRecord(final long subjectId, final int selectedDate, int endDate) {
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
-                .orderBy(Constant.PRO_DATE, Query.Direction.DESCENDING)
-                .orderBy(Constant.PRO_MEMO, Query.Direction.ASCENDING)
-                .whereGreaterThanOrEqualTo(Constant.PRO_DATE, selectedDate)
-                .whereLessThan(Constant.PRO_DATE, endDate)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(context, "查詢本月明細失敗", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-                        Entry entry;
-                        LedgerRecord record;
-
-                        for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
-                            entry = documentSnapshots.get(i).toObject(Entry.class);
-                            List<Subject> subjects = entry.getSubjects();
-
-                            for (int j = 0, len2 = subjects.size(); j < len2; j++) {
-                                Subject subject = subjects.get(j);
-
-                                if (subject.getId() == subjectId) {
-                                    //儲存分錄，供點擊清單後能顯示詳情，越前面越新
-                                    entries.add(entry);
-
-                                    //儲存明細，越前面是越新的紀錄
-                                    record = new LedgerRecord();
-                                    record.setDate(entry.getDate());
-                                    record.setMemo(entry.getMemo());
-                                    record.setCredit(subject.getCredit());
-                                    record.setDebit(subject.getDebit());
-
-                                    records.add(record);
+        accessor.loadLedgerItems(MyApp.mapSubjectByName.get(subjectName).getId(),
+                        Utility.getDateNumber(selectedYear, selectedMonth, 31),
+                        new EntryAccessor.RetrieveLedgerRecordListener() {
+                            @Override
+                            public void onRetrieve(List<LedgerRecord> records, List<Entry> entries) {
+                                if (records.isEmpty()) {
+                                    TextView txtHint = findViewById(R.id.txtHint);
+                                    txtHint.setText("該月沒有紀錄");
+                                    layHint.setVisibility(View.VISIBLE);
+                                } else {
+                                    layHint.setVisibility(View.GONE);
                                 }
-                            }
-                        }
 
-                        if (records.isEmpty()) {
-                            Toast.makeText(context, "本月沒有紀錄", Toast.LENGTH_SHORT).show();
-                        }
-
-                        //若選擇1月，則略過查詢歷史總額，否則繼續查詢
-                        if (String.valueOf(selectedDate).substring(4).equals("0101")) {
-                            queryOriginBalance(subjectId, selectedDate);
-                        } else {
-                            queryHistoryRecord(subjectId, selectedDate);
-                        }
-                    }
-                });
-    }
-
-    private void queryHistoryRecord(final long subjectId, final int selectedDate) {
-        MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId()).collection(Constant.KEY_ENTRIES)
-                .whereLessThan(Constant.PRO_DATE, selectedDate)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(context, "查詢歷史明細失敗", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        Entry entry;
-                        int totalCredit = 0, totalDebit = 0;
-
-                        //從歷史分錄中計算累積借貸總額
-                        List<DocumentSnapshot > documentSnapshots = task.getResult().getDocuments();
-                        for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
-                            entry = documentSnapshots.get(i).toObject(Entry.class);
-
-                            for (Subject subject : entry.getSubjects()) {
-                                if (subject.getId() == subjectId) {
-                                    totalCredit += subject.getCredit();
-                                    totalDebit += subject.getDebit();
+                                //顯示清單
+                                if (adapter == null) {
+                                    adapter = new LedgerListAdapter(context, records);
+                                    lstLedger.setAdapter(adapter);
+                                } else {
+                                    adapter.setRecords(records);
                                 }
+
+                                mEntries = entries;
+
+                                prgBar.setVisibility(View.GONE);
+                                lstLedger.setVisibility(View.VISIBLE);
+                                canQuery = true;
                             }
-                        }
 
-                        LedgerRecord record = new LedgerRecord();
-                        record.setDate(selectedDate);
-                        record.setMemo("(歷史累積紀錄)");
-                        record.setCredit(totalCredit);
-                        record.setDebit(totalDebit);
-
-                        records.add(record);
-                        entries.add(null);
-
-                        //繼續查詢初始餘額
-                        queryOriginBalance(subjectId, selectedDate);
-                    }
-                });
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(context, "查詢明細失敗", Toast.LENGTH_SHORT).show();
+                            }
+                        });
     }
-
-    private void queryOriginBalance(final long subjectId, final int selectedDate) {
-        Subject subject = MyApp.mapSubjectById.get(subjectId);
-
-        LedgerRecord record = new LedgerRecord();
-        record.setDate((selectedDate / 10000) * 10000 + 101); //修正為當年1/1，如20180101
-        record.setMemo("(初始餘額)");
-        record.setCredit(subject.getCredit());
-        record.setDebit(subject.getDebit());
-
-        records.add(record);
-        entries.add(null);
-
-        //計算清單項目所要顯示的餘額
-        LedgerRecord r = records.get(records.size() - 1);
-        r.setBalance(r.getCredit() - r.getDebit());
-        for (int i = records.size() - 2; i >= 0; i--) {
-            r = records.get(i);
-            r.setBalance(records.get(i + 1).getBalance() + r.getCredit() - r.getDebit());
-        }
-
-        if (records.isEmpty()) {
-            TextView txtHint = findViewById(R.id.txtHint);
-            txtHint.setText("該月沒有紀錄");
-            layHint.setVisibility(View.VISIBLE);
-        } else {
-            layHint.setVisibility(View.GONE);
-        }
-
-        //顯示清單
-        lstLedger.setAdapter(new LedgerListAdapter(context, records));
-        prgBar.setVisibility(View.GONE);
-        lstLedger.setVisibility(View.VISIBLE);
-        canQuery = true;
-    }
-
 }

@@ -2,7 +2,6 @@ package com.vincent.acnt;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -11,26 +10,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.vincent.acnt.accessor.BookAccessor;
 import com.vincent.acnt.adapter.MemberPagerAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
-import com.vincent.acnt.entity.Book;
 import com.vincent.acnt.entity.User;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import javax.annotation.Nullable;
 
 public class BookMemberActivity extends AppCompatActivity {
     private Context context;
@@ -41,21 +29,20 @@ public class BookMemberActivity extends AppCompatActivity {
     private BookMemberFragment[] memberFragments = new BookMemberFragment[2];
     private MemberPagerAdapter adapter;
 
-    private Set<String> userIds = new HashSet<>();
     private List<User> legalMembers = new ArrayList<>(), waitingMembers = new ArrayList<>();
 
     private boolean isFirstIn = true;
 
     private Dialog dlgWaiting;
-
-    private CollectionReference ref;
-    private ListenerRegistration lsrBook;
+    private BookAccessor asrBook;
+    private ListenerRegistration regBook;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_member);
         context = this;
+        asrBook = new BookAccessor(MyApp.db.collection(Constant.KEY_BOOKS));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(activityTitle);
@@ -110,67 +97,41 @@ public class BookMemberActivity extends AppCompatActivity {
     private void loadMembers() {
         dlgWaiting.show();
 
-        lsrBook = MyApp.db.collection(Constant.KEY_BOOKS).document(MyApp.browsingBook.obtainDocumentId())
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        Book book = documentSnapshot.toObject(Book.class);
+        regBook = asrBook.observeBookMembersById(MyApp.browsingBook.obtainDocumentId(), new BookAccessor.RetrieveBookMembersListener() {
+            @Override
+            public void onRetrieve(List<User> members) {
+                legalMembers.clear();
+                waitingMembers.clear();
 
-                        legalMembers.clear();
-                        waitingMembers.clear();
-                        userIds.clear();
+                List<User> approvedMembers = new ArrayList<>(16);
+                User user;
 
-                        userIds.addAll(book.getAdminMembers());
-                        userIds.addAll(book.getApprovedMembers());
-                        userIds.addAll(book.getWaitingMembers());
+                for (int i = 0, len = members.size(); i < len; i++) {
+                    user = members.get(i);
 
-                        ref = MyApp.db.collection(Constant.KEY_USERS);
-
-                        for (String userId : userIds) {
-                            ref.whereEqualTo(Constant.PRO_ID, userId);
-                        }
-
-                        sortMembers();
+                    if (MyApp.browsingBook.isAdminUser(user.getId())) {
+                        legalMembers.add(user);
                     }
-                });
-    }
 
-    private void sortMembers() {
-        ref.get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-                            List<User> approvedMembers = new ArrayList<>();
-                            User user;
-
-                            for (int i = 0, len = documentSnapshots.size(); i < len; i++) {
-                                user = documentSnapshots.get(i).toObject(User.class);
-                                user.defineDocumentId(documentSnapshots.get(i).getId());
-
-                                if (MyApp.browsingBook.isAdminUser(user.getId())) {
-                                    legalMembers.add(user);
-                                }
-
-                                if (MyApp.browsingBook.isApprovedUser(user.getId())) {
-                                    approvedMembers.add(user);
-                                }
-
-                                if (MyApp.browsingBook.isWaitingUser(user.getId())) {
-                                    waitingMembers.add(user);
-                                }
-                            }
-
-                            legalMembers.addAll(approvedMembers);
-
-                            showMembers();
-                        } else {
-                            Toast.makeText(context, "取得使用者資料失敗", Toast.LENGTH_SHORT).show();
-                            dlgWaiting.dismiss();
-                        }
+                    if (MyApp.browsingBook.isApprovedUser(user.getId())) {
+                        approvedMembers.add(user);
                     }
-                });
+
+                    if (MyApp.browsingBook.isWaitingUser(user.getId())) {
+                        waitingMembers.add(user);
+                    }
+                }
+
+                legalMembers.addAll(approvedMembers);
+                showMembers();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(context, "取得使用者資料失敗", Toast.LENGTH_SHORT).show();
+                dlgWaiting.dismiss();
+            }
+        });
     }
 
     private void showMembers() {
@@ -187,8 +148,6 @@ public class BookMemberActivity extends AppCompatActivity {
             adapter.setTitle(0, String.format("全部（ %d ）", legalMembers.size()));
             adapter.setTitle(1, String.format("待批准（ %d ）", waitingMembers.size()));
             adapter.notifyDataSetChanged();
-            memberFragments[0].getAdapter().notifyDataSetChanged();
-            memberFragments[1].getAdapter().notifyDataSetChanged();
         }
 
         dlgWaiting.dismiss();
@@ -196,7 +155,7 @@ public class BookMemberActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        lsrBook.remove();
+        regBook.remove();
         super.onDestroy();
     }
 }

@@ -14,6 +14,7 @@ public class Constant {
     public static final String PRO_ID = "id";
     public static final String PRO_NAME = "name";
     public static final String PRO_BOOKS = "books";
+    public static final String PRO_ADMIN_MEMBERS = "adminMembers";
     public static final String PRO_APPROVED_MEMBERS = "approvedMembers";
     public static final String PRO_WAITING_MEMBERS = "waitingMembers";
     public static final String PRO_SUBJECT_NO = "no";
