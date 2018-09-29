@@ -5,7 +5,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.entity.Subject;
 
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ public class SubjectAccessor extends BaseAccessor {
 
     public ListenerRegistration observeSubjects(final RetrieveEntitiesListener listener) {
         return super.collection
+                .orderBy(Constant.PRO_SUBJECT_NO, Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
