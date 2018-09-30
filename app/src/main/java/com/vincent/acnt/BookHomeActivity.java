@@ -142,18 +142,24 @@ public class BookHomeActivity extends AppCompatActivity {
             @Override
             public void onRetrieve(List<? extends Entity> entities) {
                 List<Subject> subjects = (List<Subject>) entities;
-                Subject subject;
+                //Subject subject;
 
+                /*
                 MyApp.mapSubjectById.clear();
                 MyApp.mapSubjectByName.clear();
                 MyApp.mapSubjectByNo.clear();
+                */
 
+                MyApp.subjectTable.clear();
                 for (int i = 0, len = subjects.size(); i < len; i++) {
+                    MyApp.subjectTable.add(subjects.get(i));
+                    /*
                     subject = subjects.get(i);
 
                     MyApp.mapSubjectById.put(subject.getId(), subject);
                     MyApp.mapSubjectByNo.put(subject.getNo(), subject);
                     MyApp.mapSubjectByName.put(subject.getName(), subject);
+                    */
                 }
 
                 observeTodayStatement();
@@ -207,9 +213,12 @@ public class BookHomeActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         MyApp.browsingBook = null;
+        /*
         MyApp.mapSubjectById.clear();
         MyApp.mapSubjectByNo.clear();
         MyApp.mapSubjectByName.clear();
+        */
+        MyApp.subjectTable.clear();
         MyApp.thisMonthEntries.clear();
         regSubject.remove();
         regEntry.remove();

@@ -154,9 +154,17 @@ public class SubjectEditActivity extends AppCompatActivity {
         }
 
         if (bundle.getInt(Constant.KEY_MODE) == Constant.MODE_CREATE) {
+            if (MyApp.subjectTable.existByProperty(Constant.PRO_SUBJECT_NO, subject.getNo())) {
+                errMsg.append("科目編號").append(subject.getNo()).append("已被使用\n");
+            } else if (MyApp.subjectTable.existByProperty(Constant.PRO_SUBJECT_NO, subject.getName())) {
+                errMsg.append("科目名稱").append(subject.getNo()).append("已被使用\n");
+            }
+
+            /*
             if (MyApp.mapSubjectByNo.containsKey(subject.getNo())) {
                 errMsg.append("科目編號").append(subject.getNo()).append("已被使用\n");
             }
+            */
         }
 
         errMsg.append(v.chkSubjectNo(String.valueOf(subject.getNo())));

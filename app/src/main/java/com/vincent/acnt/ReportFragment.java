@@ -52,7 +52,7 @@ public class ReportFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent it = new Intent(context, LedgerActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString(Constant.KEY_SUBJECT, reportItems.get(position).getName());
+                bundle.putString(Constant.PRO_NAME, reportItems.get(position).getName());
                 it.putExtras(bundle);
                 context.startActivity(it);
             }

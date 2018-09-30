@@ -57,21 +57,23 @@ public class EntryDetailActivity extends AppCompatActivity {
 
         LayoutInflater inflater = LayoutInflater.from(context);
         TextView txtSubject, txtCredit, txtDebit;
+        Subject subject;
 
-        for (Subject subject : entry.getSubjects()) {
+        for (Subject abstractSubject : entry.getSubjects()) {
             RelativeLayout layElement = (RelativeLayout) inflater.inflate(R.layout.lst_entry_element_detail, null);
             txtSubject = layElement.findViewById(R.id.txtSubject);
             txtCredit = layElement.findViewById(R.id.txtCredit);
             txtDebit = layElement.findViewById(R.id.txtDebit);
 
-            Subject s = MyApp.mapSubjectById.get(subject.getId());
-            txtSubject.setText(s.getName());
-            txtSubject.setTextColor(Utility.getSubjectColor(s));
+            //subjectElement = MyApp.mapSubjectById.get(subject.getId());
+            subject = MyApp.subjectTable.findFirstByProperty(Constant.PRO_ID, abstractSubject.getId());
+            txtSubject.setText(subject.getName());
+            txtSubject.setTextColor(Utility.getSubjectColor(subject));
 
-            if (subject.getDebit() == 0) {
-                txtCredit.setText(NumberFormat.getNumberInstance(Locale.US).format(subject.getCredit()));
+            if (abstractSubject.getDebit() == 0) {
+                txtCredit.setText(NumberFormat.getNumberInstance(Locale.US).format(abstractSubject.getCredit()));
             } else {
-                txtDebit.setText(NumberFormat.getNumberInstance(Locale.US).format(subject.getDebit()));
+                txtDebit.setText(NumberFormat.getNumberInstance(Locale.US).format(abstractSubject.getDebit()));
             }
 
             laySubjectContainer.addView(layElement);

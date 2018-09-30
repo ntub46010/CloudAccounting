@@ -111,9 +111,23 @@ public class ReportActivity extends AppCompatActivity {
 
         //儲存各個科目的初始餘額
         mapReportItem.clear();
-        Subject subject;
+        Subject s;
         ReportItem item;
 
+        List<Subject> subjects = MyApp.subjectTable.findAll();
+        for (int i = 0, len = subjects.size(); i < len; i++) {
+            s = subjects.get(i);
+
+            item = new ReportItem();
+            item.setId(s.getNo());
+            item.setName(s.getName());
+            item.addCredit(s.getCredit());
+            item.addDebit(s.getDebit());
+
+            mapReportItem.put(s.getNo(), item);
+        }
+
+        /*
         for (int i = 0, len = MyApp.mapSubjectById.size(); i < len; i++) {
             subject = MyApp.mapSubjectById.valueAt(i);
             item = new ReportItem();
@@ -125,6 +139,7 @@ public class ReportActivity extends AppCompatActivity {
 
             mapReportItem.put(subject.getNo(), item);
         }
+        */
 
         accessor.loadReportItems(endDate, mapReportItem, new EntryAccessor.RetrieveReportItemsListener() {
             @Override

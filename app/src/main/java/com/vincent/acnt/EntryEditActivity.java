@@ -138,9 +138,12 @@ public class EntryEditActivity extends AppCompatActivity {
     private void loadSubjects() {
         ArrayAdapter<String> adpSubjectName = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
 
+        adpSubjectName.addAll((List<? extends String>)(List<?>) MyApp.subjectTable.findAllPropertyValues(Constant.PRO_NAME));
+        /*
         for (int i = 0, len = MyApp.mapSubjectById.size(); i < len; i++) {
             adpSubjectName.add(MyApp.mapSubjectById.valueAt(i).getName());
         }
+        */
 
         for (EntryElementView view : elementViews) {
             view.getActSubjectName().setAdapter(adpSubjectName);
@@ -267,11 +270,12 @@ public class EntryEditActivity extends AppCompatActivity {
             subject = entry.getSubjects().get(i);
 
             //分錄中的科目只儲存ID，不儲存名稱
-            if (MyApp.mapSubjectByName.containsKey(subject.getName())) {
-                subject.setId(MyApp.mapSubjectByName.get(subject.getName()).getId());
-                subject.setName(null);
-            } else {
+            Subject s = MyApp.subjectTable.findFirstByProperty(Constant.PRO_NAME, subject.getName());
+            if (s == null) {
                 unknownSubject.append(subject.getName()).append("、");
+            } else {
+                subject.setId(s.getId());
+                subject.setName(null);
             }
         }
 

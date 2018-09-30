@@ -83,6 +83,18 @@ public class ObjectTableTest {
         assertTrue(table.findAllByProperty("id", 0).isEmpty());
     }
 
+    @Test
+    public void checkTupleIsExistByValue() throws Exception {
+        ObjectTable<Subject> table = generateFullTable();
+        assertTrue(table.existByProperty("credit", 0));
+    }
+
+    @Test
+    public void findSiblingValueByProperty() throws Exception {
+        ObjectTable<Subject> table = generateFullTable();
+        assertEquals(0, table.findSiblingValueByProperty("id", 3, "credit"));
+    }
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void removeObjectFromNonexistentIndex() throws Exception {
         ObjectTable<Subject> table = new ObjectTable<>(Subject.class);
@@ -98,17 +110,7 @@ public class ObjectTableTest {
 
     @Test(expected = NoSuchPropertyException.class)
     public void findObjectByNonexistentProperty() throws Exception {
-        ObjectTable<Subject> table = new ObjectTable<>(Subject.class);
-        Subject subject;
-
-        for (int i = 0; i < 3; i++) {
-            subject = new Subject();
-            subject.setId(i);
-            subject.setName("Name of " + String.valueOf(i));
-
-            table.add(subject);
-        }
-
+        ObjectTable<Subject> table = generateFullTable();
         table.findFirstByProperty("createTime", 20180929);
     }
 
@@ -129,7 +131,7 @@ public class ObjectTableTest {
         assertEquals(0, table.size());
     }
 
-    private ObjectTable generateFullTable() throws Exception {
+    private ObjectTable<Subject> generateFullTable() throws Exception {
         ObjectTable<Subject> table = new ObjectTable<>(Subject.class);
         Subject subject;
 

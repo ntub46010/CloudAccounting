@@ -24,28 +24,32 @@ public class ObjectTable<E> {
     private final String[] ACCEPTED_MUTATOR_METHODS_PREFIX = {"set", "define"};
     private static final int DEFAULT_CAPACITY = 16;
 
-    public ObjectTable(Class clz, int initialCapacity) throws NoSuchMethodException {
+    public ObjectTable(Class clz, int initialCapacity) {
         this.fields = clz.getDeclaredFields();
         this.objects = new Object[initialCapacity][fields.length];
-        this.constructor = clz.getConstructor();
         this.mapFieldIndexByName = new HashMap<>();
 
         prepareUtils(clz);
     }
 
-    public ObjectTable(Class clz) throws NoSuchMethodException {
+    public ObjectTable(Class clz) {
         this(clz, DEFAULT_CAPACITY);
     }
 
-    public void add(E object) throws IllegalAccessException {
+    public void add(E object) {
         if (size >= capacity()) {
             expandCapacity();
         }
 
         int fieldIndex;
-        for (int i = 0;  i < fields.length; i++) {
-            fieldIndex = mapFieldIndexByName.get(fields[i].getName().toLowerCase());
-            objects[size][fieldIndex] = fields[i].get(object);
+
+        try {
+            for (int i = 0;  i < fields.length; i++) {
+                fieldIndex = mapFieldIndexByName.get(fields[i].getName().toLowerCase());
+                objects[size][fieldIndex] = fields[i].get(object);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
         size++;
@@ -60,10 +64,18 @@ public class ObjectTable<E> {
         size--;
     }
 
-    public E findFirstByProperty(String fieldName, Object expectedValue) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (!mapFieldIndexByName.containsKey(fieldName)) {
-            throw new NoSuchPropertyException("No such property called " + fieldName);
+    public List<E> findAll() {
+        List<E> results = new ArrayList<>();
+
+        for (int row = 0; row < size; row++) {
+            results.add(constructObject(objects[row]));
         }
+
+        return results;
+    }
+
+    public E findFirstByProperty(String fieldName, Object expectedValue) {
+        checkFieldIsExist(fieldName);
 
         int fieldIndex = mapFieldIndexByName.get(fieldName);
 
@@ -76,10 +88,8 @@ public class ObjectTable<E> {
         return null;
     }
 
-    public List<E> findAllByProperty(String fieldName, Object expectedValue) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-        if (!mapFieldIndexByName.containsKey(fieldName)) {
-            throw new NoSuchPropertyException("No such property called " + fieldName);
-        }
+    public List<E> findAllByProperty(String fieldName, Object expectedValue) {
+        checkFieldIsExist(fieldName);
 
         List<E> results = new ArrayList<>();
         int fieldIndex = mapFieldIndexByName.get(fieldName);
@@ -91,6 +101,49 @@ public class ObjectTable<E> {
         }
 
         return results;
+    }
+
+    public Object findSiblingValueByProperty(String fieldName, Object expectedValue, String siblingFieldName) {
+        checkFieldIsExist(fieldName);
+        checkFieldIsExist(siblingFieldName);
+
+        int fieldIndex = mapFieldIndexByName.get(fieldName);
+        int siblingFieldIndex = mapFieldIndexByName.get(siblingFieldName);
+
+        for (int i = 0; i < size; i++) {
+            if (String.valueOf(objects[i][fieldIndex]).equals(String.valueOf(expectedValue))) {
+                return objects[i][siblingFieldIndex];
+            }
+        }
+
+        return null;
+    }
+
+    public List<Object> findAllPropertyValues(String fieldName) {
+        checkFieldIsExist(fieldName);
+
+        List<Object> values = new ArrayList<>();
+        int fieldIndex = mapFieldIndexByName.get(fieldName);
+
+        for (int i = 0; i < size; i++) {
+            values.add(objects[i][fieldIndex]);
+        }
+
+        return values;
+    }
+
+    public boolean existByProperty(String fieldName, Object expectedValue) {
+        checkFieldIsExist(fieldName);
+
+        int fieldIndex = mapFieldIndexByName.get(fieldName);
+
+        for (int i = 0; i < size; i++) {
+            if (String.valueOf(objects[i][fieldIndex]).equals(String.valueOf(expectedValue))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public int capacity() {
@@ -111,6 +164,12 @@ public class ObjectTable<E> {
     }
 
     private void prepareUtils(Class clz) {
+        try {
+            this.constructor = clz.getConstructor();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
         for (int i = 0; i < fields.length; i++) {
             fields[i].setAccessible(true);
             this.mapFieldIndexByName.put(fields[i].getName().toLowerCase(), i);
@@ -137,22 +196,27 @@ public class ObjectTable<E> {
         objects = newObjects;
     }
 
-    private E constructObject(Object[] propertyValues) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        E output = (E) constructor.newInstance();
-        String methodName;
-        int fieldIndex;
+    private E constructObject(Object[] propertyValues) {
+        try {
+            E output = (E) constructor.newInstance();
+            String methodName;
+            int fieldIndex;
 
-        for (int i = 0; i < mutatorMethods.size(); i++) {
-            methodName = mutatorMethods.get(i).getName();
-            int lenMutatorPrefix = calMutatorPrefixLen(methodName);
+            for (int i = 0; i < mutatorMethods.size(); i++) {
+                methodName = mutatorMethods.get(i).getName();
+                int lenMutatorPrefix = calMutatorPrefixLen(methodName);
 
-            if (lenMutatorPrefix > 0) {
-                fieldIndex = mapFieldIndexByName.get(methodName.substring(lenMutatorPrefix).toLowerCase());
-                mutatorMethods.get(i).invoke(output, propertyValues[fieldIndex]);
+                if (lenMutatorPrefix > 0) {
+                    fieldIndex = mapFieldIndexByName.get(methodName.substring(lenMutatorPrefix).toLowerCase());
+                    mutatorMethods.get(i).invoke(output, propertyValues[fieldIndex]);
+                }
             }
-        }
 
-        return output;
+            return output;
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private int calMutatorPrefixLen(String methodName) {
@@ -163,6 +227,12 @@ public class ObjectTable<E> {
             }
         }
         return -1;
+    }
+
+    private void checkFieldIsExist(String fieldName) {
+        if (!mapFieldIndexByName.containsKey(fieldName)) {
+            throw new NoSuchPropertyException("No such property called " + fieldName);
+        }
     }
 
     public String toString() {
