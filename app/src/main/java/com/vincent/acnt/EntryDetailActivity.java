@@ -65,7 +65,6 @@ public class EntryDetailActivity extends AppCompatActivity {
             txtCredit = layElement.findViewById(R.id.txtCredit);
             txtDebit = layElement.findViewById(R.id.txtDebit);
 
-            //subjectElement = MyApp.mapSubjectById.get(subject.getId());
             subject = MyApp.subjectTable.findFirstByProperty(Constant.PRO_ID, abstractSubject.getId());
             txtSubject.setText(subject.getName());
             txtSubject.setTextColor(Utility.getSubjectColor(subject));

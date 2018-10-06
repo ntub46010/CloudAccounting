@@ -90,14 +90,7 @@ public class SubjectActivity extends AppCompatActivity {
     }
 
     private void loadSubjects() {
-        //List<Subject> subjects = new ArrayList<>(64);
         List<Subject> subjects = MyApp.subjectTable.findAll();
-
-        /*
-        for (String subjectNo : MyApp.mapSubjectByNo.keySet()) {
-            subjects.add(MyApp.mapSubjectByNo.get(subjectNo));
-        }
-        */
 
         if (subjects.isEmpty()) {
             TextView txtHint = findViewById(R.id.txtHint);

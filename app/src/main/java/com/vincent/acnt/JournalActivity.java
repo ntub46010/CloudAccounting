@@ -90,7 +90,7 @@ public class JournalActivity extends AppCompatActivity {
             }
         });
 
-        setupSpinner();
+        //setupSpinner();
 
         adapter = new EntryCardAdapter(context, MyApp.thisMonthEntries);
         recyEntry.setAdapter(adapter);

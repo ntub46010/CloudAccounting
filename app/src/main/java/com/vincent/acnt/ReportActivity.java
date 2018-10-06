@@ -127,20 +127,6 @@ public class ReportActivity extends AppCompatActivity {
             mapReportItem.put(s.getNo(), item);
         }
 
-        /*
-        for (int i = 0, len = MyApp.mapSubjectById.size(); i < len; i++) {
-            subject = MyApp.mapSubjectById.valueAt(i);
-            item = new ReportItem();
-
-            item.setId(subject.getNo());
-            item.setName(subject.getName());
-            item.addCredit(subject.getCredit());
-            item.addDebit(subject.getDebit());
-
-            mapReportItem.put(subject.getNo(), item);
-        }
-        */
-
         accessor.loadReportItems(endDate, mapReportItem, new EntryAccessor.RetrieveReportItemsListener() {
             @Override
             public void onRetrieve(Map<String, ReportItem> mapReportItem) {

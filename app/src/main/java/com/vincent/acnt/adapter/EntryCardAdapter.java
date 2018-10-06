@@ -112,7 +112,7 @@ public class EntryCardAdapter extends RecyclerView.Adapter<EntryCardAdapter.Data
         ));
         holder.txtMemo.setText(entry.getMemo());
 
-        if (entry.getCreator().equals(MyApp.user.getId())) {
+        if (entry.getCreator() != null && entry.getCreator().equals(MyApp.user.getId())) {
             holder.imgCreator.setVisibility(View.VISIBLE);
         } else {
             holder.imgCreator.setVisibility(View.GONE);

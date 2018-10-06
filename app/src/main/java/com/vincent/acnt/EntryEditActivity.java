@@ -139,11 +139,6 @@ public class EntryEditActivity extends AppCompatActivity {
         ArrayAdapter<String> adpSubjectName = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
 
         adpSubjectName.addAll((List<? extends String>)(List<?>) MyApp.subjectTable.findAllPropertyValues(Constant.PRO_NAME));
-        /*
-        for (int i = 0, len = MyApp.mapSubjectById.size(); i < len; i++) {
-            adpSubjectName.add(MyApp.mapSubjectById.valueAt(i).getName());
-        }
-        */
 
         for (EntryElementView view : elementViews) {
             view.getActSubjectName().setAdapter(adpSubjectName);

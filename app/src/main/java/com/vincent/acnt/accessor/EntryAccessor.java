@@ -68,7 +68,6 @@ public class EntryAccessor extends BaseAccessor {
                             for (int j = 0, len2 = subjects.size(); j < len2; j++) {
                                 //將分錄中的科目補上名稱
                                 subject = subjects.get(j);
-                                //s = MyApp.mapSubjectById.get(subject.getId());
                                 s = MyApp.subjectTable.findFirstByProperty(Constant.PRO_ID, subject.getId());
                                 subject.setName(s.getName());
 
@@ -132,9 +131,8 @@ public class EntryAccessor extends BaseAccessor {
                             subjects = entry.getSubjects();
                             for (int j = 0, len2 = subjects.size(); j < len2; j++) {
                                 subject = subjects.get(j);
-                                subject.setName((String) MyApp.subjectTable.findSiblingValueByProperty(
-                                        Constant.PRO_ID, subject.getId(), Constant.PRO_NAME));
-                                //subject.setName(MyApp.mapSubjectById.get(subject.getId()).getName());
+                                subject.setName((String) MyApp.subjectTable
+                                        .findSiblingValueByProperty(Constant.PRO_ID, subject.getId(), Constant.PRO_NAME));
                             }
 
                             entries.add(entry);
@@ -215,7 +213,6 @@ public class EntryAccessor extends BaseAccessor {
                         }
 
                         //加入期初餘額
-                        //Subject s = MyApp.mapSubjectById.get(subjectId);
                         Subject s = MyApp.subjectTable.findFirstByProperty(Constant.PRO_ID, subjectId);
                         LedgerRecord originalItem = new LedgerRecord();
                         originalItem.setDate((endOfMonth / 10000) * 10000 + 101); //修正為當年1/1，如20180101
@@ -270,7 +267,6 @@ public class EntryAccessor extends BaseAccessor {
 
                             for (int j = 0, len2 = subjects.size(); j < len2; j++) {
                                 subject = subjects.get(j);
-                                //s = MyApp.mapSubjectById.get(subject.getId());
                                 s = MyApp.subjectTable.findFirstByProperty(Constant.PRO_ID, subject.getId());
 
                                 if (mapReportItem.containsKey(s.getNo())) {

@@ -181,12 +181,6 @@ public class LedgerActivity extends AppCompatActivity {
     private void loadSubjects() {
         ArrayAdapter<String> adpSubjectName = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
 
-        /*
-        for (int i = 0, len = MyApp.mapSubjectById.size(); i < len; i++) {
-            //adpSubjectName.add(MyApp.mapSubjectById.valueAt(i).getName());
-        }
-        */
-
         adpSubjectName.addAll((List<? extends String>)(List<?>) MyApp.subjectTable.findAllPropertyValues(Constant.PRO_NAME));
 
         actSubjectName.setAdapter(adpSubjectName);
