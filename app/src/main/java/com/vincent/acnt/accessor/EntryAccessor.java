@@ -18,6 +18,7 @@ import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.LedgerRecord;
 import com.vincent.acnt.entity.ReportItem;
 import com.vincent.acnt.entity.Subject;
+import com.vincent.acnt.entity.SubjectType;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class EntryAccessor extends BaseAccessor {
                                 subject.setName(s.getName());
 
                                 //累計支出
-                                if (s.getNo().substring(0, 1).equals(Constant.CODE_TYPE[4])) {
+                                if (s.getNo().substring(0, 1).equals(SubjectType.EXPENSE.getCode())) {
                                     if (entry.getDate() >= thisMonthStartDate) {
                                         thisMonthExpanseCredit += subject.getCredit();
                                         thisMonthExpanseDebit += subject.getDebit();

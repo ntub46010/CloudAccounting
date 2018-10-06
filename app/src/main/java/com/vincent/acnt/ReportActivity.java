@@ -19,6 +19,7 @@ import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.ReportItem;
 import com.vincent.acnt.entity.Subject;
+import com.vincent.acnt.entity.SubjectType;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -156,11 +157,14 @@ public class ReportActivity extends AppCompatActivity {
 
     private void setupFragment() {
         ReportPagerAdapter adapter = new ReportPagerAdapter(getSupportFragmentManager());
+        SubjectType subjectType;
 
         for (int i = 0; i < 5; i++) {
+            subjectType = SubjectType.getType(String.valueOf(i + 1));
+
             reportFragments[i] = new ReportFragment();
-            reportFragments[i].setType(Constant.CODE_TYPE[i]);
-            reportFragments[i].setReportItems(getReportItemsByType(Constant.CODE_TYPE[i]));
+            reportFragments[i].setType(subjectType);
+            reportFragments[i].setReportItems(getReportItemsByType(subjectType));
         }
 
         adapter.addFragment(reportFragments[0], "資產");
@@ -172,13 +176,13 @@ public class ReportActivity extends AppCompatActivity {
         vpgReport.setAdapter(adapter);
     }
 
-    private List<ReportItem> getReportItemsByType(String type) {
+    private List<ReportItem> getReportItemsByType(SubjectType subjectType) {
         List<ReportItem> reportItems = new ArrayList<>(32);
         ReportItem item;
 
         // 由於mapReportItem使用TreeMap實作，因此取得的項目將會依照科目編號排列並依序存入List
         for (String subjectNo : mapReportItem.keySet()) {
-            if (subjectNo.substring(0, 1).equals(type)) {
+            if (subjectNo.substring(0, 1).equals(subjectType.getCode())) {
                 item = mapReportItem.get(subjectNo);
                 item.calBalance();
 
@@ -191,6 +195,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private void prepareRefreshReport() {
         Calendar now = Calendar.getInstance();
+
         DatePickerDialog dlgDate = new DatePickerDialog(
                 context,
                 new DatePickerDialog.OnDateSetListener() {
@@ -200,9 +205,13 @@ public class ReportActivity extends AppCompatActivity {
                         loadReportItems(Utility.getDateNumber(year, month, dayOfMonth), new TaskListener() {
                             @Override
                             public void onFinish() {
+                                SubjectType subjectType;
+
                                 for (int i = 0; i < 5; i++) {
-                                    reportFragments[i].setType(Constant.CODE_TYPE[i]);
-                                    reportFragments[i].setReportItems(getReportItemsByType(Constant.CODE_TYPE[i]));
+                                    subjectType = SubjectType.getType(String.valueOf(i + 1));
+
+                                    reportFragments[i].setType(subjectType);
+                                    reportFragments[i].setReportItems(getReportItemsByType(subjectType));
                                     reportFragments[i].onResume();
                                 }
                             }

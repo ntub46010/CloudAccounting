@@ -29,6 +29,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.vincent.acnt.entity.RegisterProvider;
 import com.vincent.acnt.entity.User;
 
 import org.json.JSONObject;
@@ -114,7 +115,8 @@ public class LoginActivity extends RegisterHelper {
                         GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
                             @Override
                             public void onCompleted(JSONObject object, GraphResponse response) {
-                                loginWithCredential(FacebookAuthProvider.getCredential(accessToken.getToken()), object.optString("name"));
+                                loginWithCredential(FacebookAuthProvider.getCredential(accessToken.getToken()),
+                                        object.optString("name"), RegisterProvider.FACEBOOK);
                             }
                         });
 
@@ -157,7 +159,8 @@ public class LoginActivity extends RegisterHelper {
         try {
             // Google Sign In was successful, authenticate with Firebase
             GoogleSignInAccount account = task.getResult(ApiException.class);
-            loginWithCredential(GoogleAuthProvider.getCredential(account.getIdToken(), null), account.getDisplayName());
+            loginWithCredential(GoogleAuthProvider.getCredential(account.getIdToken(), null),
+                    account.getDisplayName(), RegisterProvider.GOOGLE);
         } catch (ApiException e) {
             // Google Sign In failed
             dlgWaiting.dismiss();
@@ -165,7 +168,7 @@ public class LoginActivity extends RegisterHelper {
         }
     }
 
-    private void loginWithCredential(AuthCredential credential, final String name) {
+    private void loginWithCredential(AuthCredential credential, final String name, final RegisterProvider registerProvider) {
         //在Auth中登錄會員
         MyApp.mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -179,6 +182,7 @@ public class LoginActivity extends RegisterHelper {
                             user.setId(String.valueOf(currentUser.getUid()));
                             user.setName(name);
                             user.setEmail(currentUser.getEmail());
+                            user.setRegisterProvider(registerProvider.getProvider());
 
                             findUserDocument(user,
                                     new TaskListener() {

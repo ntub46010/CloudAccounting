@@ -25,7 +25,6 @@ public class Constant {
     public static final int CODE_DEBIT = 2;
     public static final int CODE_APPROVED = 3;
     public static final int CODE_WAITING = 4;
-    public static final String[] CODE_TYPE = new String[5];
 
     public static final int MODE_IMPORT = 995;
     public static final int MODE_CREATE = 996;

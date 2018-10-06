@@ -14,8 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public class ObjectTable2<R, E> {
-    private Table<R, String, Object> table;
+/**
+ *  K: primary key type
+ *  T: tuple type
+ */
+public class ObjectTable2<K, T> {
+    private Table<K, String, Object> table;
     private String primaryFieldName;
 
     private Field[] fields;
@@ -66,10 +70,10 @@ public class ObjectTable2<R, E> {
         }
     }
 
-    public void add(E object) {
+    public void add(T object) {
         try {
             Field primaryField = mapFieldByName.get(primaryFieldName);
-            R primaryKey = (R) primaryField.get(object);
+            K primaryKey = (K) primaryField.get(object);
             Field field;
             Object value;
 
@@ -89,7 +93,7 @@ public class ObjectTable2<R, E> {
         }
     }
 
-    public void remove(R rowKey) {
+    public void remove(K rowKey) {
         if (!table.rowKeySet().contains(rowKey)) {
             throw new NoSuchElementException("There is not tuple which row key is " + String.valueOf(rowKey));
         }
@@ -99,26 +103,26 @@ public class ObjectTable2<R, E> {
         }
     }
 
-    public List<E> findAll() {
-        List<E> results = new ArrayList<>();
+    public List<T> findAll() {
+        List<T> results = new ArrayList<>();
 
-        for (R primary : table.rowKeySet()) {
+        for (K primary : table.rowKeySet()) {
             results.add(constructObject(primary, table.row(primary)));
         }
 
         return results;
     }
 
-    public E findFirstByProperty(String fieldName, Object expectedValue) {
+    public T findFirstByProperty(String fieldName, Object expectedValue) {
         checkFieldIsExist(fieldName);
 
         if (fieldName.equals(primaryFieldName)) {
-            return constructObject((R) expectedValue, table.row((R) expectedValue));
+            return constructObject((K) expectedValue, table.row((K) expectedValue));
         }
 
-        Map<R, Object> mapValueByPrimaryKey = table.column(fieldName);
+        Map<K, Object> mapValueByPrimaryKey = table.column(fieldName);
 
-        for (R primaryKey : mapValueByPrimaryKey.keySet()) {
+        for (K primaryKey : mapValueByPrimaryKey.keySet()) {
             if (isValueEqual(mapValueByPrimaryKey.get(primaryKey), expectedValue)) {
                 return constructObject(primaryKey, table.row(primaryKey));
             }
@@ -127,12 +131,12 @@ public class ObjectTable2<R, E> {
         return null;
     }
 
-    public List<E> findAllByProperty(String fieldName, Object expectedValue) {
+    public List<T> findAllByProperty(String fieldName, Object expectedValue) {
         checkFieldIsExist(fieldName);
 
         if (fieldName.equals(primaryFieldName)) {
-            List<E> results = new ArrayList<>();
-            E object = constructObject((R) expectedValue, table.row((R) expectedValue));
+            List<T> results = new ArrayList<>();
+            T object = constructObject((K) expectedValue, table.row((K) expectedValue));
 
             if (object != null) {
                 results.add(object);
@@ -144,12 +148,12 @@ public class ObjectTable2<R, E> {
         return findAllBySlaveProperty(fieldName, expectedValue);
     }
 
-    private List<E> findAllBySlaveProperty(String fieldName, Object expectedValue) {
-        Map<R, Object> mapValueByPrimaryKey = table.column(fieldName);
-        List<E> results = new ArrayList<>();
-        E object;
+    private List<T> findAllBySlaveProperty(String fieldName, Object expectedValue) {
+        Map<K, Object> mapValueByPrimaryKey = table.column(fieldName);
+        List<T> results = new ArrayList<>();
+        T object;
 
-        for (R primaryKey : mapValueByPrimaryKey.keySet()) {
+        for (K primaryKey : mapValueByPrimaryKey.keySet()) {
             if (isValueEqual(mapValueByPrimaryKey.get(primaryKey), expectedValue)) {
                 object = constructObject(primaryKey, table.row(primaryKey));
 
@@ -178,9 +182,9 @@ public class ObjectTable2<R, E> {
     }
 
     private Object findSiblingValueBySlaveProperty(String fieldName, Object expectedValue, String siblingFieldName) {
-        Map<R, Object> mapValueByPrimaryKey = table.column(fieldName);
+        Map<K, Object> mapValueByPrimaryKey = table.column(fieldName);
 
-        for (R primaryKey : mapValueByPrimaryKey.keySet()) {
+        for (K primaryKey : mapValueByPrimaryKey.keySet()) {
             if (isValueEqual(mapValueByPrimaryKey.get(primaryKey), expectedValue)) {
                 return table.get(primaryKey, siblingFieldName);
             }
@@ -206,9 +210,9 @@ public class ObjectTable2<R, E> {
             return table.rowKeySet().contains(expectedValue);
 
         } else {
-            Map<R, Object> mapValueByPrimaryKey = table.column(fieldName);
+            Map<K, Object> mapValueByPrimaryKey = table.column(fieldName);
 
-            for (R primaryKey : mapValueByPrimaryKey.keySet()) {
+            for (K primaryKey : mapValueByPrimaryKey.keySet()) {
                 if (isValueEqual(mapValueByPrimaryKey.get(primaryKey), expectedValue)) {
                     return true;
                 }
@@ -231,13 +235,13 @@ public class ObjectTable2<R, E> {
         this.ACCEPTED_MUTATOR_METHODS_PREFIX = prefix;
     }
 
-    private E constructObject(R primaryKey, Map<String, Object> propertyValues) {
+    private T constructObject(K primaryKey, Map<String, Object> propertyValues) {
         if (propertyValues.size() == 0) {
             return null;
         }
 
         try {
-            E output = (E) constructor.newInstance();
+            T output = (T) constructor.newInstance();
             String methodName;
             String propertyName;
 

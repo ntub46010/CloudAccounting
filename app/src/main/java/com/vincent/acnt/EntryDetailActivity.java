@@ -14,6 +14,7 @@ import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.Subject;
+import com.vincent.acnt.entity.SubjectType;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -67,7 +68,7 @@ public class EntryDetailActivity extends AppCompatActivity {
 
             subject = MyApp.subjectTable.findFirstByProperty(Constant.PRO_ID, abstractSubject.getId());
             txtSubject.setText(subject.getName());
-            txtSubject.setTextColor(Utility.getSubjectColor(subject));
+            txtSubject.setTextColor(SubjectType.getType(subject.getNo().substring(0, 1)).getColor());
 
             if (abstractSubject.getDebit() == 0) {
                 txtCredit.setText(NumberFormat.getNumberInstance(Locale.US).format(abstractSubject.getCredit()));

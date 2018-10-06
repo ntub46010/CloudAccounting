@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.vincent.acnt.adapter.ReportListAdapter;
 import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.entity.ReportItem;
+import com.vincent.acnt.entity.SubjectType;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -25,7 +26,7 @@ public class ReportFragment extends Fragment {
 
     private TextView txtBalance;
 
-    private String type;
+    private SubjectType subjectType;
     private List<ReportItem> reportItems;
 
     private ReportListAdapter adapter;
@@ -74,30 +75,30 @@ public class ReportFragment extends Fragment {
             balance += reportItems.get(i).getBalance();
         }
 
-        String text = "";
-        switch (type) {
-            case "1":
-                text = "資產餘額：";
+        String balanceTitle = "";
+        switch (subjectType) {
+            case ASSET:
+                balanceTitle = "資產餘額：";
                 break;
-            case "2":
-                text = "負債餘額：";
+            case LIABILITY:
+                balanceTitle = "負債餘額：";
                 break;
-            case "3":
-                text = "權益餘額：";
+            case CAPITAL:
+                balanceTitle = "權益餘額：";
                 break;
-            case "4":
-                text = "收入餘額：";
+            case REVENUE:
+                balanceTitle = "收入餘額：";
                 break;
-            case "5":
-                text = "支出餘額：";
+            case EXPENSE:
+                balanceTitle = "支出餘額：";
                 break;
         }
 
-        txtBalance.setText(text +  NumberFormat.getNumberInstance(Locale.US).format(balance));
+        txtBalance.setText(balanceTitle +  NumberFormat.getNumberInstance(Locale.US).format(balance));
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setType(SubjectType subjectType) {
+        this.subjectType = subjectType;
     }
 
     public void setReportItems(List<ReportItem> reportItems) {
