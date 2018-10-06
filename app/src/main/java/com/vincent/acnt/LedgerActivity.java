@@ -23,6 +23,7 @@ import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.LedgerRecord;
+import com.vincent.acnt.entity.Subject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,13 +35,14 @@ public class LedgerActivity extends AppCompatActivity {
 
     private Spinner spnYear, spnMonth;
     private AutoCompleteTextView actSubjectName;
+    private Button btnShow;
     private ListView lstLedger;
     private ProgressBar prgBar;
     private RelativeLayout layHint;
 
     private int selectedYear, selectedMonth;
     private int queryFlag = -2;
-    private boolean canQuery = true;
+    private Subject targetSubject;
 
     private List<Entry> mEntries;
     private LedgerListAdapter adapter;
@@ -69,13 +71,16 @@ public class LedgerActivity extends AppCompatActivity {
         spnYear = findViewById(R.id.spnYear);
         spnMonth = findViewById(R.id.spnMonth);
         actSubjectName = findViewById(R.id.actSubjectName);
-        Button btnShow = findViewById(R.id.btnShow);
+        btnShow = findViewById(R.id.btnShow);
         lstLedger = findViewById(R.id.lstRecord);
         prgBar = findViewById(R.id.prgBar);
         layHint = findViewById(R.id.layContentHint);
 
-        if (getIntent().getExtras() != null) {
-            actSubjectName.setText(getIntent().getExtras().getString(Constant.KEY_SUBJECT));
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            String subjectName = bundle.getString(Constant.PRO_NAME);
+            targetSubject = MyApp.subjectTable.findFirstByProperty(Constant.PRO_NAME, subjectName);
+            actSubjectName.setText(subjectName);
             queryFlag++;
         }
 
@@ -176,16 +181,16 @@ public class LedgerActivity extends AppCompatActivity {
     private void loadSubjects() {
         ArrayAdapter<String> adpSubjectName = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
 
-        for (int i = 0, len = MyApp.mapSubjectById.size(); i < len; i++) {
-            adpSubjectName.add(MyApp.mapSubjectById.valueAt(i).getName());
-        }
+        adpSubjectName.addAll((List<? extends String>)(List<?>) MyApp.subjectTable.findAllPropertyValues(Constant.PRO_NAME));
 
         actSubjectName.setAdapter(adpSubjectName);
         prgBar.setVisibility(View.GONE);
     }
 
     private boolean isSubjectExist(String subjectName) {
-        if (!MyApp.mapSubjectByName.containsKey(subjectName)) {
+        targetSubject = MyApp.subjectTable.findFirstByProperty(Constant.PRO_NAME, subjectName);
+
+        if (targetSubject == null) {
             Utility.getPlainDialog(context, activityTitle, "會計科目不存在").show();
             return false;
         }
@@ -194,16 +199,15 @@ public class LedgerActivity extends AppCompatActivity {
     }
 
     private void showLedger() {
-        String subjectName = actSubjectName.getText().toString();
-        if (!canQuery || subjectName.equals("")) {
+        if (actSubjectName.getText().toString().equals("")) {
             return;
         }
 
-        canQuery = false;
+        btnShow.setEnabled(false);
         prgBar.setVisibility(View.VISIBLE);
         lstLedger.setVisibility(View.INVISIBLE);
 
-        accessor.loadLedgerItems(MyApp.mapSubjectByName.get(subjectName).getId(),
+        accessor.loadLedgerItems(targetSubject.getId(),
                         Utility.getDateNumber(selectedYear, selectedMonth, 31),
                         new EntryAccessor.RetrieveLedgerRecordListener() {
                             @Override
@@ -228,12 +232,13 @@ public class LedgerActivity extends AppCompatActivity {
 
                                 prgBar.setVisibility(View.GONE);
                                 lstLedger.setVisibility(View.VISIBLE);
-                                canQuery = true;
+                                btnShow.setEnabled(true);
                             }
 
                             @Override
                             public void onFailure(Exception e) {
                                 Toast.makeText(context, "查詢明細失敗", Toast.LENGTH_SHORT).show();
+                                btnShow.setEnabled(true);
                             }
                         });
     }

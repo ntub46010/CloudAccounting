@@ -9,6 +9,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.vincent.acnt.data.Constant;
+import com.vincent.acnt.data.ObjectTable;
+import com.vincent.acnt.data.ObjectTable2;
 import com.vincent.acnt.entity.Book;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.Subject;
@@ -27,9 +29,7 @@ public class MyApp extends Application {
     public static User user;
     public static Book browsingBook;
 
-    public static LongSparseArray<Subject> mapSubjectById = new LongSparseArray<>();
-    public static Map<String, Subject> mapSubjectByNo = new TreeMap<>();
-    public static Map<String, Subject> mapSubjectByName = new ArrayMap<>();
+    public static ObjectTable2<Long, Subject> subjectTable = new ObjectTable2<>(Subject.class, "id");
     public static List<Entry> thisMonthEntries = new ArrayList<>(64);
 
     @Override
