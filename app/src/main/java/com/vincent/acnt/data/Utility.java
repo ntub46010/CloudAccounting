@@ -7,7 +7,6 @@ import android.view.Window;
 
 import com.vincent.acnt.MyApp;
 import com.vincent.acnt.R;
-import com.vincent.acnt.entity.Subject;
 
 import java.math.BigDecimal;
 import java.net.URLDecoder;
@@ -64,23 +63,6 @@ public class Utility {
         }
     }
 
-    public static int getSubjectColor(Subject subject) {
-        switch (subject.getNo().substring(0, 1)) {
-            case "1":
-                return MyApp.res.getColor(R.color.type_asset);
-            case "2":
-                return MyApp.res.getColor(R.color.type_liability);
-            case "3":
-                return MyApp.res.getColor(R.color.type_capital);
-            case "4":
-                return MyApp.res.getColor(R.color.type_revenue);
-            case "5":
-                return MyApp.res.getColor(R.color.type_expense);
-            default:
-                return MyApp.res.getColor(R.color.type_asset);
-        }
-    }
-
     public static int getWeekColor(Calendar calendar) {
         switch (calendar.get(Calendar.DAY_OF_WEEK)) {
             case 1:
@@ -109,7 +91,7 @@ public class Utility {
     public static String encrypt(String text) {
         text = URLEncoder.encode(text);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String str;
         for (int i = 0; i < text.length(); i++) {
             str = String.valueOf((int) text.charAt(i));
@@ -124,7 +106,7 @@ public class Utility {
     public static String decrypt(String text) {
         text = convertTo10Notation(text);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int ascCode;
         for (int i = 0; i < text.length() - 2; i = i + 3) {
             ascCode = Integer.parseInt(text.substring(i, i + 3));
@@ -135,7 +117,7 @@ public class Utility {
     }
 
     public static String convertTo62Notation(String text) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         BigDecimal multiple = new BigDecimal(symbols.length());
         BigDecimal dec = new BigDecimal(text);
         BigDecimal r;
@@ -163,7 +145,7 @@ public class Utility {
             total = total.add(dec);
         }
 
-        StringBuffer result = new StringBuffer(total.toString());
+        StringBuilder result = new StringBuilder(total.toString());
         for (int i = 3 - result.length() % 3; i > 0; i--)
             result.insert(0, "0");
 

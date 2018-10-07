@@ -8,8 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.vincent.acnt.R;
-import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.Subject;
+import com.vincent.acnt.entity.SubjectType;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -58,7 +58,7 @@ public class SubjectListAdapter extends BaseAdapter {
         txtCredit.setText("借：" + NumberFormat.getNumberInstance(Locale.US).format(subject.getCredit()));
         txtDebit.setText("貸：" + NumberFormat.getNumberInstance(Locale.US).format(subject.getDebit()));
 
-        txtId.setTextColor(Utility.getSubjectColor(subject));
+        txtId.setTextColor(SubjectType.getType(subject.getNo().substring(0, 1)).getColor());
 
         return view;
     }

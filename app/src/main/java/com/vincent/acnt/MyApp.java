@@ -41,10 +41,5 @@ public class MyApp extends Application {
         mAuth = FirebaseAuth.getInstance();
 
         FirebaseDatabase.getInstance().setPersistenceEnabled(false);
-
-        for (int i = 0; i < 5; i++) {
-            Constant.CODE_TYPE[i] = String.valueOf(i + 1);
-        }
-
     }
 }

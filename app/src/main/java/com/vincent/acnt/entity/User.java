@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Entity, Serializable {
-    private String id;
-    private String name, email;
+    private String id, name, email, registerProvider;
     private List<String> books;
     private String documentId;
 
@@ -52,6 +51,14 @@ public class User implements Entity, Serializable {
         }
 
         this.books = books;
+    }
+
+    public String getRegisterProvider() {
+        return registerProvider;
+    }
+
+    public void setRegisterProvider(String registerProvider) {
+        this.registerProvider = registerProvider;
     }
 
     @Override
