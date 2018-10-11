@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,12 +30,14 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.entity.RegisterProvider;
 import com.vincent.acnt.entity.User;
 
 import org.json.JSONObject;
 
 public class LoginActivity extends RegisterHelper {
+    private TextInputLayout tilEmail, tilPwd;
     protected EditText edtEmail, edtPwd;
 
     private CallbackManager mCallbackManager;
@@ -47,8 +50,10 @@ public class LoginActivity extends RegisterHelper {
         setContentView(R.layout.activity_login);
         context = this;
 
+        tilEmail = findViewById(R.id.tilEmail);
+        tilPwd = findViewById(R.id.tilPwd);
         edtEmail = findViewById(R.id.edtEmail);
-        edtPwd = findViewById(R.id.edtPwd);
+        edtPwd = findViewById(R.id.edtPwd1);
 
         Button btnRegister = findViewById(R.id.btnRegister);
         btnRegister.setOnClickListener(new View.OnClickListener() {
@@ -62,6 +67,9 @@ public class LoginActivity extends RegisterHelper {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                tilEmail.setError(null);
+                tilPwd.setError(null);
+
                 loginWithEmail(edtEmail.getText().toString(), edtPwd.getText().toString());
             }
         });
@@ -76,13 +84,17 @@ public class LoginActivity extends RegisterHelper {
         prepareLogin();
     }
 
-    private void loginWithEmail(String account, String password) {
+    private void loginWithEmail(String account, final String password) {
         dlgWaiting.show();
         MyApp.mAuth.signInWithEmailAndPassword(account, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            getSharedPreferences(getApplication().getPackageName(), MODE_PRIVATE).edit()
+                                    .putString(Constant.KEY_PASSWORD, password)
+                                    .apply();
+
                             prepareLogin();
                         } else {
                             Toast.makeText(context, "登入失敗", Toast.LENGTH_SHORT).show();

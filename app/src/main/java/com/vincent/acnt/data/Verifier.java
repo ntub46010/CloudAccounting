@@ -39,6 +39,13 @@ public class Verifier {
             return "密碼需為8~20位英數字";
     }
 
+    public String chkPasswordEqual(String pwd1, String pwd2) {
+        if (pwd1.equals(pwd2))
+            return null;
+        else
+            return "確認密碼不相符";
+    }
+
     public String chkEmail(String s) {
         if (Pattern.matches(ptnEmail, s))
             return null;
