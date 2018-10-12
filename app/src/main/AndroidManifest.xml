@@ -35,7 +35,8 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".SubjectEditActivity" />
         <activity android:name=".EntryEditActivity" />
-        <activity android:name=".BookMemberActivity"></activity>
+        <activity android:name=".BookMemberActivity" />
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>

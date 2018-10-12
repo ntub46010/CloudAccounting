@@ -27,7 +27,7 @@
         android:layout_below="@id/tilEmail">
 
         <EditText
-            android:id="@+id/edtPwd"
+            android:id="@+id/edtPwd1"
             style="@style/edt_account"
             android:hint="密碼"
             android:text="12345678"

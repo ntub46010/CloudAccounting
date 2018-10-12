@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/tilNickName"
+        style="@style/til_account"
+        app:errorEnabled="true">
+
+        <EditText
+            android:id="@+id/edtNickname"
+            style="@style/edt_account"
+            android:hint="您的暱稱"
+            android:text="仲佑"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/tilEmail"
+        style="@style/til_account"
+        android:layout_below="@id/tilNickName"
+        app:errorEnabled="true">
+
+        <EditText
+            android:id="@+id/edtEmail"
+            style="@style/edt_account"
+            android:text="zxcveric@yahoo.com.tw"
+            android:hint="電子郵件"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/tilPwd1"
+        style="@style/til_account"
+        android:layout_below="@id/tilEmail"
+        app:errorEnabled="true">
+
+        <EditText
+            android:id="@+id/edtPwd1"
+            style="@style/edt_account"
+            android:hint="密碼"
+            android:text="12345678"
+            android:inputType="textPassword" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/tilPwd2"
+        style="@style/til_account"
+        android:layout_below="@id/tilPwd1"
+        app:errorEnabled="true">
+
+        <EditText
+            android:id="@+id/edtPwd2"
+            style="@style/edt_account"
+            android:hint="確認密碼"
+            android:text="12345678"
+            android:inputType="textPassword" />
+
+    </android.support.design.widget.TextInputLayout>
+
+</RelativeLayout>

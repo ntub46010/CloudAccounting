@@ -11,12 +11,14 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Verifier;
+import com.vincent.acnt.entity.RegisterProvider;
 import com.vincent.acnt.entity.User;
 
 public class RegisterActivity extends RegisterHelper {
-    private TextInputLayout tilNickName, tilEmail, tilPwd;
-    private EditText edtNickName, edtEmail, edtPwd;
+    private TextInputLayout tilNickName, tilEmail, tilPwd1, tilPwd2;
+    private EditText edtNickName, edtEmail, edtPwd1, edtPwd2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,16 +28,23 @@ public class RegisterActivity extends RegisterHelper {
 
         tilNickName = findViewById(R.id.tilNickName);
         tilEmail = findViewById(R.id.tilEmail);
-        tilPwd = findViewById(R.id.tilPwd);
+        tilPwd1 = findViewById(R.id.tilPwd1);
+        tilPwd2 = findViewById(R.id.tilPwd2);
         edtEmail = findViewById(R.id.edtEmail);
-        edtPwd = findViewById(R.id.edtPwd);
+        edtPwd1 = findViewById(R.id.edtPwd1);
+        edtPwd2 = findViewById(R.id.edtPwd2);
         edtNickName = findViewById(R.id.edtNickname);
 
         Button btnRegister = findViewById(R.id.btnRegister);
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                registerWithEmail(edtNickName.getText().toString(), edtEmail.getText().toString(), edtPwd.getText().toString());
+                tilNickName.setError(null);
+                tilEmail.setError(null);
+                tilPwd1.setError(null);
+                tilPwd2.setError(null);
+
+                registerWithEmail(edtNickName.getText().toString(), edtEmail.getText().toString(), edtPwd1.getText().toString(), edtPwd2.getText().toString());
             }
         });
 
@@ -48,24 +57,28 @@ public class RegisterActivity extends RegisterHelper {
         });
     }
 
-    private void registerWithEmail(String nickName, String email, String password) {
-        if (isNotValid(nickName, email, password)) {
+    private void registerWithEmail(String nickName, String email, final String pwd1, String pwd2) {
+        if (isNotValid(nickName, email, pwd1, pwd2)) {
             return;
         }
 
         dlgWaiting.show();
 
-        MyApp.mAuth.createUserWithEmailAndPassword(email, password)
+        MyApp.mAuth.createUserWithEmailAndPassword(email, pwd1)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             currentUser = MyApp.mAuth.getCurrentUser();
+                            getSharedPreferences(getApplication().getPackageName(), MODE_PRIVATE).edit()
+                                    .putString(Constant.KEY_PASSWORD, pwd1)
+                                    .apply();
 
                             User user = new User();
                             user.setId(currentUser.getUid());
                             user.setName(edtNickName.getText().toString());
                             user.setEmail(currentUser.getEmail());
+                            user.setRegisterProvider(RegisterProvider.EMAIL.getProvider());
 
                             createUserDocument(
                                     user,
@@ -90,13 +103,14 @@ public class RegisterActivity extends RegisterHelper {
                 });
     }
 
-    private boolean isNotValid(String nickName, String email, String password) {
+    private boolean isNotValid(String nickName, String email, String pwd1, String pwd2) {
         Verifier v = new Verifier(context);
         tilNickName.setError(v.chkNickName(nickName));
         tilEmail.setError(v.chkEmail(email));
-        tilPwd.setError(v.chkPassword(password));
+        tilPwd1.setError(v.chkPassword(pwd1));
+        tilPwd2.setError(v.chkPasswordEqual(pwd1, pwd2));
 
-        return tilNickName.getError() != null || tilEmail.getError() != null || tilPwd.getError() != null;
+        return tilNickName.getError() != null || tilEmail.getError() != null || tilPwd1.getError() != null || tilPwd2.getError() != null;
     }
 
 }
