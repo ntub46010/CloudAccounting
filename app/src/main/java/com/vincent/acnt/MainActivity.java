@@ -48,10 +48,6 @@ public class MainActivity extends AppCompatActivity {
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSharedPreferences(getApplication().getPackageName(), MODE_PRIVATE).edit()
-                        .remove(Constant.KEY_PASSWORD)
-                        .apply();
-
                 MyApp.mAuth.signOut();
                 startActivity(new Intent(context, LoginActivity.class));
                 finish();

@@ -70,9 +70,6 @@ public class RegisterActivity extends RegisterHelper {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             currentUser = MyApp.mAuth.getCurrentUser();
-                            getSharedPreferences(getApplication().getPackageName(), MODE_PRIVATE).edit()
-                                    .putString(Constant.KEY_PASSWORD, pwd1)
-                                    .apply();
 
                             User user = new User();
                             user.setId(currentUser.getUid());
@@ -91,7 +88,7 @@ public class RegisterActivity extends RegisterHelper {
                                     }
                             );
                         } else {
-                            Toast.makeText(context, "註冊失敗", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "註冊失敗，請查看提示訊息", Toast.LENGTH_SHORT).show();
                             String errMsg =  task.getException().getMessage();
 
                             if (errMsg.equals("The email address is already in use by another account.")) {

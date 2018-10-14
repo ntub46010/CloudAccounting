@@ -15,39 +15,44 @@
         style="@style/toolbar"
         app:titleTextColor="#FFFFFF"/>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:layout_below="@id/toolbar">
 
-        <include
-            android:id="@+id/account_field"
-            layout="@layout/content_account_field"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/tilPwd3"
-            style="@style/til_account"
-            android:layout_below="@id/account_field"
-            app:errorEnabled="true">
+            <include
+                android:id="@+id/account_field"
+                layout="@layout/content_account_field"/>
 
-            <EditText
-                android:id="@+id/edtPwd3"
-                style="@style/edt_account"
-                android:hint="確認新密碼"
-                android:text="12345678"
-                android:inputType="textPassword" />
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/tilPwd3"
+                style="@style/til_account"
+                android:layout_below="@id/account_field"
+                app:errorEnabled="true">
 
-        </android.support.design.widget.TextInputLayout>
+                <EditText
+                    android:id="@+id/edtPwd3"
+                    style="@style/edt_account"
+                    android:hint="確認新密碼"
+                    android:inputType="textPassword" />
 
-        <Button
-            android:id="@+id/btnSubmit"
-            style="@style/btn_login"
-            android:layout_below="@id/tilPwd3"
-            android:layout_centerHorizontal="true"
-            android:text="送出"/>
+            </android.support.design.widget.TextInputLayout>
 
-    </RelativeLayout>
+            <Button
+                android:id="@+id/btnSubmit"
+                style="@style/btn_login"
+                android:layout_below="@id/tilPwd3"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="16dp"
+                android:text="送出"/>
+
+        </RelativeLayout>
+
+    </ScrollView>
 
 </RelativeLayout>

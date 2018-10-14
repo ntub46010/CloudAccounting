@@ -10,7 +10,6 @@ public class Constant {
     public static final String KEY_ENTRIES = "Entries";
     public static final String KEY_ENTRY = "Entry";
     public static final String KEY_MODE = "mode";
-    public static final String KEY_PASSWORD = "password";
 
     public static final String PRO_ID = "id";
     public static final String PRO_NAME = "name";

@@ -91,14 +91,9 @@ public class LoginActivity extends RegisterHelper {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            getSharedPreferences(getApplication().getPackageName(), MODE_PRIVATE).edit()
-                                    .putString(Constant.KEY_PASSWORD, password)
-                                    .apply();
-
                             prepareLogin();
                         } else {
-                            Toast.makeText(context, "登入失敗", Toast.LENGTH_SHORT).show();
-                            Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "帳號或密碼錯誤，請確認後再嘗試登入", Toast.LENGTH_SHORT).show();
                             dlgWaiting.dismiss();
                         }
                     }

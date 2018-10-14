@@ -88,6 +88,10 @@ public class Utility {
         return year * 10000 + month * 100 + day;
     }
 
+    public static boolean isEmptyString(String s) {
+        return s == null || s.equals("");
+    }
+
     public static String encrypt(String text) {
         text = URLEncoder.encode(text);
 
