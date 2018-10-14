@@ -1,6 +1,8 @@
 package com.vincent.acnt;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
@@ -8,6 +10,8 @@ import android.support.design.widget.TextInputLayout;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -31,6 +35,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.vincent.acnt.data.Constant;
+import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.entity.RegisterProvider;
 import com.vincent.acnt.entity.User;
 
@@ -38,7 +43,7 @@ import org.json.JSONObject;
 
 public class LoginActivity extends RegisterHelper {
     private TextInputLayout tilEmail, tilPwd;
-    protected EditText edtEmail, edtPwd;
+    private EditText edtEmail, edtPwd;
 
     private CallbackManager mCallbackManager;
     private GoogleSignInClient mGoogleSignInClient;
@@ -54,6 +59,7 @@ public class LoginActivity extends RegisterHelper {
         tilPwd = findViewById(R.id.tilPwd);
         edtEmail = findViewById(R.id.edtEmail);
         edtPwd = findViewById(R.id.edtPwd1);
+        TextView txtForgetPwd = findViewById(R.id.txtForgetPwd);
 
         Button btnRegister = findViewById(R.id.btnRegister);
         btnRegister.setOnClickListener(new View.OnClickListener() {
@@ -76,6 +82,13 @@ public class LoginActivity extends RegisterHelper {
 
         prepareFacebookButton();
         prepareGoogleButton();
+
+        txtForgetPwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                prepareForgetPasswordDialog();
+            }
+        });
     }
 
     @Override
@@ -201,6 +214,42 @@ public class LoginActivity extends RegisterHelper {
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void prepareForgetPasswordDialog() {
+        View[] layEditText = Utility.getEditTextLayout(context, edtEmail.getText().toString());
+        LinearLayout layout = (LinearLayout) layEditText[0];
+        final EditText edtWantedEmail = (EditText) layEditText[1];
+
+        Utility.getPlainDialog(context, "忘記密碼", "請填寫您的Email，送出後至信箱收取更改密碼的信件\n（此功能僅限使用Email註冊者使用）")
+                .setView(layout)
+                .setPositiveButton("送出", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String email = edtWantedEmail.getText().toString();
+                        if (Utility.isEmptyString(email)) {
+                            Toast.makeText(context, "未填寫Email", Toast.LENGTH_SHORT).show();
+                        } else {
+                            sendPasswordResetEmail(email);
+                        }
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    private void sendPasswordResetEmail(String email) {
+        MyApp.mAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(context, "已送出，請至信箱收取信件", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, "請求失敗，請重新嘗試", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
