@@ -69,24 +69,17 @@ public class BookOptionActivity extends AppCompatActivity {
     }
 
     private void prepareDialog() {
-        LinearLayout container = new LinearLayout(context);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(40, 0, 40, 0);
-        container.setOrientation(LinearLayout.VERTICAL);
-
-        final EditText edtBookName = new EditText(context);
-        edtBookName.setLayoutParams(lp);
-        edtBookName.setMaxLines(1);
-        edtBookName.setSingleLine(true);
-        edtBookName.setText(MyApp.browsingBook.getName());
-        container.addView(edtBookName);
+        View[] layEditText = Utility.getEditTextLayout(context, MyApp.browsingBook.getName());
+        LinearLayout layout = (LinearLayout) layEditText[0];
+        final EditText edtBookName = (EditText) layEditText[1];
 
         dialog = Utility.getPlainDialog(context, activityTitle, "請輸入新帳本名稱")
-                .setView(container)
+                .setView(layout)
                 .setPositiveButton("確定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String bookName = edtBookName.getText().toString();
+
                         if (bookName.equals("")) {
                             Utility.getPlainDialog(context, activityTitle, "帳本名稱未輸入").show();
                         } else {

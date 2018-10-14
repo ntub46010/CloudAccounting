@@ -3,7 +3,10 @@ package com.vincent.acnt.data;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.view.View;
 import android.view.Window;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.vincent.acnt.MyApp;
 import com.vincent.acnt.R;
@@ -30,6 +33,22 @@ public class Utility {
         dialog.setContentView(R.layout.dlg_waiting);
         dialog.setCancelable(false);
         return dialog;
+    }
+
+    public static View[] getEditTextLayout(Context context, String defaultContentText) {
+        LinearLayout container = new LinearLayout(context);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(40, 0, 40, 0);
+        container.setOrientation(LinearLayout.VERTICAL);
+
+        final EditText editText = new EditText(context);
+        editText.setLayoutParams(lp);
+        editText.setMaxLines(1);
+        editText.setSingleLine(true);
+        editText.setText(defaultContentText);
+        container.addView(editText);
+
+        return new View[] {container, editText};
     }
 
     public static String getEngMonth(String month) {
@@ -86,6 +105,10 @@ public class Utility {
 
     public static int getDateNumber(int year, int month, int day) {
         return year * 10000 + month * 100 + day;
+    }
+
+    public static boolean isEmptyString(String s) {
+        return s == null || s.equals("");
     }
 
     public static String encrypt(String text) {

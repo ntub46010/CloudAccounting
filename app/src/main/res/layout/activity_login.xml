@@ -66,4 +66,13 @@
         android:drawableStart="@drawable/icon_email"
         android:text="使用 Email 註冊"/>
 
+    <TextView
+        android:id="@+id/txtForgetPwd"
+        style="@style/text"
+        android:layout_below="@id/btnRegister"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:text="忘記密碼？"
+        android:textColor="@color/colorPrimaryDark"/>
+
 </RelativeLayout>
