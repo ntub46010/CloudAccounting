@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ObjectTable<E> {
+public class ObjectArrayTable<E> {
     private Object[][] objects;
 
     private Field[] fields;
@@ -24,7 +24,7 @@ public class ObjectTable<E> {
     private final String[] ACCEPTED_MUTATOR_METHODS_PREFIX = {"set", "define"};
     private static final int DEFAULT_CAPACITY = 16;
 
-    public ObjectTable(Class clz, int initialCapacity) {
+    public ObjectArrayTable(Class clz, int initialCapacity) {
         this.fields = clz.getDeclaredFields();
         this.objects = new Object[initialCapacity][fields.length];
         this.mapFieldIndexByName = new HashMap<>();
@@ -32,7 +32,7 @@ public class ObjectTable<E> {
         prepareUtils(clz);
     }
 
-    public ObjectTable(Class clz) {
+    public ObjectArrayTable(Class clz) {
         this(clz, DEFAULT_CAPACITY);
     }
 

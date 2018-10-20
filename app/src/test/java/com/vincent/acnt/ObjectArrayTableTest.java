@@ -2,24 +2,24 @@ package com.vincent.acnt;
 
 import android.util.NoSuchPropertyException;
 
-import com.vincent.acnt.data.ObjectTable;
+import com.vincent.acnt.data.ObjectArrayTable;
 import com.vincent.acnt.entity.Subject;
 
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class ObjectTableTest {
+public class ObjectArrayTableTest {
 
     @Test
     public void createTableWithMoreCapacity() throws Exception {
-        ObjectTable<Subject> table = new ObjectTable<>(Subject.class, 64);
+        ObjectArrayTable<Subject> table = new ObjectArrayTable<>(Subject.class, 64);
         assertEquals(64, table.capacity());
     }
 
     @Test
     public void addObject() throws Exception {
-        ObjectTable<Subject> table = new ObjectTable<>(Subject.class);
+        ObjectArrayTable<Subject> table = new ObjectArrayTable<>(Subject.class);
         Subject subject = new Subject();
         subject.setNo("101");
         subject.setName("現金");
@@ -35,7 +35,7 @@ public class ObjectTableTest {
 
     @Test
     public void expandCapacity() throws Exception {
-        ObjectTable<Subject> table = generateFullTable();
+        ObjectArrayTable<Subject> table = generateFullTable();
 
         assertEquals(16, table.capacity());
 
@@ -45,7 +45,7 @@ public class ObjectTableTest {
 
     @Test
     public void removeObject() throws Exception {
-        ObjectTable<Subject> table = new ObjectTable<>(Subject.class);
+        ObjectArrayTable<Subject> table = new ObjectArrayTable<>(Subject.class);
         Subject subject = new Subject();
 
         for (int i = 0; i < 2; i++) {
@@ -59,45 +59,45 @@ public class ObjectTableTest {
 
     @Test
     public void findFirstObjectBySingleProperty() throws Exception {
-        ObjectTable<Subject> table = generateFullTable();
+        ObjectArrayTable<Subject> table = generateFullTable();
 
         assertEquals("Name of 2", table.findFirstByProperty("credit", 2).getName());
     }
 
     @Test
     public void findNothingBySingleProperty() throws Exception {
-        ObjectTable<Subject> table = new ObjectTable<>(Subject.class);
+        ObjectArrayTable<Subject> table = new ObjectArrayTable<>(Subject.class);
         assertNull(table.findFirstByProperty("id", 0));
     }
 
     @Test
     public void findListBySingleProperty() throws Exception {
-        ObjectTable<Subject> table = generateFullTable();
+        ObjectArrayTable<Subject> table = generateFullTable();
 
         assertEquals(6, table.findAllByProperty("credit", 0).size());
     }
 
     @Test
     public void findEmptyBySingleProperty() throws Exception {
-        ObjectTable<Subject> table = new ObjectTable<>(Subject.class);
+        ObjectArrayTable<Subject> table = new ObjectArrayTable<>(Subject.class);
         assertTrue(table.findAllByProperty("id", 0).isEmpty());
     }
 
     @Test
     public void checkTupleIsExistByValue() throws Exception {
-        ObjectTable<Subject> table = generateFullTable();
+        ObjectArrayTable<Subject> table = generateFullTable();
         assertTrue(table.existByProperty("credit", 0));
     }
 
     @Test
     public void findSiblingValueByProperty() throws Exception {
-        ObjectTable<Subject> table = generateFullTable();
+        ObjectArrayTable<Subject> table = generateFullTable();
         assertEquals(0, table.findSiblingValueByProperty("id", 3, "credit"));
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void removeObjectFromNonexistentIndex() throws Exception {
-        ObjectTable<Subject> table = new ObjectTable<>(Subject.class);
+        ObjectArrayTable<Subject> table = new ObjectArrayTable<>(Subject.class);
         Subject subject = new Subject();
 
         for (int i = 0; i < 2; i++) {
@@ -110,13 +110,13 @@ public class ObjectTableTest {
 
     @Test(expected = NoSuchPropertyException.class)
     public void findObjectByNonexistentProperty() throws Exception {
-        ObjectTable<Subject> table = generateFullTable();
+        ObjectArrayTable<Subject> table = generateFullTable();
         table.findFirstByProperty("createTime", 20180929);
     }
 
     @Test
     public void clearTable() throws Exception {
-        ObjectTable<Subject> table = new ObjectTable<>(Subject.class);
+        ObjectArrayTable<Subject> table = new ObjectArrayTable<>(Subject.class);
         Subject subject;
 
         for (int i = 0; i < table.capacity(); i++) {
@@ -131,8 +131,8 @@ public class ObjectTableTest {
         assertEquals(0, table.size());
     }
 
-    private ObjectTable<Subject> generateFullTable() throws Exception {
-        ObjectTable<Subject> table = new ObjectTable<>(Subject.class);
+    private ObjectArrayTable<Subject> generateFullTable() throws Exception {
+        ObjectArrayTable<Subject> table = new ObjectArrayTable<>(Subject.class);
         Subject subject;
 
         for (int i = 0; i < table.capacity(); i++) {

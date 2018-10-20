@@ -2,15 +2,11 @@ package com.vincent.acnt;
 
 import android.app.Application;
 import android.content.res.Resources;
-import android.util.ArrayMap;
-import android.util.LongSparseArray;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.vincent.acnt.data.Constant;
-import com.vincent.acnt.data.ObjectTable;
-import com.vincent.acnt.data.ObjectTable2;
+import com.vincent.acnt.data.ObjectMapTable;
 import com.vincent.acnt.entity.Book;
 import com.vincent.acnt.entity.Entry;
 import com.vincent.acnt.entity.Subject;
@@ -18,8 +14,6 @@ import com.vincent.acnt.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class MyApp extends Application {
     public static Resources res;
@@ -29,7 +23,7 @@ public class MyApp extends Application {
     public static User user;
     public static Book browsingBook;
 
-    public static ObjectTable2<Long, Subject> subjectTable = new ObjectTable2<>(Subject.class, "id");
+    public static ObjectMapTable<Long, Subject> subjectTable = new ObjectMapTable<>(Subject.class, "id");
     public static List<Entry> thisMonthEntries = new ArrayList<>(64);
 
     @Override

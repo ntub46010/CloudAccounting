@@ -23,6 +23,7 @@ import com.vincent.acnt.data.Utility;
 import com.vincent.acnt.data.Verifier;
 import com.vincent.acnt.entity.RegisterProvider;
 import com.vincent.acnt.entity.User;
+import com.vincent.acnt.entity.UserProfileRequest;
 
 public class SettingsActivity extends AppCompatActivity {
     private Context context;
@@ -90,9 +91,10 @@ public class SettingsActivity extends AppCompatActivity {
 
                 dlgWaiting.show();
 
-                UpdateProfileRequest request = generateUpdateRequest();
+                UserProfileRequest request = generateUpdateRequest();
                 if (MyApp.user.getRegisterProvider().equals(RegisterProvider.EMAIL.getProvider())) {
                     if (Utility.isEmptyString(request.getOldPwd())) {
+                        isNotValid(request);
                         tilPwd1.setError("請輸入原密碼");
                         dlgWaiting.dismiss();
                         return;
@@ -100,7 +102,11 @@ public class SettingsActivity extends AppCompatActivity {
 
                     processRequest(request);
                 } else {
-                    updateProfile(request);
+                    if (isNotValid(request)) {
+                        dlgWaiting.dismiss();
+                    } else {
+                        updateProfile(request);
+                    }
                 }
             }
         });
@@ -108,41 +114,30 @@ public class SettingsActivity extends AppCompatActivity {
         dlgWaiting = Utility.getWaitingDialog(context);
     }
 
-    private UpdateProfileRequest generateUpdateRequest() {
-        String nickName = edtNickName.getText().toString();
-        String pwd1 = edtPwd1.getText().toString();
-        String pwd2 = edtPwd2.getText().toString();
-        String pwd3 = edtPwd3.getText().toString();
-
-        UpdateProfileRequest request = new UpdateProfileRequest();
-        request.setNickName(nickName);
-        request.setOldPwd(pwd1);
-        request.setNewPwd(pwd2);
-        request.setNewPwdConfirm(pwd3);
+    private UserProfileRequest generateUpdateRequest() {
+        UserProfileRequest request = new UserProfileRequest();
+        request.setNickName(edtNickName.getText().toString());
+        request.setEmail(edtEmail.getText().toString());
+        request.setOldPwd(edtPwd1.getText().toString());
+        request.setNewPwd(edtPwd2.getText().toString());
+        request.setNewPwdConfirm(edtPwd3.getText().toString());
 
         return request;
     }
 
-    private void processRequest(final UpdateProfileRequest request) {
+    private void processRequest(final UserProfileRequest request) {
         MyApp.mAuth.signInWithEmailAndPassword(MyApp.user.getEmail(), request.getOldPwd())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
                             tilPwd1.setError("原密碼不正確");
+                            isNotValid(request);
+                            dlgWaiting.dismiss();
+                            return;
                         }
 
-                        Verifier v = new Verifier(context);
-                        String newPwd = request.getNewPwd();
-                        String newPwdConfirm = request.getNewPwdConfirm();
-
-                        tilNickName.setError(v.chkNickName(request.getNickName()));
-                        if (!Utility.isEmptyString(newPwd) || !Utility.isEmptyString(newPwdConfirm)) {
-                            tilPwd2.setError(v.chkPassword(newPwd));
-                            tilPwd3.setError(v.chkPasswordEqual(newPwd, newPwdConfirm));
-                        }
-
-                        if (isNotValid()) {
+                        if (isNotValid(request)) {
                             dlgWaiting.dismiss();
                         } else {
                             updateProfile(request);
@@ -151,11 +146,12 @@ public class SettingsActivity extends AppCompatActivity {
                 });
     }
 
-    private boolean isNotValid() {
-        return tilNickName.getError() != null || tilPwd1.getError() != null || tilPwd2.getError() != null || tilPwd3.getError() != null;
+    private boolean isNotValid(UserProfileRequest request) {
+        Verifier v = new Verifier(context);
+        return v.verifyUserProfile(request, tilNickName, tilEmail, tilPwd1, tilPwd2, tilPwd3);
     }
 
-    private void updateProfile(final UpdateProfileRequest request) {
+    private void updateProfile(final UserProfileRequest request) {
         User user = MyApp.user;
 
         if (!Utility.isEmptyString(request.getNewPwd()) || !Utility.isEmptyString(request.getNewPwdConfirm())) {
@@ -186,7 +182,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    private void updatePassword(UpdateProfileRequest request) {
+    private void updatePassword(UserProfileRequest request) {
         MyApp.mAuth.getCurrentUser()
                 .updatePassword(request.getNewPwd())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -197,45 +193,5 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    private class UpdateProfileRequest {
-        private String nickName, oldPwd, newPwd, newPwdConfirm;
-
-        public UpdateProfileRequest() {
-
-        }
-
-        public String getNickName() {
-            return nickName;
-        }
-
-        public void setNickName(String nickName) {
-            this.nickName = nickName;
-        }
-
-        public String getOldPwd() {
-            return oldPwd;
-        }
-
-        public void setOldPwd(String oldPwd) {
-            this.oldPwd = oldPwd;
-        }
-
-        public String getNewPwd() {
-            return newPwd;
-        }
-
-        public void setNewPwd(String newPwd) {
-            this.newPwd = newPwd;
-        }
-
-        public String getNewPwdConfirm() {
-            return newPwdConfirm;
-        }
-
-        public void setNewPwdConfirm(String newPwdConfirm) {
-            this.newPwdConfirm = newPwdConfirm;
-        }
     }
 }

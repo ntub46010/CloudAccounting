@@ -146,9 +146,12 @@ public class SubjectEditActivity extends AppCompatActivity {
     }
 
     private boolean isNotValid(Subject subject) {
-        StringBuilder errMsg = new StringBuilder(64);
+        //StringBuilder errMsg = new StringBuilder(64);
         Verifier v = new Verifier(context);
 
+        String errMsg = v.verifySubject(subject, MyApp.subjectTable, bundle.getInt(Constant.KEY_MODE));
+
+        /*
         if (subject.getNo().substring(0, 1).equals("0")) {
             errMsg.append("科目類別未選擇\n");
         }
@@ -169,6 +172,7 @@ public class SubjectEditActivity extends AppCompatActivity {
         if (subject.getCredit() != 0 && subject.getDebit() != 0) {
             errMsg.append("只能在借貸其中一方輸入金額\n");
         }
+        */
 
         if (errMsg.length() != 0) {
             Utility.getPlainDialog(context, activityTitle, errMsg.toString()).show();

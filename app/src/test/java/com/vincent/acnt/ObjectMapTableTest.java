@@ -2,7 +2,7 @@ package com.vincent.acnt;
 
 import android.util.NoSuchPropertyException;
 
-import com.vincent.acnt.data.ObjectTable2;
+import com.vincent.acnt.data.ObjectMapTable;
 import com.vincent.acnt.entity.Subject;
 
 import org.junit.Test;
@@ -12,11 +12,11 @@ import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
 
-public class ObjectTable2Test {
+public class ObjectMapTableTest {
 
     @Test
     public void insertObject() throws Exception {
-        ObjectTable2<Long, Subject> table = new ObjectTable2<>(Subject.class, "id");
+        ObjectMapTable<Long, Subject> table = new ObjectMapTable<>(Subject.class, "id");
         Subject subject = new Subject();
         subject.setId(1);
         subject.setNo("101");
@@ -39,7 +39,7 @@ public class ObjectTable2Test {
 
     @Test
     public void removeObject() throws Exception {
-        ObjectTable2<Long, Subject> table = generateFullTable();
+        ObjectMapTable<Long, Subject> table = generateFullTable();
         int originalSize = table.size();
 
         table.remove(0L);
@@ -52,7 +52,7 @@ public class ObjectTable2Test {
 
     @Test
     public void findFirstObjectBySingleProperty() throws Exception {
-        ObjectTable2<Long, Subject> table = generateFullTable();
+        ObjectMapTable<Long, Subject> table = generateFullTable();
 
         assertEquals(2, table.findFirstByProperty("name", "Name of 2").getId());
         assertEquals("Name of 0", table.findFirstByProperty("no", "no. 0").getName());
@@ -62,7 +62,7 @@ public class ObjectTable2Test {
 
     @Test
     public void findListBySingleProperty() throws Exception {
-        ObjectTable2<Long, Subject> table = generateFullTable();
+        ObjectMapTable<Long, Subject> table = generateFullTable();
 
         assertEquals(table.size() / 3 + 1, table.findAllByProperty("credit", 0).size());
         assertEquals(1, table.findAllByProperty("no", "no. 0").size());
@@ -72,7 +72,7 @@ public class ObjectTable2Test {
 
     @Test
     public void findAll() throws Exception {
-        ObjectTable2<Long, Subject> table = generateFullTable();
+        ObjectMapTable<Long, Subject> table = generateFullTable();
 
         List<Subject> subjects = table.findAll();
 
@@ -85,7 +85,7 @@ public class ObjectTable2Test {
 
     @Test
     public void findAllPropertyValues() throws Exception {
-        ObjectTable2<Long, Subject> table = generateFullTable();
+        ObjectMapTable<Long, Subject> table = generateFullTable();
 
         List<String> numbers = (List<String>)(List<?>) table.findAllPropertyValues("no");
 
@@ -98,7 +98,7 @@ public class ObjectTable2Test {
 
     @Test
     public void checkTupleIsExistByValue() throws Exception {
-        ObjectTable2<Long, Subject> table = generateFullTable();
+        ObjectMapTable<Long, Subject> table = generateFullTable();
 
         assertTrue(table.existByProperty("no", "no. 0"));
         assertFalse(table.existByProperty("no", "no. -1"));
@@ -108,7 +108,7 @@ public class ObjectTable2Test {
 
     @Test
     public void findSiblingValueByProperty() throws Exception {
-        ObjectTable2<Long, Subject> table = generateFullTable();
+        ObjectMapTable<Long, Subject> table = generateFullTable();
 
         assertEquals(3, table.findSiblingValueByProperty("id", 3, "id"));
         assertEquals("no. 3", table.findSiblingValueByProperty("id", 3L, "no"));
@@ -118,33 +118,33 @@ public class ObjectTable2Test {
 
     @Test(expected = NoSuchElementException.class)
     public void removeObjectFromNonexistentIndex() throws Exception {
-        ObjectTable2<Long, Subject> table = generateFullTable();
+        ObjectMapTable<Long, Subject> table = generateFullTable();
 
         table.remove(-1L);
     }
 
     @Test(expected = NoSuchPropertyException.class)
     public void findObjectByNonexistentProperty() throws Exception {
-        ObjectTable2<Long, Subject> table = generateFullTable();
+        ObjectMapTable<Long, Subject> table = generateFullTable();
 
         table.findFirstByProperty("createTime", 20180929);
     }
 
     @Test(expected = NoSuchPropertyException.class)
     public void createTableWithNonexistentPrimaryField() throws Exception {
-        ObjectTable2<Long, Subject> table = new ObjectTable2<>(Subject.class, "studentId");
+        ObjectMapTable<Long, Subject> table = new ObjectMapTable<>(Subject.class, "studentId");
     }
 
     @Test
     public void clearTable() throws Exception {
-        ObjectTable2<Long, Subject> table = generateFullTable();
+        ObjectMapTable<Long, Subject> table = generateFullTable();
         table.clear();
 
         assertEquals(0, table.size());
     }
 
-    private ObjectTable2<Long, Subject> generateFullTable() throws Exception {
-        ObjectTable2<Long, Subject> table = new ObjectTable2<>(Subject.class, "id");
+    private ObjectMapTable<Long, Subject> generateFullTable() throws Exception {
+        ObjectMapTable<Long, Subject> table = new ObjectMapTable<>(Subject.class, "id");
         Subject subject;
 
         for (int i = 0; i < 10; i++) {

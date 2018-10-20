@@ -192,6 +192,14 @@ public class EntryEditActivity extends AppCompatActivity {
             return;
         }
 
+        List<Subject> subjects = entry.getSubjects();
+        Subject subject;
+        for (int i = 0, len = subjects.size(); i < len; i++) {
+            subject = subjects.get(i);
+            subject.setId((Long) MyApp.subjectTable.findSiblingValueByProperty(Constant.PRO_NAME, subject.getName(), Constant.PRO_ID));
+            subject.setName(null);
+        }
+
         dlgWaiting.show();
 
         if (bundle.getInt(Constant.KEY_MODE) == Constant.MODE_CREATE) {
@@ -214,6 +222,7 @@ public class EntryEditActivity extends AppCompatActivity {
 
         entry.setMemo(edtMemo.getText().toString());
         entry.setPs(edtPs.getText().toString());
+        entry.setCreator(MyApp.user.getId());
 
         Subject subject;
         for (EntryElementView view : elementViews) {
@@ -245,6 +254,10 @@ public class EntryEditActivity extends AppCompatActivity {
         }
 
         Verifier v = new Verifier(context);
+
+        String errMsg = v.verifyEntry(entry, MyApp.subjectTable);
+
+        /*
         StringBuilder errMsg = new StringBuilder(256);
         StringBuilder unknownSubject = new StringBuilder(256);
 
@@ -252,8 +265,8 @@ public class EntryEditActivity extends AppCompatActivity {
             errMsg.append("日期未輸入\n");
         }
 
-        errMsg.append(v.chkMemo(entry.getMemo()));
-        errMsg.append(v.chkPs(entry.getPs()));
+        errMsg.append(v.checkMemo(entry.getMemo()));
+        errMsg.append(v.checkPs(entry.getPs()));
 
         if (entry.calDifference() != 0) {
             errMsg.append("借貸金額不平衡\n");
@@ -277,6 +290,7 @@ public class EntryEditActivity extends AppCompatActivity {
         if (unknownSubject.length() > 0) {
             errMsg.append("\n以下科目不存在：").append(unknownSubject.toString().substring(0, unknownSubject.length() - 1));
         }
+        */
 
         if (errMsg.length() != 0) {
             Utility.getPlainDialog(context, activityTitle, errMsg.toString()).show();

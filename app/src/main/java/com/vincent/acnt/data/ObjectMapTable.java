@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
  *  K: primary key type
  *  T: tuple type
  */
-public class ObjectTable2<K, T> {
+public class ObjectMapTable<K, T> {
     private Table<K, String, Object> table;
     private String primaryFieldName;
 
@@ -30,7 +30,7 @@ public class ObjectTable2<K, T> {
 
     private String[] ACCEPTED_MUTATOR_METHODS_PREFIX = {"set", "define"};
 
-    public ObjectTable2(Class clz, String primaryFieldName) {
+    public ObjectMapTable(Class clz, String primaryFieldName) {
         table = HashBasedTable.create();
         this.fields = clz.getDeclaredFields();
         this.mapFieldByName = new HashMap<>();
@@ -186,6 +186,10 @@ public class ObjectTable2<K, T> {
 
         for (K primaryKey : mapValueByPrimaryKey.keySet()) {
             if (isValueEqual(mapValueByPrimaryKey.get(primaryKey), expectedValue)) {
+                if (siblingFieldName.equals(primaryFieldName)) {
+                    return primaryKey;
+                }
+
                 return table.get(primaryKey, siblingFieldName);
             }
         }

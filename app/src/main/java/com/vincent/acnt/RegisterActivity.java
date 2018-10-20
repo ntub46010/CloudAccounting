@@ -11,10 +11,10 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.vincent.acnt.data.Constant;
 import com.vincent.acnt.data.Verifier;
 import com.vincent.acnt.entity.RegisterProvider;
 import com.vincent.acnt.entity.User;
+import com.vincent.acnt.entity.UserProfileRequest;
 
 public class RegisterActivity extends RegisterHelper {
     private TextInputLayout tilNickName, tilEmail, tilPwd1, tilPwd2;
@@ -101,13 +101,15 @@ public class RegisterActivity extends RegisterHelper {
     }
 
     private boolean isNotValid(String nickName, String email, String pwd1, String pwd2) {
-        Verifier v = new Verifier(context);
-        tilNickName.setError(v.chkNickName(nickName));
-        tilEmail.setError(v.chkEmail(email));
-        tilPwd1.setError(v.chkPassword(pwd1));
-        tilPwd2.setError(v.chkPasswordEqual(pwd1, pwd2));
+        UserProfileRequest request = new UserProfileRequest();
+        request.setNickName(nickName);
+        request.setEmail(email);
+        request.setNewPwd(pwd1);
+        request.setNewPwdConfirm(pwd2);
 
-        return tilNickName.getError() != null || tilEmail.getError() != null || tilPwd1.getError() != null || tilPwd2.getError() != null;
+        Verifier v = new Verifier(context);
+
+        return v.verifyUserProfile(request, tilNickName, tilEmail, tilPwd1, tilPwd2, null);
     }
 
 }
